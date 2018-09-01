@@ -28,12 +28,17 @@ function preload ()
 {
   this.load.image('ball', 'assets/images/ball.png');
   this.load.image('hook', 'assets/images/hook.png');
+  this.load.image('ground', 'assets/images/ground.png');
 }
 
 function create ()
 {
+
   this.cameras.main.setBackgroundColor('#44BBA4');
   platforms = this.physics.add.staticGroup();
+  var floorX = 0;
+  var floorY = gameHeight;
+  platforms.create(floorX, floorY, 'ground').setScale(40, 2).refreshBody();
 
   hook = this.physics.add.sprite(0, 0, 'hook');
   hook.setScale(0.3);
@@ -43,6 +48,7 @@ function create ()
 
   ball = this.physics.add.sprite(300, 100, 'ball');
   ball.setCollideWorldBounds(true);
+  this.physics.add.collider(ball, platforms);
 }
 
 function update ()
