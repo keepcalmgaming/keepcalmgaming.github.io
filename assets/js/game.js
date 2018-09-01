@@ -78,6 +78,7 @@ function create ()
   ball.setScale(0.3);
   ball.setCircle(120);
   ball.setCollideWorldBounds(false);
+  ball.setBounce(0.1)
 
   this.physics.add.collider(ball, platforms);
   this.physics.add.collider(hook, platforms, onHitWall, null, this);
@@ -119,15 +120,12 @@ function createPlatform(x, y, widthX, widthY) {
 
 function update ()
 {
+    for (var skittle of skittles.getChildren()) {
+      skittle.setFlipX(ball.x > skittle.x)
+    }
+
     hook.setAngle(Phaser.Math.RadToDeg(Phaser.Math.Angle.Between(ball.x, ball.y, hook.x, hook.y))+90);
     graphics.clear();
-
-    if (hook.active) {
-        graphics.beginPath();
-        graphics.moveTo(ball.x, ball.y);
-        graphics.lineTo(hook.x, hook.y);
-        graphics.strokePath();
-    }
 
     if (hook.active) {
         graphics.beginPath();
@@ -148,9 +146,12 @@ function update ()
     }, this);
 
     this.input.on('pointerup', function(pointer) {
+        if (!ball.active) {
+          this.scene.restart();
+        }
         hook.setActive(false);
         hook.setVisible(false);
-    })
+    }, this);
 
     screenWrap(ball);
 }
@@ -184,7 +185,7 @@ function onSkittleHit(hook, skittle) {
   skittle.destroy();
   skittleCount -= 1;
   if (skittleCount <= 0) {
-    ball.scene.add.text(gameWidth/2 - 150, gameHeight/2 - 50, 'YOU WON', { fontFamily: 'Times New Roman', fontSize: 64, color: '#F6BD60' })
+    ball.scene.add.text(gameWidth/2 - 150, gameHeight/2 - 50, 'YOU LIVED', { fontFamily: 'Times New Roman', fontSize: 64, color: '#F6BD60' })
   }
   console.log("Skittle DIED", skittleCount);
 }
