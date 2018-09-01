@@ -26,12 +26,16 @@ var platforms;
 var ball;
 var hook;
 var rope;
+var bullet;
+var bullets;
 
 function preload ()
 {
   this.load.image('ball', 'assets/images/ball.png');
   this.load.image('hook', 'assets/images/hook.png');
   this.load.image('ground', 'assets/images/ground.png');
+  this.load.image('skittle', 'assets/images/skittle.png');
+  this.load.image('bullet', 'assets/images/bullet.png');
 }
 
 function create ()
@@ -75,6 +79,15 @@ function create ()
   this.physics.add.collider(hook, platforms, onHitWall, null, this);
 
   this.physics.world.on('worldbounds', onWorldBounds);
+
+  skittle = this.physics.add.sprite(innerWidth - 200, gameHeight - 200, 'skittle');
+  skittle.setScale(0.3);
+  skittle.setCollideWorldBounds(true);
+
+  bullets = this.physics.add.group();
+  this.physics.add.collider(ball, skittle, onSkittleHit, null, this);
+
+  timedEvent = this.time.addEvent({ delay: 4500, callback: onEvent, callbackScope: this, loop: true });
 }
 
 function createPlatform(x, y, widthX, widthY) {
@@ -97,13 +110,22 @@ function update ()
         graphics.strokePath();
     }
 
+    if (hook.active) {
+        graphics.beginPath();
+        graphics.moveTo(ball.x, ball.y);
+        graphics.lineTo(hook.x, hook.y);
+        graphics.strokePath();
+    }
+
     this.input.on('pointerdown', function (pointer) {
+      if (ball.active) {
         hook.setActive(true);
         hook.setVisible(true);
 
         hook.x = ball.x;
         hook.y = ball.y;
         this.physics.moveTo(hook, pointer.x, pointer.y, 2500);
+      }
     }, this);
 
     this.input.on('pointerup', function(pointer) {
@@ -126,11 +148,26 @@ function onHitWall(hook) {
   grap.call(hook.scene);
 }
 
+function onBallHit(hook) {
+  ball.destroy();
+  ball.setActive(false).setVisible(false);
+  hook.destroy();
+  console.log("YOU DIED");
+}
+
+function onSkittleHit(hook) {
+  skittle.setActive(false).setVisible(false);
+  skittle.destroy();
+  console.log("Skittle DIED");
+}
+
 function grap() {
   console.log('processing grap')
-  hook.setVelocity(0, 0);
-  ball.setVelocity(0, 0);
-  this.physics.moveTo(ball, hook.x, hook.y, 420);
+  if (ball.active) {
+    hook.setVelocity(0, 0);
+    ball.setVelocity(0, 0);
+    this.physics.moveTo(ball, hook.x, hook.y, 420);
+  }
 }
 
 function disableHook() {
@@ -160,4 +197,20 @@ function screenWrap (sprite) {
         sprite.y = 0;
         disableHook();
     }
+}
+
+function onEvent ()
+{
+  if (skittle.active)
+   fireBullet (skittle)
+}
+
+function fireBullet (skittle) {
+  if (skittle.active) {
+    bullet = bullets.create(skittle.body.x, skittle.body.y, 'bullet');
+    bullet.setScale(0.3);
+    bullet.body.allowGravity = false;
+    bullet.scene.physics.moveTo(bullet, ball.x, ball.y, 500);
+    bullet.scene.physics.add.collider(ball, bullet, onBallHit);
+  }
 }
