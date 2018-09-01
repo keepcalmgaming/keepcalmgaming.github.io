@@ -29,6 +29,10 @@ var rope;
 var bullet;
 var bullets;
 
+var skittles;
+
+var skittleCount;
+
 function preload ()
 {
   this.load.image('ball', 'assets/images/ball.png');
@@ -80,14 +84,29 @@ function create ()
 
   this.physics.world.on('worldbounds', onWorldBounds);
 
-  skittle = this.physics.add.sprite(innerWidth - 200, gameHeight - 200, 'skittle');
+  skittles = this.physics.add.group();
+  skittleCount = 0;
+
+  createSkittle(gameWidth - 200, gameHeight - 100);
+  createSkittle(halfWidth - 240, 150)
+  createSkittle(gameWidth - 300, gameHeight - 320);
+  createSkittle(150, gameHeight - 100);
+  createSkittle(420, gameHeight - 100);
+
+  this.physics.add.collider(skittles, platforms);
+
+  bullets = this.physics.add.group();
+  this.physics.add.collider(bullets, platforms, onBulletWall, null, this);
+}
+
+function createSkittle(x, y) {
+  var skittle = skittles.create(x, y, 'skittle');
   skittle.setScale(0.3);
   skittle.setCollideWorldBounds(true);
 
-  bullets = this.physics.add.group();
-  this.physics.add.collider(ball, skittle, onSkittleHit, null, this);
-
-  timedEvent = this.time.addEvent({ delay: 4500, callback: onEvent, callbackScope: this, loop: true });
+  skittleCount += 1;
+  skittle.scene.physics.add.collider(ball, skittle, onSkittleHit, null, this);
+  skittle.scene.time.addEvent({ delay: Math.floor(Math.random() * (4500 - 2000 + 1) ) + 3000, callback: onEvent, callbackScope: skittle, loop: true });
 }
 
 function createPlatform(x, y, widthX, widthY) {
@@ -148,21 +167,29 @@ function onHitWall(hook) {
   grap.call(hook.scene);
 }
 
+function onBulletWall(bullet) {
+  bullet.destroy();
+}
+
 function onBallHit(hook) {
+  ball.scene.add.text(gameWidth/2 - 150, gameHeight/2 - 50, 'YOU DIED', { fontFamily: 'Times New Roman', fontSize: 64, color: '#4C191B' })
   ball.destroy();
   ball.setActive(false).setVisible(false);
   hook.destroy();
   console.log("YOU DIED");
 }
 
-function onSkittleHit(hook) {
+function onSkittleHit(hook, skittle) {
   skittle.setActive(false).setVisible(false);
   skittle.destroy();
-  console.log("Skittle DIED");
+  skittleCount -= 1;
+  if (skittleCount <= 0) {
+    ball.scene.add.text(gameWidth/2 - 150, gameHeight/2 - 50, 'YOU WON', { fontFamily: 'Times New Roman', fontSize: 64, color: '#F6BD60' })
+  }
+  console.log("Skittle DIED", skittleCount);
 }
 
 function grap() {
-  console.log('processing grap')
   if (ball.active) {
     hook.setVelocity(0, 0);
     ball.setVelocity(0, 0);
@@ -201,8 +228,8 @@ function screenWrap (sprite) {
 
 function onEvent ()
 {
-  if (skittle.active)
-   fireBullet (skittle)
+  if (this.active)
+   fireBullet (this)
 }
 
 function fireBullet (skittle) {
@@ -210,7 +237,7 @@ function fireBullet (skittle) {
     bullet = bullets.create(skittle.body.x, skittle.body.y, 'bullet');
     bullet.setScale(0.3);
     bullet.body.allowGravity = false;
-    bullet.scene.physics.moveTo(bullet, ball.x, ball.y, 500);
+    bullet.scene.physics.moveTo(bullet, ball.x, ball.y, 200);
     bullet.scene.physics.add.collider(ball, bullet, onBallHit);
   }
 }
