@@ -14,15 +14,18 @@ var config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 300 },
-            debug: true
+            debug: false
         }
     }
 };
 
 var game = new Phaser.Game(config);
+var graphics;
+
 var platforms;
 var ball;
 var hook;
+var rope;
 
 function preload ()
 {
@@ -40,20 +43,35 @@ function create ()
   var floorY = gameHeight;
   platforms.create(floorX, floorY, 'ground').setScale(40, 2).refreshBody();
 
+  graphics = this.add.graphics({ lineStyle: { width: 4, color: 0xF6F7EB } });
+
   hook = this.physics.add.sprite(0, 0, 'hook');
   hook.setScale(0.3);
   hook.body.allowGravity = false;
   hook.setActive(false);
   hook.setVisible(false);
+  hook.setCollideWorldBounds(true);
+  hook.body.onWorldBounds = true;
 
   ball = this.physics.add.sprite(300, 100, 'ball');
   ball.setCollideWorldBounds(true);
+
   this.physics.add.collider(ball, platforms);
+
+  this.physics.world.on('worldbounds', onWorldBounds);
 }
 
 function update ()
 {
-    var that = this;
+    hook.setAngle(Phaser.Math.RadToDeg(Phaser.Math.Angle.Between(ball.x, ball.y, hook.x, hook.y))+90);
+    graphics.clear();
+
+    if (hook.active) {
+        graphics.beginPath();
+        graphics.moveTo(ball.x, ball.y);
+        graphics.lineTo(hook.x, hook.y);
+        graphics.strokePath();
+    }
 
     this.input.on('pointerdown', function (pointer) {
         hook.setActive(true);
@@ -61,7 +79,7 @@ function update ()
 
         hook.x = ball.x;
         hook.y = ball.y;
-        that.physics.moveTo(hook, pointer.x, pointer.y, 840);
+        this.physics.moveTo(hook, pointer.x, pointer.y, 840);
     }, this);
 
     this.input.on('pointerup', function(pointer) {
@@ -70,7 +88,20 @@ function update ()
     })
 
     screenWrap(ball);
-    screenWrap(hook);
+}
+
+function onWorldBounds(body) {
+  if (body.gameObject == hook) {
+    if (hook.active) {
+      grap.call(body.gameObject.scene);
+    }
+  }
+}
+
+function grap() {
+  hook.setVelocity(0, 0);
+  ball.setVelocity(0, 0);
+  this.physics.moveTo(ball, hook.x, hook.y, 420);
 }
 
 function screenWrap (sprite) {
@@ -91,5 +122,4 @@ function screenWrap (sprite) {
     {
         sprite.y = 0;
     }
-
 }
