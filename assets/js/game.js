@@ -58,6 +58,7 @@ function create ()
   ball.setCollideWorldBounds(false);
 
   this.physics.add.collider(ball, platforms);
+  this.physics.add.collider(hook, platforms, onHitWall, null, this);
 
   this.physics.world.on('worldbounds', onWorldBounds);
 }
@@ -97,6 +98,10 @@ function onWorldBounds(body) {
       grap.call(body.gameObject.scene);
     }
   }
+}
+
+function onHitWall(hook) {
+  grap.call(hook.scene);
 }
 
 function grap() {
