@@ -1,7 +1,10 @@
+var gameHeight = window.innerHeight;
+var gameWidth = window.innerWidth;
+
 var config = {
     type: Phaser.AUTO,
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: gameWidth,
+    height: gameHeight,
     scene: {
         preload: preload,
         create: create,
@@ -54,4 +57,28 @@ function update ()
         hook.setActive(false);
         hook.setVisible(false);
     })
+
+    screenWrap(ball);
+}
+
+function screenWrap (sprite) {
+
+    if (sprite.x < 0)
+    {
+        sprite.x = gameWidth;
+    }
+    else if (sprite.x > gameWidth)
+    {
+        sprite.x = 0;
+    }
+
+    if (sprite.y < 0)
+    {
+        sprite.y = gameHeight;
+    }
+    else if (sprite.y > gameHeight)
+    {
+        sprite.y = 0;
+    }
+
 }
