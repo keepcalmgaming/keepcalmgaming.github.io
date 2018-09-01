@@ -39,13 +39,26 @@ function create ()
 
   this.cameras.main.setBackgroundColor('#44BBA4');
   platforms = this.physics.add.staticGroup();
-  var floorX = 0;
-  var floorY = gameHeight;
-  platforms.create(floorX, floorY, 'ground').setScale(40, 2).refreshBody();
+
+  var halfWidth = gameWidth / 2;
+  var halfHeight = gameHeight / 2;
+  createPlatform(0, gameHeight, halfWidth - 100, 40);
+  createPlatform(halfWidth + 100, gameHeight, halfWidth - 100, 40);
+  createPlatform(0, 40, halfWidth - 100, 40);
+  createPlatform(halfWidth + 100, 40, halfWidth - 100, 40);
+
+  createPlatform(halfWidth - 280, 300, 80, 80);
+  createPlatform(halfWidth + 200, 300, 80, 80);
+
+  createPlatform(0, halfHeight + 150, 40, 300);
+  createPlatform(gameWidth - 40, halfHeight + 150, 40, 300);
+  createPlatform(0, halfHeight + 150, 400, 40);
+  createPlatform(gameWidth - 400, halfHeight + 150, 400, 40);
+
 
   graphics = this.add.graphics({ lineStyle: { width: 4, color: 0xF6F7EB } });
 
-  hook = this.physics.add.sprite(0, 0, 'hook');
+  hook = this.physics.add.sprite(300, gameHeight - 300, 'hook');
   hook.setScale(0.3);
   hook.body.allowGravity = false;
   hook.setActive(false);
@@ -53,14 +66,23 @@ function create ()
   hook.setCollideWorldBounds(true);
   hook.body.onWorldBounds = true;
 
-  ball = this.physics.add.sprite(300, 100, 'ball');
+  ball = this.physics.add.image(300, gameHeight - 300, 'ball');
   ball.setScale(0.3);
+  ball.setCircle(120);
   ball.setCollideWorldBounds(false);
 
   this.physics.add.collider(ball, platforms);
   this.physics.add.collider(hook, platforms, onHitWall, null, this);
 
   this.physics.world.on('worldbounds', onWorldBounds);
+}
+
+function createPlatform(x, y, widthX, widthY) {
+  var scaleX = widthX / 40;
+  var scaleY = widthY / 40;
+  var platform = platforms.create(x, y, 'ground').setScale(scaleX, scaleY);
+  platform.setOrigin(0, 1);
+  platform.refreshBody();
 }
 
 function update ()
