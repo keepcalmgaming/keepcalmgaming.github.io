@@ -13,10 +13,12 @@ var game = new Phaser.Game(config);
 
 function preload ()
 {
+  this.load.spritesheet('ball', 'assets/images/ball.png', { frameWidth: 32, frameHeight: 48 });
 }
 
 function create ()
 {
+  this.cameras.main.setBackgroundColor('#ffffff');
 }
 
 function update ()
