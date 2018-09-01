@@ -54,7 +54,8 @@ function create ()
   hook.body.onWorldBounds = true;
 
   ball = this.physics.add.sprite(300, 100, 'ball');
-  ball.setCollideWorldBounds(true);
+  ball.setScale(0.3);
+  ball.setCollideWorldBounds(false);
 
   this.physics.add.collider(ball, platforms);
 
@@ -79,7 +80,7 @@ function update ()
 
         hook.x = ball.x;
         hook.y = ball.y;
-        this.physics.moveTo(hook, pointer.x, pointer.y, 840);
+        this.physics.moveTo(hook, pointer.x, pointer.y, 2500);
     }, this);
 
     this.input.on('pointerup', function(pointer) {
@@ -99,27 +100,37 @@ function onWorldBounds(body) {
 }
 
 function grap() {
+  console.log('processing grap')
   hook.setVelocity(0, 0);
   ball.setVelocity(0, 0);
   this.physics.moveTo(ball, hook.x, hook.y, 420);
+}
+
+function disableHook() {
+  hook.setActive(false);
+  hook.setVisible(false);
 }
 
 function screenWrap (sprite) {
     if (sprite.x < 0)
     {
         sprite.x = gameWidth;
+        disableHook();
     }
     else if (sprite.x > gameWidth)
     {
         sprite.x = 0;
+        disableHook();
     }
 
     if (sprite.y < 0)
     {
         sprite.y = gameHeight;
+        disableHook();
     }
     else if (sprite.y > gameHeight)
     {
         sprite.y = 0;
+        disableHook();
     }
 }
