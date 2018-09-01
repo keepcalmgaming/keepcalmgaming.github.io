@@ -45,9 +45,13 @@ function create ()
   hook.body.allowGravity = false;
   hook.setActive(false);
   hook.setVisible(false);
+  hook.setCollideWorldBounds(true);
+  hook.body.onWorldBounds = true;
 
   ball = this.physics.add.sprite(300, 100, 'ball');
   ball.setCollideWorldBounds(true);
+
+  this.physics.world.on('worldbounds', onWorldBounds);
 }
 
 function update ()
@@ -77,6 +81,20 @@ function update ()
     })
 
     screenWrap(ball);
+}
+
+function onWorldBounds(body) {
+  if (body.gameObject == hook) {
+    if (hook.active) {
+      grap.call(body.gameObject.scene);
+    }
+  }
+}
+
+function grap() {
+  hook.setVelocity(0, 0);
+  ball.setVelocity(0, 0);
+  this.physics.moveTo(ball, hook.x, hook.y, 420);
 }
 
 function screenWrap (sprite) {
