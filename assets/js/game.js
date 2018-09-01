@@ -14,15 +14,18 @@ var config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 300 },
-            debug: true
+            debug: false
         }
     }
 };
 
 var game = new Phaser.Game(config);
+var graphics;
+
 var platforms;
 var ball;
 var hook;
+var rope;
 
 function preload ()
 {
@@ -34,6 +37,8 @@ function create ()
 {
   this.cameras.main.setBackgroundColor('#44BBA4');
   platforms = this.physics.add.staticGroup();
+
+  graphics = this.add.graphics({ lineStyle: { width: 4, color: 0xF6F7EB } });
 
   hook = this.physics.add.sprite(0, 0, 'hook');
   hook.setScale(0.3);
@@ -47,7 +52,15 @@ function create ()
 
 function update ()
 {
-    var that = this;
+    hook.setAngle(Phaser.Math.RadToDeg(Phaser.Math.Angle.Between(ball.x, ball.y, hook.x, hook.y))+90);
+    graphics.clear();
+
+    if (hook.active) {
+        graphics.beginPath();
+        graphics.moveTo(ball.x, ball.y);
+        graphics.lineTo(hook.x, hook.y);
+        graphics.strokePath();
+    }
 
     this.input.on('pointerdown', function (pointer) {
         hook.setActive(true);
@@ -55,7 +68,7 @@ function update ()
 
         hook.x = ball.x;
         hook.y = ball.y;
-        that.physics.moveTo(hook, pointer.x, pointer.y, 840);
+        this.physics.moveTo(hook, pointer.x, pointer.y, 840);
     }, this);
 
     this.input.on('pointerup', function(pointer) {
@@ -64,7 +77,6 @@ function update ()
     })
 
     screenWrap(ball);
-    screenWrap(hook);
 }
 
 function screenWrap (sprite) {
@@ -85,5 +97,4 @@ function screenWrap (sprite) {
     {
         sprite.y = 0;
     }
-
 }
