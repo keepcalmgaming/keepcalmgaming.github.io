@@ -34,23 +34,28 @@ function create ()
 {
   this.cameras.main.setBackgroundColor('#44BBA4');
   platforms = this.physics.add.staticGroup();
-  ball = this.physics.add.sprite(300, 500, 'ball');
-  ball.setCollideWorldBounds(true);
 
   hook = this.physics.add.sprite(0, 0, 'hook');
   hook.setScale(0.3);
   hook.body.allowGravity = false;
   hook.setActive(false);
   hook.setVisible(false);
+
+  ball = this.physics.add.sprite(300, 100, 'ball');
+  ball.setCollideWorldBounds(true);
 }
 
 function update ()
 {
+    var that = this;
+
     this.input.on('pointerdown', function (pointer) {
         hook.setActive(true);
         hook.setVisible(true);
-        hook.x = pointer.x;
-        hook.y = pointer.y;
+
+        hook.x = ball.x;
+        hook.y = ball.y;
+        that.physics.moveTo(hook, pointer.x, pointer.y, 840);
     }, this);
 
     this.input.on('pointerup', function(pointer) {
@@ -59,10 +64,10 @@ function update ()
     })
 
     screenWrap(ball);
+    screenWrap(hook);
 }
 
 function screenWrap (sprite) {
-
     if (sprite.x < 0)
     {
         sprite.x = gameWidth;
