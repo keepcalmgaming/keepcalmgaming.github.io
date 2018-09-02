@@ -1,5 +1,9 @@
 var gameHeight = window.innerHeight;
 var gameWidth = window.innerWidth;
+var halfWidth = gameWidth / 2;
+var halfHeight = gameHeight / 2;
+
+var debug = false;
 
 var config = {
     type: Phaser.AUTO,
@@ -14,7 +18,7 @@ var config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 300 },
-            debug: false
+            debug: debug
         }
     }
 };
@@ -31,7 +35,20 @@ var bullets;
 
 var skittles;
 
-var skittleCount;
+var GS;
+
+function initGameState() {
+  GS = {
+    skittleCount: 0,
+    hookGrapped: false,
+  }
+}
+
+function log() {
+  if (debug) {
+    console.log.apply(null, arguments);
+  }
+}
 
 function preload ()
 {
@@ -42,27 +59,40 @@ function preload ()
   this.load.image('bullet', 'assets/images/bullet.png');
 }
 
+var level = {
+  platforms: [
+    [0, gameHeight, halfWidth - 100, 40],
+    [halfWidth + 100, gameHeight, halfWidth - 100, 40],
+    [0, 40, halfWidth - 100, 40],
+    [halfWidth + 100, 40, halfWidth - 100, 40],
+
+    [halfWidth - 280, 300, 80, 80],
+    [halfWidth + 200, 300, 80, 80],
+
+    [0, halfHeight + 150, 40, 300],
+    [gameWidth - 40, halfHeight + 150, 40, 300],
+    [0, halfHeight + 150, 400, 40],
+    [gameWidth - 400, halfHeight + 150, 400, 40]
+  ],
+  enemies: [
+    [gameWidth - 200, gameHeight - 100],
+    [halfWidth - 240, 150],
+    [gameWidth - 300, gameHeight - 320],
+    [150, gameHeight - 100],
+    [420, gameHeight - 100]
+  ]
+};
+
 function create ()
 {
+  initGameState();
 
   this.cameras.main.setBackgroundColor('#44BBA4');
   platforms = this.physics.add.staticGroup();
 
-  var halfWidth = gameWidth / 2;
-  var halfHeight = gameHeight / 2;
-  createPlatform(0, gameHeight, halfWidth - 100, 40);
-  createPlatform(halfWidth + 100, gameHeight, halfWidth - 100, 40);
-  createPlatform(0, 40, halfWidth - 100, 40);
-  createPlatform(halfWidth + 100, 40, halfWidth - 100, 40);
-
-  createPlatform(halfWidth - 280, 300, 80, 80);
-  createPlatform(halfWidth + 200, 300, 80, 80);
-
-  createPlatform(0, halfHeight + 150, 40, 300);
-  createPlatform(gameWidth - 40, halfHeight + 150, 40, 300);
-  createPlatform(0, halfHeight + 150, 400, 40);
-  createPlatform(gameWidth - 400, halfHeight + 150, 400, 40);
-
+  for (var p of level.platforms) {
+    createPlatform(p[0], p[1], p[2], p[3]);
+  }
 
   graphics = this.add.graphics({ lineStyle: { width: 4, color: 0xF6F7EB } });
 
@@ -78,21 +108,21 @@ function create ()
   ball.setScale(0.3);
   ball.setCircle(120);
   ball.setCollideWorldBounds(false);
-  ball.setBounce(0.1)
+  ball.setBounce(0.1);
+  ball.body.stopVelocityOnCollide = false;
+  ball.setMass(2);
 
-  this.physics.add.collider(ball, platforms);
+  this.physics.add.collider(ball, platforms, onBallWall, null, this);
   this.physics.add.collider(hook, platforms, onHitWall, null, this);
 
   this.physics.world.on('worldbounds', onWorldBounds);
 
   skittles = this.physics.add.group();
-  skittleCount = 0;
+  GS.skittleCount = 0;
 
-  createSkittle(gameWidth - 200, gameHeight - 100);
-  createSkittle(halfWidth - 240, 150)
-  createSkittle(gameWidth - 300, gameHeight - 320);
-  createSkittle(150, gameHeight - 100);
-  createSkittle(420, gameHeight - 100);
+  for (var s of level.enemies) {
+    createSkittle(s[0], s[1]);
+  }
 
   this.physics.add.collider(skittles, platforms);
 
@@ -105,7 +135,7 @@ function createSkittle(x, y) {
   skittle.setScale(0.3);
   skittle.setCollideWorldBounds(true);
 
-  skittleCount += 1;
+  GS.skittleCount += 1;
   skittle.scene.physics.add.collider(ball, skittle, onSkittleHit, null, this);
   skittle.scene.time.addEvent({ delay: Math.floor(Math.random() * (4500 - 2000 + 1) ) + 3000, callback: onEvent, callbackScope: skittle, loop: true });
 }
@@ -115,6 +145,8 @@ function createPlatform(x, y, widthX, widthY) {
   var scaleY = widthY / 40;
   var platform = platforms.create(x, y, 'ground').setScale(scaleX, scaleY);
   platform.setOrigin(0, 1);
+  // platform.setFrictionX(0);
+  // platform.setFrictionY(0);
   platform.refreshBody();
 }
 
@@ -136,6 +168,7 @@ function update ()
 
     this.input.on('pointerdown', function (pointer) {
       if (ball.active) {
+        GS.hookGrapped = false;
         hook.setActive(true);
         hook.setVisible(true);
 
@@ -149,8 +182,9 @@ function update ()
         if (!ball.active) {
           this.scene.restart();
         }
-        hook.setActive(false);
-        hook.setVisible(false);
+        if (hook.active) {
+          returnHook();
+        }
     }, this);
 
     screenWrap(ball);
@@ -164,7 +198,12 @@ function onWorldBounds(body) {
   }
 }
 
+function onBallWall(ball) {
+  // console.log(ball.body.velocity)
+}
+
 function onHitWall(hook) {
+  console.log('hit wall')
   grap.call(hook.scene);
 }
 
@@ -177,28 +216,31 @@ function onBallHit(hook) {
   ball.destroy();
   ball.setActive(false).setVisible(false);
   hook.destroy();
-  console.log("YOU DIED");
 }
 
 function onSkittleHit(hook, skittle) {
+  if (skittle.active) {
+    GS.skittleCount -= 1;
+  }
   skittle.setActive(false).setVisible(false);
   skittle.destroy();
-  skittleCount -= 1;
-  if (skittleCount <= 0) {
+  if (GS.skittleCount <= 0) {
     ball.scene.add.text(gameWidth/2 - 150, gameHeight/2 - 50, 'YOU LIVED', { fontFamily: 'Times New Roman', fontSize: 64, color: '#F6BD60' })
   }
-  console.log("Skittle DIED", skittleCount);
 }
 
 function grap() {
-  if (ball.active) {
+  log('grapping', ball.active, GS.hookGrapped)
+  if (ball.active && !GS.hookGrapped) {
+    GS.hookGrapped = true;
     hook.setVelocity(0, 0);
     ball.setVelocity(0, 0);
-    this.physics.moveTo(ball, hook.x, hook.y, 420);
+    this.physics.moveTo(ball, hook.x, hook.y, 300);
   }
 }
 
-function disableHook() {
+function returnHook() {
+  log('returning hook')
   hook.setActive(false);
   hook.setVisible(false);
 }
@@ -207,23 +249,23 @@ function screenWrap (sprite) {
     if (sprite.x < 0)
     {
         sprite.x = gameWidth;
-        disableHook();
+        returnHook();
     }
     else if (sprite.x > gameWidth)
     {
         sprite.x = 0;
-        disableHook();
+        returnHook();
     }
 
     if (sprite.y < 0)
     {
         sprite.y = gameHeight;
-        disableHook();
+        returnHook();
     }
     else if (sprite.y > gameHeight)
     {
         sprite.y = 0;
-        disableHook();
+        returnHook();
     }
 }
 
