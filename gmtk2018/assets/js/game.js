@@ -21,6 +21,8 @@ function initGameState() {
   GS = {
     skittleCount: 0,
     hookGrapped: false,
+    waitingDown: false,
+    hookDistance: 0
   }
 }
 
@@ -40,15 +42,18 @@ var level = {
     [halfWidth - 280, 300, 80, 80],
     [halfWidth + 200, 300, 80, 80],
 
-    [0, halfHeight + 150, 30, 300],
-    [gameWidth - 30, halfHeight + 150, 30, 300],
-    [0, halfHeight + 150, 400, 30],
-    [gameWidth - 400, halfHeight + 150, 400, 30]
+    [0, halfHeight + 130, 30, 300],
+    [gameWidth - 30, halfHeight + 130, 30, 300],
+    [0, halfHeight + 130, 400, 30],
+    [gameWidth - 400, halfHeight + 130, 400, 30]
   ],
   enemies: [
+    [120, halfHeight],
     [gameWidth - 200, gameHeight - 100],
     [halfWidth - 240, 150],
+    [halfWidth + 240, 150],
     [gameWidth - 300, gameHeight - 320],
+    [gameWidth - 70, gameHeight - 320],
     [150, gameHeight - 100],
     [420, gameHeight - 100]
   ],
@@ -150,6 +155,27 @@ GameScene = {
       }, this);
 
       screenWrap(ball);
+
+      if (ball.active && GS.waitingDown) {
+        if (ball.body.velocity.y > 0) {
+          GS.waitingDown = false;
+          GS.hookDistance = Phaser.Math.Distance.Between(ball.x, ball.y, hook.x, hook.y);
+        }
+      }
+
+      if (hook.active && GS.hookGrapped && !GS.waitingDown) {
+        var distance = Phaser.Math.Distance.Between(ball.x, ball.y, hook.x, hook.y);
+        if (distance > GS.hookDistance) {
+          var curve = new Phaser.Curves.Line(new Phaser.Math.Vector2(hook.x, hook.y), new Phaser.Math.Vector2(ball.x, ball.y));
+          //  Get the t value for 200 pixels along the curve
+          var t = curve.getTFromDistance(GS.hookDistance);
+
+          //  Get the point at t
+          var p = curve.getPoint(t);
+          ball.x = p.x;
+          ball.y = p.y;
+        }
+      }
   }
 }
 
@@ -224,9 +250,12 @@ function grap() {
   log('grapping', ball.active, GS.hookGrapped)
   if (ball.active && !GS.hookGrapped) {
     GS.hookGrapped = true;
+    GS.waitingDown = true;
     hook.setVelocity(0, 0);
     ball.setVelocity(0, 0);
-    this.physics.moveTo(ball, hook.x, hook.y, 300);
+    var distance = Phaser.Math.Distance.Between(ball.x, ball.y, hook.x, hook.y)
+    // console.log(distance)
+    this.physics.moveTo(ball, hook.x, hook.y, 420 + distance/20);
   }
 }
 
