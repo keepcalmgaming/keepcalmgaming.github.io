@@ -6,7 +6,7 @@ const gameWidth = window.innerWidth
 const halfWidth = gameWidth / 2
 const halfHeight = gameHeight / 2
 
-const debug = true
+const debug = false
 const minSide = 10
 
 type Cell = {
@@ -20,14 +20,11 @@ type Position = {
 }
 
 export class MainScene extends Phaser.Scene {
-    // private isVertical: boolean
     private rectSize: number
     private cellH: number
     private cellW: number
     private x: number
     private y: number
-
-    private objects: any
 
     private towergame: Game
 
@@ -78,6 +75,8 @@ export class MainScene extends Phaser.Scene {
     private tower?: Phaser.GameObjects.Sprite
     private towerSpawns?: Phaser.GameObjects.Sprite[]
 
+    private textLives?: Phaser.GameObjects.Text
+
     create() {
         let field: Phaser.GameObjects.Graphics = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0x000000 }})
 
@@ -87,6 +86,8 @@ export class MainScene extends Phaser.Scene {
         this.setupTower()
 
         this.drawSpawns()
+
+        this.setupText()
 
         if (debug) {
             this.debugDrawGrid()
@@ -140,8 +141,6 @@ export class MainScene extends Phaser.Scene {
                 this.tower.y = sprite.y
             })
 
-            console.log(sprite.eventNames)
-
             this.towerSpawns.push(sprite)
         }
     }
@@ -160,6 +159,10 @@ export class MainScene extends Phaser.Scene {
             sprite.x = position.x
             sprite.y = position.y
         }
+    }
+
+    setupText() {
+        this.textLives = this.add.text(20, 20, `LIVES: ${this.towergame.lives}`, { fontFamily: 'Verdana', fontSize: 20, color: '#4C191B', align: 'center' })
     }
 
     mainframeCoords(): Cell {

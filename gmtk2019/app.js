@@ -72,7 +72,7 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
     const gameWidth = window.innerWidth;
     const halfWidth = gameWidth / 2;
     const halfHeight = gameHeight / 2;
-    const debug = true;
+    const debug = false;
     const minSide = 10;
     class MainScene extends Phaser.Scene {
         constructor(sceneConfig) {
@@ -115,6 +115,7 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
             this.setupTowerSpawns();
             this.setupTower();
             this.drawSpawns();
+            this.setupText();
             if (debug) {
                 this.debugDrawGrid();
             }
@@ -154,7 +155,6 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
                     this.tower.x = sprite.x;
                     this.tower.y = sprite.y;
                 });
-                console.log(sprite.eventNames);
                 this.towerSpawns.push(sprite);
             }
         }
@@ -170,6 +170,9 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
                 sprite.x = position.x;
                 sprite.y = position.y;
             }
+        }
+        setupText() {
+            this.textLives = this.add.text(20, 20, `LIVES: ${this.towergame.lives}`, { fontFamily: 'Verdana', fontSize: 20, color: '#4C191B', align: 'center' });
         }
         mainframeCoords() {
             return {
@@ -204,7 +207,7 @@ define("app", ["require", "exports", "scenes/main"], function (require, exports,
         physics: {
             default: 'arcade',
             arcade: {
-                debug: true
+                debug: false
             }
         },
         scene: [main_1.MainScene]
