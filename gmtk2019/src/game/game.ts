@@ -6,7 +6,7 @@ type Cell = {
 export class Game {
     private LIVES = 20
     private NUM_SPAWNS = 3
-    private NUM_TOWER_SPAWNS = 10
+    private NUM_TOWER_SPAWNS = 7
 
     public lives: number
     public X: number
@@ -38,7 +38,7 @@ export class Game {
         }
     }
 
-    randomCoords(): { x: number, y: number } {
+    randomCoords(): Cell {
         let spawnX = this.getRandNum(this.X);
         let spawnY = this.getRandNum(this.Y);
         return {x: spawnX, y: spawnY}

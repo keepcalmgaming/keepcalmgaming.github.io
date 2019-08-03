@@ -37,8 +37,6 @@ export class MainScene extends Phaser.Scene {
         // super({key: 'main'})
         super(sceneConfig)
 
-        console.log('starting constructor')
-
         let biggerSide = gameHeight > gameWidth ? gameWidth : gameHeight
         this.rectSize = biggerSide / minSide
         if (biggerSide == gameWidth) {
@@ -76,14 +74,6 @@ export class MainScene extends Phaser.Scene {
         }
     }
 
-    debugDrawSpawns() {
-        let field: Phaser.GameObjects.Graphics = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0xffffff }})
-        for(let i = 0; i < this.towergame.spawns.length; i++) {
-            let spawn = this.towergame.spawns[i]
-            field.fillRect(this.getCX(spawn.x), this.getCY(spawn.y), this.cellW, this.cellH);
-        }
-    }
-
     private mainframe?: Phaser.GameObjects.Sprite
     private tower?: Phaser.GameObjects.Sprite
     private towerSpawns?: Phaser.GameObjects.Sprite[]
@@ -100,7 +90,6 @@ export class MainScene extends Phaser.Scene {
 
         if (debug) {
             this.debugDrawGrid()
-            // this.debugDrawSpawns()
         }
     }
 
@@ -121,7 +110,9 @@ export class MainScene extends Phaser.Scene {
 
         this.tower.setOrigin(0)
 
-        let position = this.getC({x: 1, y: 2})
+        let coord = this.towergame.towerSpawns ? this.towergame.towerSpawns[0] : { x: 0, y: 0 }
+
+        let position = this.getC(coord)
         this.tower.x = position.x
         this.tower.y = position.y
     }
@@ -129,10 +120,12 @@ export class MainScene extends Phaser.Scene {
     setupTowerSpawns() {
         this.towerSpawns = []
 
+        if (!this.towergame.towerSpawns) return
+
         for (let i=0; i<this.towergame.towerSpawns.length; i++) {
             let towerSpawn = this.towergame.towerSpawns[i]
 
-            let sprite = this.physics.add.sprite(0, 0, 'towerplace')
+            let sprite = this.physics.add.sprite(0, 0, 'towerplace').setInteractive()
             this.scaleSpriteTo(sprite, this.rectSize)
             sprite.setOrigin(0)
 
@@ -140,11 +133,22 @@ export class MainScene extends Phaser.Scene {
             sprite.x = position.x
             sprite.y = position.y
 
+            sprite.on('pointerdown', (pointer: any) => {
+                if (!this.tower) return
+
+                this.tower.x = sprite.x
+                this.tower.y = sprite.y
+            })
+
+            console.log(sprite.eventNames)
+
             this.towerSpawns.push(sprite)
         }
     }
 
     drawSpawns() {
+        if (!this.towergame.spawns) return
+
         for (let i=0; i<this.towergame.spawns.length; i++) {
             let spawn = this.towergame.spawns[i]
 

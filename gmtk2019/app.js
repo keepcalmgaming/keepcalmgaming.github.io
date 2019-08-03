@@ -35,7 +35,7 @@ define("game/game", ["require", "exports"], function (require, exports) {
         constructor(x, y) {
             this.LIVES = 20;
             this.NUM_SPAWNS = 3;
-            this.NUM_TOWER_SPAWNS = 10;
+            this.NUM_TOWER_SPAWNS = 7;
             this.lives = this.LIVES;
             this.X = x;
             this.Y = y;
@@ -78,7 +78,6 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
         constructor(sceneConfig) {
             // super({key: 'main'})
             super(sceneConfig);
-            console.log('starting constructor');
             let biggerSide = gameHeight > gameWidth ? gameWidth : gameHeight;
             this.rectSize = biggerSide / minSide;
             if (biggerSide == gameWidth) {
@@ -110,13 +109,6 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
                 }
             }
         }
-        debugDrawSpawns() {
-            let field = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0xffffff } });
-            for (let i = 0; i < this.towergame.spawns.length; i++) {
-                let spawn = this.towergame.spawns[i];
-                field.fillRect(this.getCX(spawn.x), this.getCY(spawn.y), this.cellW, this.cellH);
-            }
-        }
         create() {
             let field = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0x000000 } });
             this.setupMainframe();
@@ -125,7 +117,6 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
             this.drawSpawns();
             if (debug) {
                 this.debugDrawGrid();
-                // this.debugDrawSpawns()
             }
         }
         setupMainframe() {
@@ -140,24 +131,36 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
             this.tower = this.physics.add.sprite(0, 0, 'tower');
             this.scaleSpriteTo(this.tower, this.rectSize);
             this.tower.setOrigin(0);
-            let position = this.getC({ x: 1, y: 2 });
+            let coord = this.towergame.towerSpawns ? this.towergame.towerSpawns[0] : { x: 0, y: 0 };
+            let position = this.getC(coord);
             this.tower.x = position.x;
             this.tower.y = position.y;
         }
         setupTowerSpawns() {
             this.towerSpawns = [];
+            if (!this.towergame.towerSpawns)
+                return;
             for (let i = 0; i < this.towergame.towerSpawns.length; i++) {
                 let towerSpawn = this.towergame.towerSpawns[i];
-                let sprite = this.physics.add.sprite(0, 0, 'towerplace');
+                let sprite = this.physics.add.sprite(0, 0, 'towerplace').setInteractive();
                 this.scaleSpriteTo(sprite, this.rectSize);
                 sprite.setOrigin(0);
                 let position = this.getC(towerSpawn);
                 sprite.x = position.x;
                 sprite.y = position.y;
+                sprite.on('pointerdown', (pointer) => {
+                    if (!this.tower)
+                        return;
+                    this.tower.x = sprite.x;
+                    this.tower.y = sprite.y;
+                });
+                console.log(sprite.eventNames);
                 this.towerSpawns.push(sprite);
             }
         }
         drawSpawns() {
+            if (!this.towergame.spawns)
+                return;
             for (let i = 0; i < this.towergame.spawns.length; i++) {
                 let spawn = this.towergame.spawns[i];
                 let sprite = this.physics.add.sprite(0, 0, 'monsterplace');
