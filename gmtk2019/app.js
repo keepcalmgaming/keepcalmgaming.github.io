@@ -28,55 +28,73 @@ define("scenes/greeting", ["require", "exports"], function (require, exports) {
     }
     exports.GreetingScene = GreetingScene;
 });
-define("scenes/main", ["require", "exports"], function (require, exports) {
+define("game/game", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    class Game {
+        constructor(x, y) {
+            this.LIVES = 20;
+            this.lives = this.LIVES;
+            this.X = x;
+            this.Y = y;
+        }
+    }
+    exports.Game = Game;
+});
+define("scenes/main", ["require", "exports", "game/game"], function (require, exports, game_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const gameHeight = window.innerHeight;
     const gameWidth = window.innerWidth;
     const halfWidth = gameWidth / 2;
     const halfHeight = gameHeight / 2;
+    const debug = true;
+    const minSide = 10;
     class MainScene extends Phaser.Scene {
         constructor(sceneConfig) {
-            super({ key: 'main' });
-            if (gameHeight > gameWidth) {
-                this.isVertical = true;
-                this.rectSize = gameWidth;
+            // super({key: 'main'})
+            super(sceneConfig);
+            console.log('starting constructor');
+            let biggerSide = gameHeight > gameWidth ? gameWidth : gameHeight;
+            this.rectSize = biggerSide / minSide;
+            if (biggerSide == gameWidth) {
+                this.x = minSide;
+                this.y = Math.floor(gameHeight / this.rectSize);
             }
             else {
-                this.isVertical = false;
-                this.rectSize = gameHeight;
+                this.x = Math.floor(gameWidth / this.rectSize);
+                this.y = minSide;
             }
-            this.cellW = this.rectSize / 5;
-            this.cellH = this.rectSize / 5;
+            this.cellW = gameWidth / this.x;
+            this.cellH = gameHeight / this.y;
+            this.towergame = new game_1.Game(this.x, this.y);
+            console.log('constructor finished', this.x, this.y, this.towergame);
         }
         preload() {
             this.load.image('token', 'images/token.png');
         }
-        create() {
+        debugDrawGrid() {
             let field = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0x000000 } });
-            for (let i = 0; i < 5; i++) {
-                for (let j = 0; j < 5; j++) {
+            for (let i = 0; i < this.x; i++) {
+                for (let j = 0; j < this.y; j++) {
                     let offsetX = i * this.cellW;
                     let offsetY = j * this.cellH;
                     field.strokeRect(offsetX, offsetY, this.cellH, this.cellW);
                 }
             }
-            field.strokePath();
-            this.objects = this.physics.add.group();
+        }
+        create() {
+            console.log('hello', this.x, this.y, this.towergame);
+            let field = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0x000000 } });
             this.physics.add.sprite(halfWidth, halfHeight, 'token');
+            if (debug) {
+                this.debugDrawGrid();
+            }
         }
-        getC(x, y) {
-            return {
-                x: this.getCX(x),
-                y: this.getCY(y)
-            };
-        }
-        getCX(x) { return (x + 0.5) * this.cellW; }
-        getCY(y) { return (y + 0.5) * this.cellH; }
     }
     exports.MainScene = MainScene;
 });
-define("app", ["require", "exports", "scenes/greeting", "scenes/main"], function (require, exports, greeting_1, main_1) {
+define("app", ["require", "exports", "scenes/main"], function (require, exports, main_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const gameHeight = window.innerHeight;
@@ -91,7 +109,7 @@ define("app", ["require", "exports", "scenes/greeting", "scenes/main"], function
                 debug: true
             }
         },
-        scene: [greeting_1.GreetingScene, main_1.MainScene]
+        scene: [main_1.MainScene]
     };
     class App {
         constructor() {
