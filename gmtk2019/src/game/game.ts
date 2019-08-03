@@ -1,3 +1,5 @@
+const spawnsCount = 3
+
 export class Game {
     private LIVES = 20
 
@@ -9,5 +11,15 @@ export class Game {
         this.lives = this.LIVES
         this.X = x
         this.Y = y
+    }
+
+    getSpawnCoors() {
+		let spawnX = this.getRandNum(this.X);
+		let spawnY = this.getRandNum(this.Y);
+    	return [spawnX, spawnY]
+    }
+
+    getRandNum(n: number) {
+        return Math.floor(Math.random() * Math.floor(n));
     }
 }

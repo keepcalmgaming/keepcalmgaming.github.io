@@ -9,6 +9,8 @@ const halfHeight = gameHeight / 2
 const debug = true
 const minSide = 10
 
+const spawnsCount = 3
+
 type Cell = {
     x: number,
     y: number
@@ -63,10 +65,18 @@ export class MainScene extends Phaser.Scene {
 
     debugDrawGrid() {
         let field: Phaser.GameObjects.Graphics = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0x000000 }})
+        
         for (let i=0; i<this.x; i++) {
             for (let j=0; j<this.y; j++) {
-                field.strokeRect(this.getCX(i), this.getCY(j), this.cellH, this.cellW)
+                field.strokeRect(this.getCX(i), this.getCY(j), this.cellW, this.cellH)
             }
+        }
+    }
+
+    setSpawns() {
+        let field: Phaser.GameObjects.Graphics = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0xffffff }})
+        for(let i = 0; i < spawnsCount; i++) {
+            field.fillRect(this.getCX(this.towergame.getRandNum(this.x)), this.getCY(this.towergame.getRandNum(this.y)), this.cellW, this.cellH); 
         }
     }
 
@@ -79,6 +89,7 @@ export class MainScene extends Phaser.Scene {
 
         if (debug) {
             this.debugDrawGrid()
+            this.setSpawns()
         }
     }
 

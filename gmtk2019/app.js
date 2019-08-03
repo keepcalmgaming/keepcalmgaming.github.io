@@ -31,12 +31,21 @@ define("scenes/greeting", ["require", "exports"], function (require, exports) {
 define("game/game", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    const spawnsCount = 3;
     class Game {
         constructor(x, y) {
             this.LIVES = 20;
             this.lives = this.LIVES;
             this.X = x;
             this.Y = y;
+        }
+        getSpawnCoors() {
+            let spawnX = this.getRandNum(this.X);
+            let spawnY = this.getRandNum(this.Y);
+            return [spawnX, spawnY];
+        }
+        getRandNum(n) {
+            return Math.floor(Math.random() * Math.floor(n));
         }
     }
     exports.Game = Game;
@@ -50,6 +59,7 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
     const halfHeight = gameHeight / 2;
     const debug = true;
     const minSide = 10;
+    const spawnsCount = 3;
     class MainScene extends Phaser.Scene {
         constructor(sceneConfig) {
             // super({key: 'main'})
@@ -77,8 +87,14 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
             let field = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0x000000 } });
             for (let i = 0; i < this.x; i++) {
                 for (let j = 0; j < this.y; j++) {
-                    field.strokeRect(this.getCX(i), this.getCY(j), this.cellH, this.cellW);
+                    field.strokeRect(this.getCX(i), this.getCY(j), this.cellW, this.cellH);
                 }
+            }
+        }
+        setSpawns() {
+            let field = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0xffffff } });
+            for (let i = 0; i < spawnsCount; i++) {
+                field.fillRect(this.getCX(this.towergame.getRandNum(this.x)), this.getCY(this.towergame.getRandNum(this.y)), this.cellW, this.cellH);
             }
         }
         create() {
@@ -86,6 +102,7 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
             this.setupMainframe();
             if (debug) {
                 this.debugDrawGrid();
+                this.setSpawns();
             }
         }
         setupMainframe() {
