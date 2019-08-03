@@ -78,6 +78,8 @@ export class MainScene extends Phaser.Scene {
     private textLives?: Phaser.GameObjects.Text
 
     create() {
+        this.cameras.main.setBackgroundColor('#ffffff');
+
         let field: Phaser.GameObjects.Graphics = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0x000000 }})
 
         this.setupMainframe()
