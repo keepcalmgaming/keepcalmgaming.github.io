@@ -9,6 +9,16 @@ const halfHeight = gameHeight / 2
 const debug = true
 const minSide = 10
 
+type Cell = {
+    x: number,
+    y: number
+}
+
+type Position = {
+    x: number,
+    y: number
+}
+
 export class MainScene extends Phaser.Scene {
     // private isVertical: boolean
     private rectSize: number
@@ -55,22 +65,56 @@ export class MainScene extends Phaser.Scene {
         let field: Phaser.GameObjects.Graphics = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0x000000 }})
         for (let i=0; i<this.x; i++) {
             for (let j=0; j<this.y; j++) {
-                let offsetX = i*this.cellW;
-                let offsetY = j*this.cellH;
-                field.strokeRect(offsetX, offsetY, this.cellH, this.cellW)
+                field.strokeRect(this.getCX(i), this.getCY(j), this.cellH, this.cellW)
             }
         }
     }
 
-    create() {
-        console.log('hello', this.x, this.y, this.towergame)
+    private mainframe: Phaser.GameObjects.Sprite
 
+    create() {
         let field: Phaser.GameObjects.Graphics = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0x000000 }})
 
-        this.physics.add.sprite(halfWidth, halfHeight, 'token')
+        this.setupMainframe()
 
         if (debug) {
             this.debugDrawGrid()
         }
     }
+
+    setupMainframe() {
+        this.mainframe = this.physics.add.sprite(halfWidth, halfHeight, 'token')
+
+        this.scaleSpriteTo(this.mainframe, this.rectSize*2)
+        this.mainframe.setOrigin(0)
+
+        let position = this.getC(this.mainframeCoords())
+        this.mainframe.x = position.x
+        this.mainframe.y = position.y
+
+        console.log(this.mainframe)
+    }
+
+    mainframeCoords(): Cell {
+        return {
+            x: Math.floor(this.x / 2) - 1,
+            y: Math.floor(this.y / 2) - 1
+        }
+    }
+
+    scaleSpriteTo(sprite: Phaser.GameObjects.Sprite, dim: number) {
+        let scale = dim / sprite.width
+        sprite.setScale(scale)
+    }
+
+    getC(c: Cell): Position {
+        return {
+            x: this.getCX(c.x),
+            y: this.getCY(c.y)
+        }
+    }
+
+    getCX(x: number): number {return (x)*this.cellW }
+
+    getCY(y: number): number { return (y)*this.cellH }
 }
