@@ -12,8 +12,10 @@ export class Game {
     public X: number
     public Y: number
 
-    public spawns?: Cell[]
-    public towerSpawns?: Cell[]
+    public spawns: Cell[] = []
+    public towerSpawns: Cell[] = []
+
+    public mainframe: Cell
 
     constructor(x: number, y: number) {
         this.lives = this.LIVES
@@ -22,6 +24,11 @@ export class Game {
 
         this.createSpawns(this.NUM_SPAWNS)
         this.createTowerSpawns(this.NUM_TOWER_SPAWNS)
+
+        this.mainframe = {
+            x: Math.floor(this.X / 2) - 1,
+            y: Math.floor(this.Y / 2) - 1
+        }
     }
 
     createTowerSpawns(num: number) {
