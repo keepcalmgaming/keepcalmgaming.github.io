@@ -9,8 +9,6 @@ const halfHeight = gameHeight / 2
 const debug = true
 const minSide = 10
 
-const spawnsCount = 3
-
 type Cell = {
     x: number,
     y: number
@@ -56,16 +54,23 @@ export class MainScene extends Phaser.Scene {
 
         this.towergame = new Game(this.x, this.y)
 
-        console.log('constructor finished', this.x, this.y, this.towergame)
+        console.log('Game Created', this.x, this.y, this.towergame)
     }
 
     preload() {
+        this.load.image('bullet', 'images/bullet.png')
+        this.load.image('mainframe', 'images/mainframe.png')
+        this.load.image('monster', 'images/monster.png')
+        this.load.image('monsterplace', 'images/monsterplace.png')
+        this.load.image('tower', 'images/tower.png')
+        this.load.image('towerplace', 'images/towerplace.png')
+
         this.load.image('token', 'images/token.png')
     }
 
     debugDrawGrid() {
         let field: Phaser.GameObjects.Graphics = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0x000000 }})
-        
+
         for (let i=0; i<this.x; i++) {
             for (let j=0; j<this.y; j++) {
                 field.strokeRect(this.getCX(i), this.getCY(j), this.cellW, this.cellH)
@@ -73,37 +78,65 @@ export class MainScene extends Phaser.Scene {
         }
     }
 
-    setSpawns() {
+    debugDrawSpawns() {
         let field: Phaser.GameObjects.Graphics = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0xffffff }})
-        for(let i = 0; i < spawnsCount; i++) {
-            field.fillRect(this.getCX(this.towergame.getRandNum(this.x)), this.getCY(this.towergame.getRandNum(this.y)), this.cellW, this.cellH); 
+        for(let i = 0; i < this.towergame.spawns.length; i++) {
+            let spawn = this.towergame.spawns[i]
+            field.fillRect(this.getCX(spawn.x), this.getCY(spawn.y), this.cellW, this.cellH);
         }
     }
 
     private mainframe: Phaser.GameObjects.Sprite
+    private tower: Phaser.GameObjects.Sprite
 
     create() {
         let field: Phaser.GameObjects.Graphics = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0x000000 }})
 
         this.setupMainframe()
+        this.setupTower()
+
+        this.drawSpawns()
 
         if (debug) {
             this.debugDrawGrid()
-            this.setSpawns()
+            // this.debugDrawSpawns()
         }
     }
 
     setupMainframe() {
-        this.mainframe = this.physics.add.sprite(halfWidth, halfHeight, 'token')
-
+        this.mainframe = this.physics.add.sprite(0, 0, 'mainframe')
         this.scaleSpriteTo(this.mainframe, this.rectSize*2)
+
         this.mainframe.setOrigin(0)
 
         let position = this.getC(this.mainframeCoords())
         this.mainframe.x = position.x
         this.mainframe.y = position.y
+    }
 
-        console.log(this.mainframe)
+    setupTower() {
+        this.tower = this.physics.add.sprite(0, 0, 'tower')
+        this.scaleSpriteTo(this.tower, this.rectSize)
+
+        this.tower.setOrigin(0)
+
+        let position = this.getC({x: 1, y: 2})
+        this.tower.x = position.x
+        this.tower.y = position.y
+    }
+
+    drawSpawns() {
+        for (let i=0; i<this.towergame.spawns.length; i++) {
+            let spawn = this.towergame.spawns[i]
+
+            let sprite = this.physics.add.sprite(0, 0, 'monsterplace')
+            this.scaleSpriteTo(sprite, this.rectSize)
+            sprite.setOrigin(0)
+
+            let position = this.getC(spawn)
+            sprite.x = position.x
+            sprite.y = position.y
+        }
     }
 
     mainframeCoords(): Cell {
