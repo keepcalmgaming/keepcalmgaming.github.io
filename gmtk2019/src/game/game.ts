@@ -1,12 +1,19 @@
+type Cell = {
+    x: number,
+    y: number
+}
+
 export class Game {
     private LIVES = 20
     private NUM_SPAWNS = 3
+    private NUM_TOWER_SPAWNS = 10
 
     public lives: number
     public X: number
     public Y: number
 
-    public spawns?: {x: number, y: number}[]
+    public spawns?: Cell[]
+    public towerSpawns?: Cell[]
 
     constructor(x: number, y: number) {
         this.lives = this.LIVES
@@ -14,11 +21,19 @@ export class Game {
         this.Y = y
 
         this.createSpawns(this.NUM_SPAWNS)
+        this.createTowerSpawns(this.NUM_TOWER_SPAWNS)
     }
 
-    createSpawns(numSpawns: number) {
+    createTowerSpawns(num: number) {
+        this.towerSpawns = []
+        for (let i=0; i<num; i++) {
+            this.towerSpawns.push(this.randomCoords())
+        }
+    }
+
+    createSpawns(num: number) {
         this.spawns = []
-        for (let i=0; i<numSpawns; i++) {
+        for (let i=0; i<num; i++) {
             this.spawns.push(this.randomCoords())
         }
     }

@@ -64,8 +64,6 @@ export class MainScene extends Phaser.Scene {
         this.load.image('monsterplace', 'images/monsterplace.png')
         this.load.image('tower', 'images/tower.png')
         this.load.image('towerplace', 'images/towerplace.png')
-
-        this.load.image('token', 'images/token.png')
     }
 
     debugDrawGrid() {
@@ -86,13 +84,16 @@ export class MainScene extends Phaser.Scene {
         }
     }
 
-    private mainframe: Phaser.GameObjects.Sprite
-    private tower: Phaser.GameObjects.Sprite
+    private mainframe?: Phaser.GameObjects.Sprite
+    private tower?: Phaser.GameObjects.Sprite
+    private towerSpawns?: Phaser.GameObjects.Sprite[]
 
     create() {
         let field: Phaser.GameObjects.Graphics = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0x000000 }})
 
         this.setupMainframe()
+
+        this.setupTowerSpawns()
         this.setupTower()
 
         this.drawSpawns()
@@ -123,6 +124,24 @@ export class MainScene extends Phaser.Scene {
         let position = this.getC({x: 1, y: 2})
         this.tower.x = position.x
         this.tower.y = position.y
+    }
+
+    setupTowerSpawns() {
+        this.towerSpawns = []
+
+        for (let i=0; i<this.towergame.towerSpawns.length; i++) {
+            let towerSpawn = this.towergame.towerSpawns[i]
+
+            let sprite = this.physics.add.sprite(0, 0, 'towerplace')
+            this.scaleSpriteTo(sprite, this.rectSize)
+            sprite.setOrigin(0)
+
+            let position = this.getC(towerSpawn)
+            sprite.x = position.x
+            sprite.y = position.y
+
+            this.towerSpawns.push(sprite)
+        }
     }
 
     drawSpawns() {
