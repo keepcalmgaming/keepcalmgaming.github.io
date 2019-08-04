@@ -122,7 +122,7 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
             console.log('Game Created', this.x, this.y, this.towergame);
         }
         create() {
-            this.cameras.main.setBackgroundColor('#ffffff');
+            this.cameras.main.setBackgroundColor('#FF7B5C');
             let field = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0x000000 } });
             this.setupMainframe();
             this.setupTowerSpawns();
@@ -261,13 +261,24 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
                 return;
             if (!this.towergame.active())
                 return;
-            let monster = this.monsters.create(0, 0, 'monster');
+            let mfc = this.getMFC();
+            let path = this.add.path(spawn.x, spawn.y);
+            let p1 = new Phaser.Math.Vector2(spawn.x, spawn.y);
+            let p2 = new Phaser.Math.Vector2(mfc.x, spawn.y);
+            let p3 = new Phaser.Math.Vector2(mfc.x, mfc.y);
+            path.add(new Phaser.Curves.Line(p1, p2));
+            path.add(new Phaser.Curves.Line(p2, p3));
+            let monster = this.add.follower(path, spawn.x, spawn.y, 'monster');
+            this.monsters.add(monster);
             this.scaleSprite(monster, this.rectSize);
             monster.setOrigin(0);
             monster.x = spawn.x;
             monster.y = spawn.y;
-            let mfc = this.getMFC();
-            this.physics.moveTo(monster, mfc.x, mfc.y, 50);
+            monster.startFollow({
+                duration: 3000,
+                from: 0,
+                to: 1
+            });
         }
         setupText() {
             this.textLives = this.add.text(20, 20, `LIVES: ${this.towergame.lives}`, { fontFamily: 'Verdana', fontSize: 20, color: '#4C191B', align: 'center' });
