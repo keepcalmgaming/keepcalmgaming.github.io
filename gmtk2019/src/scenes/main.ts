@@ -24,8 +24,8 @@ export class MainScene extends Phaser.Scene {
     private isVertical: boolean
 
     private rectSize: number
-    private cellH: number
-    private cellW: number
+    private offsetX: number = 0
+    private offsetY: number = 0
     private x: number
     private y: number
 
@@ -50,20 +50,20 @@ export class MainScene extends Phaser.Scene {
         // super({key: 'main'})
         super(sceneConfig)
 
-        let biggerSide = gameHeight > gameWidth ? gameWidth : gameHeight
-        this.rectSize = biggerSide / minSide
-        if (biggerSide == gameWidth) {
-            this.isVertical = false
+        this.isVertical = gameHeight > gameWidth
+
+        if (this.isVertical) {
             this.x = minSide
             this.y = maxSide
         } else {
-            this.isVertical = true
             this.x = maxSide
             this.y = minSide
         }
 
-        this.cellW = this.rectSize
-        this.cellH = this.rectSize
+        let rw = gameWidth / this.x, rh = gameHeight / this.y
+        this.rectSize = rh < rw ? rh : rw
+        this.offsetX = (gameWidth - this.rectSize * this.x) / 2
+        this.offsetY = (gameHeight - this.rectSize * this.y) / 2
 
         this.towergame = new Game(this.x, this.y, this.isVertical)
 
@@ -298,9 +298,9 @@ export class MainScene extends Phaser.Scene {
         }
     }
 
-    getCX(x: number): number { return x*this.cellW }
+    getCX(x: number): number { return this.offsetX + x*this.rectSize }
 
-    getCY(y: number): number { return y*this.cellH }
+    getCY(y: number): number { return this.offsetY + y*this.rectSize }
 
 
     preload() {
@@ -317,7 +317,7 @@ export class MainScene extends Phaser.Scene {
 
         for (let i=0; i<this.x; i++) {
             for (let j=0; j<this.y; j++) {
-                field.strokeRect(this.getCX(i), this.getCY(j), this.cellW, this.cellH)
+                field.strokeRect(this.getCX(i), this.getCY(j), this.rectSize, this.rectSize)
             }
         }
     }

@@ -102,22 +102,23 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
         constructor(sceneConfig) {
             // super({key: 'main'})
             super(sceneConfig);
+            this.offsetX = 0;
+            this.offsetY = 0;
             this.towerSpawns = [];
             this.monsterSpawns = [];
-            let biggerSide = gameHeight > gameWidth ? gameWidth : gameHeight;
-            this.rectSize = biggerSide / minSide;
-            if (biggerSide == gameWidth) {
-                this.isVertical = false;
+            this.isVertical = gameHeight > gameWidth;
+            if (this.isVertical) {
                 this.x = minSide;
                 this.y = maxSide;
             }
             else {
-                this.isVertical = true;
                 this.x = maxSide;
                 this.y = minSide;
             }
-            this.cellW = this.rectSize;
-            this.cellH = this.rectSize;
+            let rw = gameWidth / this.x, rh = gameHeight / this.y;
+            this.rectSize = rh < rw ? rh : rw;
+            this.offsetX = (gameWidth - this.rectSize * this.x) / 2;
+            this.offsetY = (gameHeight - this.rectSize * this.y) / 2;
             this.towergame = new game_1.Game(this.x, this.y, this.isVertical);
             console.log('Game Created', this.x, this.y, this.towergame);
         }
@@ -300,8 +301,8 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
                 y: this.getCY(c.y)
             };
         }
-        getCX(x) { return x * this.cellW; }
-        getCY(y) { return y * this.cellH; }
+        getCX(x) { return this.offsetX + x * this.rectSize; }
+        getCY(y) { return this.offsetY + y * this.rectSize; }
         preload() {
             this.load.image('bullet', 'images/bullet2.png');
             this.load.image('mainframe', 'images/mainframe.png');
@@ -314,7 +315,7 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
             let field = this.add.graphics({ lineStyle: { width: 2, color: 0x000000 }, fillStyle: { color: 0x000000 } });
             for (let i = 0; i < this.x; i++) {
                 for (let j = 0; j < this.y; j++) {
-                    field.strokeRect(this.getCX(i), this.getCY(j), this.cellW, this.cellH);
+                    field.strokeRect(this.getCX(i), this.getCY(j), this.rectSize, this.rectSize);
                 }
             }
         }
