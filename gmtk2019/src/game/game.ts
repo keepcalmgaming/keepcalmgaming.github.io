@@ -8,6 +8,7 @@ export class Game {
     private NUM_SPAWNS = 3
     private NUM_TOWER_SPAWNS = 7
 
+    public score: number = 0
     public lives: number
     public X: number
     public Y: number
@@ -29,6 +30,10 @@ export class Game {
             x: Math.floor(this.X / 2) - 1,
             y: Math.floor(this.Y / 2) - 1
         }
+    }
+
+    active(): boolean {
+        return this.lives > 0
     }
 
     createTowerSpawns(num: number) {

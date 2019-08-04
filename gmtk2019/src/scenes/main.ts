@@ -39,6 +39,7 @@ export class MainScene extends Phaser.Scene {
     private bullets?: Phaser.Physics.Arcade.Group
 
     public textLives?: Phaser.GameObjects.Text
+    public textScore?: Phaser.GameObjects.Text
 
     constructor(
         sceneConfig: object
@@ -87,16 +88,16 @@ export class MainScene extends Phaser.Scene {
 
     setupMainframe() {
         this.mfGroup = this.physics.add.staticGroup()
-        this.mainframe = this.mfGroup.create(0, 0, 'mainframe') as Phaser.GameObjects.Sprite
+        this.mainframe = this.mfGroup.create(0, 0, 'mainframe') as Phaser.Physics.Arcade.Sprite
         this.scaleSprite(this.mainframe, this.rectSize*2)
 
         this.mainframe.setOrigin(0)
 
         let position = this.getC(this.towergame.mainframe)
-        this.mainframe.x = position.x
-        this.mainframe.y = position.y
+        this.mainframe.x = position.x;
+        this.mainframe.y = position.y;
 
-        this.mainframe.refreshBody()
+        (this.mainframe as any)['refreshBody'].call(this.mainframe)
     }
 
     setupTower() {
@@ -161,6 +162,9 @@ export class MainScene extends Phaser.Scene {
         this.monsters = this.physics.add.group()
         this.physics.add.collider(this.monsters, this.mfGroup, this.mainframeHit)
 
+        this.bullets = this.physics.add.group()
+        this.physics.add.collider(this.monsters, this.bullets, this.bulletHit)
+
         // MONSTER SPAWNS
         for (let monsterSpawn of this.monsterSpawns) {
             this.time.addEvent({
@@ -171,10 +175,54 @@ export class MainScene extends Phaser.Scene {
                 args: [ monsterSpawn ]
             })
         }
+
+        this.time.addEvent({
+            delay: 1000,
+            loop: true,
+            callback: this.towerShoot,
+            callbackScope: this
+        })
+    }
+
+
+    towerShoot() {
+        if (!this.tower || !this.monsters || !this.bullets) return
+
+        let minDistance = 999999
+        let closestMonster: Phaser.GameObjects.Sprite | null = null
+        for (let monster of this.monsters.getChildren()) {
+            let distance = Phaser.Math.Distance.Between(this.tower.x, this.tower.y, (monster as Phaser.GameObjects.Sprite).x, (monster as Phaser.GameObjects.Sprite).y)
+            if (distance < minDistance) {
+                minDistance = distance
+                closestMonster = monster as Phaser.GameObjects.Sprite
+            }
+        }
+
+        if (closestMonster && minDistance < this.rectSize*3) {
+            let bullet = this.bullets.create(this.tower.x + this.rectSize / 2, this.tower.y + this.rectSize / 2, 'bullet')
+            let scale = this.getScale(bullet, this.rectSize)
+            bullet.setScale(scale)
+            bullet.setOrigin(0.5)
+            bullet.setCircle(20 * scale, bullet.width / 2, bullet.height / 2)
+            this.physics.moveTo(bullet, closestMonster.x + this.rectSize / 2, closestMonster.y + this.rectSize / 2, 150)
+        }
+    }
+
+    bulletHit(o1: Phaser.GameObjects.GameObject, o2: Phaser.GameObjects.GameObject) {
+        let scene = o1['scene'] as MainScene
+
+        o1.destroy()
+        o2.destroy()
+
+        if (scene.towergame.active()) {
+            scene.towergame.score++
+
+            if (!scene.textScore) return
+            scene.textScore.setText(`SCORE: ${scene.towergame.score}`)
+        }
     }
 
     mainframeHit(monster: Phaser.GameObjects.GameObject, mainframe: Phaser.GameObjects.GameObject) {
-        console.log('mf hit')
         monster.destroy()
 
         let scene = mainframe['scene'] as MainScene
@@ -189,7 +237,9 @@ export class MainScene extends Phaser.Scene {
     }
 
     createMonster(spawn: Phaser.GameObjects.Sprite) {
-        if (!this.monsters) return;
+        if (!this.monsters) return
+        if (!this.towergame) return
+        if (!this.towergame.active()) return
 
         let monster = this.monsters.create(0, 0, 'monster')
         this.scaleSprite(monster, this.rectSize)
@@ -204,11 +254,15 @@ export class MainScene extends Phaser.Scene {
 
     setupText() {
         this.textLives = this.add.text(20, 20, `LIVES: ${this.towergame.lives}`, { fontFamily: 'Verdana', fontSize: 20, color: '#4C191B', align: 'center' })
+        this.textScore = this.add.text(gameWidth - 120, 20, `SCORE: ${this.towergame.score}`, { fontFamily: 'Verdana', fontSize: 20, color: '#4C191B', align: 'center' })
+    }
+
+    getScale(sprite: Phaser.GameObjects.Sprite, dim: number) {
+        return dim / sprite.width
     }
 
     scaleSprite(sprite: Phaser.GameObjects.Sprite, dim: number) {
-        let scale = dim / sprite.width
-        sprite.setScale(scale)
+        sprite.setScale(this.getScale(sprite, dim))
     }
 
 
@@ -230,7 +284,7 @@ export class MainScene extends Phaser.Scene {
 
 
     preload() {
-        this.load.image('bullet', 'images/bullet.png')
+        this.load.image('bullet', 'images/bullet2.png')
         this.load.image('mainframe', 'images/mainframe.png')
         this.load.image('monster', 'images/monster.png')
         this.load.image('monsterplace', 'images/monsterplace.png')
