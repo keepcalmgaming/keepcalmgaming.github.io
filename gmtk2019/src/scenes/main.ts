@@ -291,7 +291,7 @@ export class MainScene extends Phaser.Scene {
         monster.y = spawn.y
 
         monster.startFollow({
-            duration: 11000,
+            duration: 15000,
             from: 0,
             to: 1
         })

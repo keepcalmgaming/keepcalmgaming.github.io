@@ -454,7 +454,7 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
             monster.x = spawn.x;
             monster.y = spawn.y;
             monster.startFollow({
-                duration: 11000,
+                duration: 15000,
                 from: 0,
                 to: 1
             });
