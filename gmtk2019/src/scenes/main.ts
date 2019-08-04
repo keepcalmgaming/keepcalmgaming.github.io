@@ -8,6 +8,7 @@ const halfHeight = gameHeight / 2
 
 const debug = true
 const minSide = 10
+const maxSide = 16
 
 type Cell = {
     x: number,
@@ -20,6 +21,8 @@ type Position = {
 }
 
 export class MainScene extends Phaser.Scene {
+    private isVertical: boolean
+
     private rectSize: number
     private cellH: number
     private cellW: number
@@ -50,17 +53,19 @@ export class MainScene extends Phaser.Scene {
         let biggerSide = gameHeight > gameWidth ? gameWidth : gameHeight
         this.rectSize = biggerSide / minSide
         if (biggerSide == gameWidth) {
+            this.isVertical = false
             this.x = minSide
-            this.y = Math.floor(gameHeight / this.rectSize)
+            this.y = maxSide
         } else {
-            this.x = Math.floor(gameWidth / this.rectSize)
+            this.isVertical = true
+            this.x = maxSide
             this.y = minSide
         }
 
-        this.cellW = gameWidth / this.x
-        this.cellH = gameHeight / this.y
+        this.cellW = this.rectSize
+        this.cellH = this.rectSize
 
-        this.towergame = new Game(this.x, this.y)
+        this.towergame = new Game(this.x, this.y, this.isVertical)
 
         console.log('Game Created', this.x, this.y, this.towergame)
     }

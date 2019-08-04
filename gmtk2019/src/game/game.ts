@@ -8,6 +8,7 @@ export class Game {
     private NUM_SPAWNS = 3
     private NUM_TOWER_SPAWNS = 7
 
+    public isVertical: boolean
     public score: number = 0
     public lives: number
     public X: number
@@ -18,7 +19,8 @@ export class Game {
 
     public mainframe: Cell
 
-    constructor(x: number, y: number) {
+    constructor(x: number, y: number, isVertical: boolean) {
+        this.isVertical = isVertical
         this.lives = this.LIVES
         this.X = x
         this.Y = y

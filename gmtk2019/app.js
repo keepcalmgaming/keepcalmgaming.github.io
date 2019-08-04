@@ -32,13 +32,14 @@ define("game/game", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class Game {
-        constructor(x, y) {
+        constructor(x, y, isVertical) {
             this.LIVES = 20;
             this.NUM_SPAWNS = 3;
             this.NUM_TOWER_SPAWNS = 7;
             this.score = 0;
             this.spawns = [];
             this.towerSpawns = [];
+            this.isVertical = isVertical;
             this.lives = this.LIVES;
             this.X = x;
             this.Y = y;
@@ -84,6 +85,7 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
     const halfHeight = gameHeight / 2;
     const debug = true;
     const minSide = 10;
+    const maxSide = 16;
     class MainScene extends Phaser.Scene {
         constructor(sceneConfig) {
             // super({key: 'main'})
@@ -93,16 +95,18 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
             let biggerSide = gameHeight > gameWidth ? gameWidth : gameHeight;
             this.rectSize = biggerSide / minSide;
             if (biggerSide == gameWidth) {
+                this.isVertical = false;
                 this.x = minSide;
-                this.y = Math.floor(gameHeight / this.rectSize);
+                this.y = maxSide;
             }
             else {
-                this.x = Math.floor(gameWidth / this.rectSize);
+                this.isVertical = true;
+                this.x = maxSide;
                 this.y = minSide;
             }
-            this.cellW = gameWidth / this.x;
-            this.cellH = gameHeight / this.y;
-            this.towergame = new game_1.Game(this.x, this.y);
+            this.cellW = this.rectSize;
+            this.cellH = this.rectSize;
+            this.towergame = new game_1.Game(this.x, this.y, this.isVertical);
             console.log('Game Created', this.x, this.y, this.towergame);
         }
         create() {
