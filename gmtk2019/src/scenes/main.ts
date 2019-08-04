@@ -232,7 +232,7 @@ export class MainScene extends Phaser.Scene {
             }
         }
 
-        if (closestMonster && minDistance < this.rectSize*3) {
+        if (closestMonster && minDistance < this.rectSize*5) {
             let bullet = this.bullets.create(this.tower.x + this.rectSize / 2, this.tower.y + this.rectSize / 2, 'bullet')
             let scale = this.getScale(bullet, this.rectSize)
             bullet.setScale(scale)
