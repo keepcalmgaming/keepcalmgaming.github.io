@@ -69,6 +69,8 @@ export class MainScene extends Phaser.Scene {
         console.log('Game Created', this.x, this.y, this.towergame)
     }
 
+    private music?: Phaser.Sound.BaseSound
+
     create() {
         this.cameras.main.setBackgroundColor('#E8745A');
 
@@ -86,8 +88,8 @@ export class MainScene extends Phaser.Scene {
 
         this.setupEvents()
 
-        // let music = this.sound.add('music')
-        // music.play()
+        this.music = this.sound.add('music')
+        this.music.play()
 
         if (debug) {
             this.debugDrawGrid()
@@ -97,6 +99,8 @@ export class MainScene extends Phaser.Scene {
     update() {
         this.input.on('pointerup', () => {
             if (!this.towergame.active()) {
+                if (this.music) { this.music.destroy() }
+
               this.towergame = new Game(this.x, this.y, this.isVertical)
               this.scene.restart();
             }
@@ -354,7 +358,7 @@ export class MainScene extends Phaser.Scene {
         this.load.image('towerplace', 'images/towerplace.png')
         this.load.image('wallbrick', 'images/wallbrick.png')
 
-        // this.load.audio('music', 'sounds/GameOST.mp3')
+        this.load.audio('music', 'sounds/GameOST.mp3')
     }
 
     debugDrawGrid() {

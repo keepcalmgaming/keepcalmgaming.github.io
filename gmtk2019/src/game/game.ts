@@ -233,7 +233,7 @@ export class Game {
 		    	currY = currY + 1
 		    	path.push({ x: currX, y: currY })
 	    	} else {
-	    		if (this.map[currY][currX] != 4) { 
+	    		if (this.map[currY][currX] != 4) {
 	    			throw 420
 	    		} else {
 	    			break
