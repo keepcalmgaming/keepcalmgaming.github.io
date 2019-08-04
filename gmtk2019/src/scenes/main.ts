@@ -46,8 +46,8 @@ export class MainScene extends Phaser.Scene {
     constructor(
         sceneConfig: object
     ) {
-        // super({key: 'main'})
-        super(sceneConfig)
+        super({key: 'main'})
+        // super(sceneConfig)
 
         this.isVertical = gameHeight > gameWidth
 

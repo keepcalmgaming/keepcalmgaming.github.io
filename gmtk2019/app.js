@@ -259,12 +259,12 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
     const maxSide = 16;
     class MainScene extends Phaser.Scene {
         constructor(sceneConfig) {
-            // super({key: 'main'})
-            super(sceneConfig);
+            super({ key: 'main' });
             this.offsetX = 0;
             this.offsetY = 0;
             this.towerSpawns = [];
             this.monsterSpawns = [];
+            // super(sceneConfig)
             this.isVertical = gameHeight > gameWidth;
             if (this.isVertical) {
                 this.x = minSide;
@@ -518,7 +518,7 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
     }
     exports.MainScene = MainScene;
 });
-define("app", ["require", "exports", "scenes/main"], function (require, exports, main_1) {
+define("app", ["require", "exports", "scenes/greeting", "scenes/main"], function (require, exports, greeting_1, main_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const gameHeight = window.innerHeight;
@@ -533,7 +533,7 @@ define("app", ["require", "exports", "scenes/main"], function (require, exports,
                 debug: false
             }
         },
-        scene: [main_1.MainScene]
+        scene: [greeting_1.GreetingScene, main_1.MainScene]
     };
     class App {
         constructor() {
