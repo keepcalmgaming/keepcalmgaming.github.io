@@ -40,7 +40,7 @@ export class Game {
         this.map = this.generateMap()
 
         this.createEntities()
-        this.createMonsterPass(labs[0])
+        this.createMonsterPass({ x: 0, y: 0 })
 
         this.mainframe = {
             x: Math.floor(this.X / 2) - 1,
@@ -148,48 +148,66 @@ export class Game {
         return Math.floor(Math.random() * Math.floor(n));
     }
 
-    createMonsterPass(maze: number[][]): Cell[] {
-    	let spawnX = 0, spawnY = 0 
+    createMonsterPass(spawn: Cell) {
+    	let startX, startY, endX, endY
+    	if (spawn.x < this.map.length / 2) {
+	    	if (spawn.y < this.map[0].length / 2) {
+	    		startX = 0
+	    		startY = 0
+	    		endX = this.map.length / 2
+	    		endY = this.map[0].length / 2
+	    	} else {
+	    		startX = 0
+	    		startY = this.map[0].length / 2 + 1
+	    		endX = this.map.length / 2
+	    		endY = this.map[0].length
+	    	}
+    	} else {
+	    	if (spawn.y < this.map[0].length / 2) {
+	    		startX = this.map.length / 2 + 1
+	    		startY = 0
+	    		endX = this.map.length
+	    		endY = this.map[0].length / 2
+	    	} else {
+	    		startX = 0
+	    		startY = this.map[0].length / 2 + 1
+	    		endX = this.map.length / 2
+	    		endY = this.map[0].length
+	    	}
+    	}
+
     	let currX, currY
     	let prevX, prevY
     	let path = []
-    	for (let i = 0; i < maze.length; i++) {
-	    	for (let j = 0; j < maze[0].length; j++) {
-	    		if (maze[i][j]==2) {
-	    			spawnX = i
-	    			spawnY = j
-	    			break
-	    		}
-	    	}
-    	}
-    	currX = spawnX
-    	currY = spawnY
+    	currX = spawn.x
+    	currY = spawn.y
     	prevX = currX
     	prevY = currY
     	path.push({ x: currX, y: currY })
-    	while (maze[currX][currY] != 4) {
-	    	if (currX - 1 >= 0 && currX - 1 != prevX && (maze[currX - 1][currY] == 0 || maze[currX - 1][currY] == 4)) {
+    	while (this.map[currX][currY] != 4) {
+	    	if (currX - 1 >= startX && currX - 1 != prevX && (this.map[currX - 1][currY] == 0 || this.map[currX - 1][currY] == 4)) {
 		    	prevX = currX
 		    	prevY = currY
 		    	currX = currX - 1
 		    	path.push({ x: currX, y: currY })
-	    	} else if (currX + 1 < maze.length && currX + 1 != prevX && (maze[currX + 1][currY] == 0 || maze[currX + 1][currY] == 4)) {
+	    	} else if (currX + 1 < endX && currX + 1 != prevX && (this.map[currX + 1][currY] == 0 || this.map[currX + 1][currY] == 4)) {
 		    	prevX = currX
 		    	prevY = currY
 		    	currX = currX + 1
 		    	path.push({ x: currX, y: currY })
-	    	} else if (currY - 1 >= 0 && currY - 1 != prevY && (maze[currX][currY - 1] == 0 || maze[currX][currY - 1] == 4)) {
+	    	} else if (currY - 1 >= startY && currY - 1 != prevY && (this.map[currX][currY - 1] == 0 || this.map[currX][currY - 1] == 4)) {
 		    	prevX = currX
 		    	prevY = currY
 		    	currY = currY - 1
 		    	path.push({ x: currX, y: currY })
-	    	} else if (currY + 1 < maze[0].length && currY + 1 != prevY && (maze[currX][currY + 1] == 0 || maze[currX][currY + 1] == 4)) {
+	    	} else if (currY + 1 < endY && currY + 1 != prevY && (this.map[currX][currY + 1] == 0 || this.map[currX][currY + 1] == 4)) {
 		    	prevX = currX
 		    	prevY = currY
 		    	currY = currY + 1
 		    	path.push({ x: currX, y: currY })
 	    	}
 	    }
+	    console.log(path)
     	return path
     }
 }
