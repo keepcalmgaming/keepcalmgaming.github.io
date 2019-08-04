@@ -62,33 +62,56 @@ define("game/game", ["require", "exports"], function (require, exports) {
             };
         }
         generateMap() {
-            // TODO refactor this, first working version was approved
             let clone = Object.create(labs);
-            let upLeft = clone[0];
+            let upLeft = this.generateQuorter(clone[this.getRandNum(labs.length - 1)], false, false);
+            let upRight = this.generateQuorter(clone[this.getRandNum(labs.length - 1)], true, false);
+            let downLeft = this.generateQuorter(clone[this.getRandNum(labs.length - 1)], false, true);
+            let downRight = this.generateQuorter(clone[this.getRandNum(labs.length - 1)], true, true);
             let result = [];
             for (var i = 0; i < 8; i++) {
-                let t = Object.create(upLeft[i]);
-                result[i] = upLeft[i].concat(t.reverse().flat());
+                result[i] = upLeft[i].concat(upRight[i].flat());
             }
-            let downLeft = Object.create(upLeft).reverse();
             for (var i = 8; i < 16; i++) {
-                let t = Object.create(downLeft[i - 8]);
-                result[i] = downLeft[i - 8].concat(t.reverse().flat());
+                result[i] = downLeft[i - 8].concat(downRight[i - 8].flat());
             }
             if (!this.isVertical) {
-                let newResult = [];
-                for (let y = 0; y < this.Y; y++) {
-                    let row = [];
-                    for (let x = 0; x < this.X; x++) {
-                        row.push(result[x][y]);
-                    }
-                    newResult.push(row);
-                }
-                console.log('result', result);
-                console.log('newResult', newResult);
-                result = newResult;
+                result = this.rotateMap(result);
             }
             return result;
+        }
+        generateQuorter(upLeft, flipX, flipY) {
+            let quorter = [];
+            if (!flipX && !flipY) {
+                quorter = Object.create(upLeft);
+            }
+            if (flipX && !flipY) {
+                for (var i = 0; i < 8; i++) {
+                    let t = Object.create(upLeft[i]);
+                    quorter[i] = t.reverse().flat();
+                }
+            }
+            if (!flipX && flipY) {
+                quorter = Object.create(upLeft).reverse();
+            }
+            if (flipX && flipY) {
+                let downLeft = Object.create(upLeft).reverse();
+                for (var i = 0; i < 8; i++) {
+                    let t = Object.create(downLeft[i]);
+                    quorter[i] = t.reverse();
+                }
+            }
+            return quorter;
+        }
+        rotateMap(map) {
+            let rotatedMap = [];
+            for (let y = 0; y < this.Y; y++) {
+                let row = [];
+                for (let x = 0; x < this.X; x++) {
+                    row.push(map[x][y]);
+                }
+                rotatedMap.push(row);
+            }
+            return rotatedMap;
         }
         active() {
             return this.lives > 0;
