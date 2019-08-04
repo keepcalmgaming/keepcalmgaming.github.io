@@ -48,6 +48,10 @@ export class Game {
         }
     }
 
+    randomLabs(): number[][] {
+        return labs[0]
+    }
+
     generateMap() {
       let clone = Object.create(labs)
       let upLeft = this.generateQuorter(clone[this.getRandNum(labs.length - 1)], false, false)
@@ -71,7 +75,7 @@ export class Game {
       return result
     }
 
-    generateQuorter(upLeft: number[], flipX: boolean, flipY: boolean) {
+    generateQuorter(upLeft: number[][], flipX: boolean, flipY: boolean) {
         let quorter = []
 
         if (!flipX && !flipY) {
@@ -207,7 +211,6 @@ export class Game {
 		    	path.push({ x: currX, y: currY })
 	    	}
 	    }
-	    console.log(path)
     	return path
     }
 }

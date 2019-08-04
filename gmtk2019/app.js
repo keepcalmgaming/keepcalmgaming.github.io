@@ -62,6 +62,9 @@ define("game/game", ["require", "exports"], function (require, exports) {
                 y: Math.floor(this.Y / 2) - 1
             };
         }
+        randomLabs() {
+            return labs[0];
+        }
         generateMap() {
             let clone = Object.create(labs);
             let upLeft = this.generateQuorter(clone[this.getRandNum(labs.length - 1)], false, false);
@@ -207,7 +210,6 @@ define("game/game", ["require", "exports"], function (require, exports) {
                     path.push({ x: currX, y: currY });
                 }
             }
-            console.log(path);
             return path;
         }
     }
@@ -257,6 +259,8 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
             this.setupMonsterSpawns();
             this.setupText();
             this.setupEvents();
+            let music = this.sound.add('music');
+            music.play();
             if (debug) {
                 this.debugDrawGrid();
             }
@@ -320,6 +324,7 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
                 let position = this.getC(spawn);
                 sprite.x = position.x;
                 sprite.y = position.y;
+                sprite['spawn'] = spawn;
                 this.monsterSpawns.push(sprite);
             }
         }
@@ -400,12 +405,8 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
             if (!this.towergame.active())
                 return;
             let mfc = this.getMFC();
-            let path = this.add.path(spawn.x, spawn.y);
-            let p1 = new Phaser.Math.Vector2(spawn.x, spawn.y);
-            let p2 = new Phaser.Math.Vector2(mfc.x, spawn.y);
-            let p3 = new Phaser.Math.Vector2(mfc.x, mfc.y);
-            path.add(new Phaser.Curves.Line(p1, p2));
-            path.add(new Phaser.Curves.Line(p2, p3));
+            let spawnpoint = spawn['spawn'];
+            let path = this.buildPath([spawnpoint, { x: spawnpoint.x, y: this.towergame.mainframe.y }, this.towergame.mainframe]);
             let monster = this.add.follower(path, spawn.x, spawn.y, 'monster');
             this.monsters.add(monster);
             this.scaleSprite(monster, this.rectSize);
@@ -417,6 +418,19 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
                 from: 0,
                 to: 1
             });
+        }
+        buildPath(cells) {
+            console.log('building path for', cells);
+            let start = this.getC(cells[0]);
+            let path = this.add.path(start.x, start.y);
+            for (let i = 1; i < cells.length; i++) {
+                let pos1 = this.getC(cells[i - 1]);
+                let pos2 = this.getC(cells[i]);
+                let p1 = new Phaser.Math.Vector2(pos1.x, pos1.y);
+                let p2 = new Phaser.Math.Vector2(pos2.x, pos2.y);
+                path.add(new Phaser.Curves.Line(p1, p2));
+            }
+            return path;
         }
         setupText() {
             this.textLives = this.add.text(20, 20, `LIVES: ${this.towergame.lives}`, { fontFamily: 'Verdana', fontSize: 20, color: '#4C191B', align: 'center' });
@@ -448,6 +462,7 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
             this.load.image('tower', 'images/tower.png');
             this.load.image('towerplace', 'images/towerplace.png');
             this.load.image('wallbrick', 'images/wallbrick.png');
+            this.load.audio('music', 'sounds/GameOST.mp3');
         }
         debugDrawGrid() {
             let field = this.add.graphics({ lineStyle: { width: 2, color: 0x000000 }, fillStyle: { color: 0x000000 } });

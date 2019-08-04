@@ -86,6 +86,9 @@ export class MainScene extends Phaser.Scene {
 
         this.setupEvents()
 
+        let music = this.sound.add('music')
+        music.play()
+
         if (debug) {
             this.debugDrawGrid()
         }
@@ -168,8 +171,10 @@ export class MainScene extends Phaser.Scene {
             sprite.setOrigin(0)
 
             let position = this.getC(spawn)
-            sprite.x = position.x
-            sprite.y = position.y
+            sprite.x = position.x;
+            sprite.y = position.y;
+
+            (sprite as any)['spawn'] = spawn
 
             this.monsterSpawns.push(sprite)
         }
@@ -263,13 +268,9 @@ export class MainScene extends Phaser.Scene {
 
         let mfc = this.getMFC()
 
-        let path = this.add.path(spawn.x, spawn.y)
+        let spawnpoint: Cell = (spawn as any)['spawn']
 
-        let p1 = new Phaser.Math.Vector2(spawn.x, spawn.y)
-        let p2 = new Phaser.Math.Vector2(mfc.x, spawn.y)
-        let p3 = new Phaser.Math.Vector2(mfc.x, mfc.y)
-        path.add(new Phaser.Curves.Line(p1, p2))
-        path.add(new Phaser.Curves.Line(p2, p3))
+        let path = this.buildPath([spawnpoint, {x: spawnpoint.x, y: this.towergame.mainframe.y}, this.towergame.mainframe])
 
         let monster = this.add.follower(path, spawn.x, spawn.y, 'monster')
         this.monsters.add(monster)
@@ -284,6 +285,23 @@ export class MainScene extends Phaser.Scene {
             from: 0,
             to: 1
         })
+    }
+
+    buildPath(cells: Cell[]): Phaser.Curves.Path {
+        console.log('building path for', cells)
+        let start = this.getC(cells[0])
+        let path = this.add.path(start.x, start.y)
+
+        for (let i=1; i<cells.length; i++) {
+            let pos1 = this.getC(cells[i-1])
+            let pos2 = this.getC(cells[i])
+
+            let p1 = new Phaser.Math.Vector2(pos1.x, pos1.y)
+            let p2 = new Phaser.Math.Vector2(pos2.x, pos2.y)
+            path.add(new Phaser.Curves.Line(p1, p2))
+        }
+
+        return path
     }
 
     setupText() {
@@ -325,6 +343,8 @@ export class MainScene extends Phaser.Scene {
         this.load.image('tower', 'images/tower.png')
         this.load.image('towerplace', 'images/towerplace.png')
         this.load.image('wallbrick', 'images/wallbrick.png')
+
+        this.load.audio('music', 'sounds/GameOST.mp3')
     }
 
     debugDrawGrid() {
