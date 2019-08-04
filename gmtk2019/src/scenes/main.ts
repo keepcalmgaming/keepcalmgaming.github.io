@@ -86,8 +86,8 @@ export class MainScene extends Phaser.Scene {
 
         this.setupEvents()
 
-        let music = this.sound.add('music')
-        music.play()
+        // let music = this.sound.add('music')
+        // music.play()
 
         if (debug) {
             this.debugDrawGrid()
@@ -344,7 +344,7 @@ export class MainScene extends Phaser.Scene {
         this.load.image('towerplace', 'images/towerplace.png')
         this.load.image('wallbrick', 'images/wallbrick.png')
 
-        this.load.audio('music', 'sounds/GameOST.mp3')
+        // this.load.audio('music', 'sounds/GameOST.mp3')
     }
 
     debugDrawGrid() {

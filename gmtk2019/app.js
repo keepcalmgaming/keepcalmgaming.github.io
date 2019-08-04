@@ -279,8 +279,8 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
             this.setupMonsterSpawns();
             this.setupText();
             this.setupEvents();
-            let music = this.sound.add('music');
-            music.play();
+            // let music = this.sound.add('music')
+            // music.play()
             if (debug) {
                 this.debugDrawGrid();
             }
@@ -482,7 +482,7 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
             this.load.image('tower', 'images/tower.png');
             this.load.image('towerplace', 'images/towerplace.png');
             this.load.image('wallbrick', 'images/wallbrick.png');
-            this.load.audio('music', 'sounds/GameOST.mp3');
+            // this.load.audio('music', 'sounds/GameOST.mp3')
         }
         debugDrawGrid() {
             let field = this.add.graphics({ lineStyle: { width: 2, color: 0x000000 }, fillStyle: { color: 0x000000 } });
