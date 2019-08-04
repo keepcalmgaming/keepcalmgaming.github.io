@@ -65,7 +65,7 @@ define("game/game", ["require", "exports"], function (require, exports) {
     ];
     class Game {
         constructor(x, y, isVertical) {
-            this.LIVES = 20;
+            this.LIVES = 4;
             this.score = 0;
             this.spawns = [];
             this.towerSpawns = [];
@@ -284,6 +284,14 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
             if (debug) {
                 this.debugDrawGrid();
             }
+        }
+        update() {
+            this.input.on('pointerup', () => {
+                if (!this.towergame.active()) {
+                    this.towergame = new game_1.Game(this.x, this.y, this.isVertical);
+                    this.scene.restart();
+                }
+            });
         }
         setupMainframe() {
             this.mfGroup = this.physics.add.staticGroup();

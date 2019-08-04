@@ -37,7 +37,7 @@ const labs = [
 ]
 
 export class Game {
-    private LIVES = 20
+    private LIVES = 4
 
     public isVertical: boolean
     public score: number = 0

@@ -94,6 +94,15 @@ export class MainScene extends Phaser.Scene {
         }
     }
 
+    update() {
+        this.input.on('pointerup', () => {
+            if (!this.towergame.active()) {
+              this.towergame = new Game(this.x, this.y, this.isVertical)
+              this.scene.restart();
+            }
+        });
+    }
+
     setupMainframe() {
         this.mfGroup = this.physics.add.staticGroup()
         this.mainframe = this.mfGroup.create(0, 0, 'mainframe') as Phaser.Physics.Arcade.Sprite
