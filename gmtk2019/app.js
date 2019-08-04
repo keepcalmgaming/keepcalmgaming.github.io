@@ -88,8 +88,8 @@ define("game/game", ["require", "exports"], function (require, exports) {
         generateMap() {
             let clone = Object.create(labs);
             let upLeft = this.generateQuorter(clone[this.getRandNum(labs.length - 1)], false, false);
-            let upRight = this.generateQuorter(clone[this.getRandNum(labs.length - 1)], false, true);
-            let downLeft = this.generateQuorter(clone[this.getRandNum(labs.length - 1)], true, false);
+            let upRight = this.generateQuorter(clone[this.getRandNum(labs.length - 1)], true, false);
+            let downLeft = this.generateQuorter(clone[this.getRandNum(labs.length - 1)], false, true);
             let downRight = this.generateQuorter(clone[this.getRandNum(labs.length - 1)], true, true);
             let result = [];
             for (var i = 0; i < 8; i++) {
