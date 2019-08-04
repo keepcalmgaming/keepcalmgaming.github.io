@@ -37,6 +37,7 @@ export class Game {
         this.lives = this.LIVES
         this.X = x
         this.Y = y
+        this.map = this.generateMap();
 
         this.createSpawns(this.NUM_SPAWNS)
         this.createTowerSpawns(this.NUM_TOWER_SPAWNS)
@@ -45,6 +46,25 @@ export class Game {
             x: Math.floor(this.X / 2) - 1,
             y: Math.floor(this.Y / 2) - 1
         }
+    }
+
+    generateMap() {
+      // TODO refactor this, first working version was approved
+      let clone = Object.create(labs)
+      let upLeft = clone[0]
+      let result = []
+      for(var i=0;i<8;i++){
+        let t = Object.create(upLeft[i])
+        result[i] = upLeft[i].concat(t.reverse().flat())
+      }
+
+      let downLeft = Object.create(upLeft).reverse()
+      for(var i=8; i<16; i++){
+        let t = Object.create(downLeft[i-8])
+        result[i] = downLeft[i-8].concat(t.reverse().flat())
+      }
+
+      return result
     }
 
     active(): boolean {
