@@ -65,7 +65,7 @@ define("game/game", ["require", "exports"], function (require, exports) {
     ];
     class Game {
         constructor(x, y, isVertical) {
-            this.LIVES = 4;
+            this.LIVES = 20;
             this.score = 0;
             this.spawns = [];
             this.towerSpawns = [];
