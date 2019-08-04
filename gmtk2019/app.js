@@ -122,7 +122,7 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
             console.log('Game Created', this.x, this.y, this.towergame);
         }
         create() {
-            this.cameras.main.setBackgroundColor('#FF7B5C');
+            this.cameras.main.setBackgroundColor('#E8745A');
             let field = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0x000000 } });
             this.setupMainframe();
             this.setupTowerSpawns();

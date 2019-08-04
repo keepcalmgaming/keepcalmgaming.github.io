@@ -71,7 +71,7 @@ export class MainScene extends Phaser.Scene {
     }
 
     create() {
-        this.cameras.main.setBackgroundColor('#FF7B5C');
+        this.cameras.main.setBackgroundColor('#E8745A');
 
         let field: Phaser.GameObjects.Graphics = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0x000000 }})
 
