@@ -173,6 +173,7 @@ export class MainScene extends Phaser.Scene {
         this.monsterSpawns = []
 
         for (let i=0; i<this.towergame.spawns.length; i++) {
+
             let spawn = this.towergame.spawns[i]
 
             let sprite = this.physics.add.sprite(0, 0, 'monsterplace')
@@ -237,7 +238,7 @@ export class MainScene extends Phaser.Scene {
             bullet.setScale(scale)
             bullet.setOrigin(0.5)
             bullet.setCircle(20 * scale, bullet.width / 2, bullet.height / 2)
-            this.physics.moveTo(bullet, closestMonster.x + this.rectSize / 2, closestMonster.y + this.rectSize / 2, 150)
+            this.physics.moveTo(bullet, closestMonster.x + this.rectSize / 2, closestMonster.y + this.rectSize / 2, this.rectSize*4)
         }
     }
 
@@ -279,7 +280,7 @@ export class MainScene extends Phaser.Scene {
 
         let spawnpoint: Cell = (spawn as any)['spawn']
 
-        let path = this.buildPath([spawnpoint, {x: spawnpoint.x, y: this.towergame.mainframe.y}, this.towergame.mainframe])
+        let path = this.buildPath(this.towergame.createMonsterPass(spawnpoint))
 
         let monster = this.add.follower(path, spawn.x, spawn.y, 'monster')
         this.monsters.add(monster)
@@ -290,7 +291,7 @@ export class MainScene extends Phaser.Scene {
         monster.y = spawn.y
 
         monster.startFollow({
-            duration: 3000,
+            duration: 11000,
             from: 0,
             to: 1
         })

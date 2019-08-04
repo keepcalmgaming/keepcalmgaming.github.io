@@ -49,7 +49,7 @@ define("game/game", ["require", "exports"], function (require, exports) {
             [1, 3, 1, 1, 0],
             [1, 1, 0, 0, 0],
             [0, 0, 0, 3, 1],
-            [0, 3, 1, 0, 0],
+            [0, 3, 1, 1, 0],
             [0, 0, 0, 0, 4]
         ],
         [
@@ -167,35 +167,37 @@ define("game/game", ["require", "exports"], function (require, exports) {
             return Math.floor(Math.random() * Math.floor(n));
         }
         createMonsterPass(spawn) {
+            console.log("start");
             let startX, startY, endX, endY;
-            if (spawn.x < this.map.length / 2) {
-                if (spawn.y < this.map[0].length / 2) {
+            if (spawn.x < this.map[0].length / 2) {
+                if (spawn.y < this.map.length / 2) {
                     startX = 0;
                     startY = 0;
-                    endX = this.map.length / 2;
-                    endY = this.map[0].length / 2;
+                    endX = this.map[0].length / 2;
+                    endY = this.map.length / 2;
                 }
                 else {
                     startX = 0;
-                    startY = this.map[0].length / 2 + 1;
-                    endX = this.map.length / 2;
-                    endY = this.map[0].length;
+                    startY = this.map.length / 2;
+                    endX = this.map[0].length / 2;
+                    endY = this.map.length;
                 }
             }
             else {
-                if (spawn.y < this.map[0].length / 2) {
-                    startX = this.map.length / 2 + 1;
+                if (spawn.y < this.map.length / 2) {
+                    startX = this.map[0].length / 2;
                     startY = 0;
-                    endX = this.map.length;
-                    endY = this.map[0].length / 2;
+                    endX = this.map[0].length;
+                    endY = this.map.length / 2;
                 }
                 else {
-                    startX = 0;
-                    startY = this.map[0].length / 2 + 1;
-                    endX = this.map.length / 2;
-                    endY = this.map[0].length;
+                    startX = this.map[0].length / 2;
+                    startY = this.map.length / 2;
+                    endX = this.map[0].length;
+                    endY = this.map.length;
                 }
             }
+            console.log(startX, endX, startY, endY);
             let currX, currY;
             let prevX, prevY;
             let path = [];
@@ -204,30 +206,40 @@ define("game/game", ["require", "exports"], function (require, exports) {
             prevX = currX;
             prevY = currY;
             path.push({ x: currX, y: currY });
-            while (this.map[currX][currY] != 4) {
-                if (currX - 1 >= startX && currX - 1 != prevX && (this.map[currX - 1][currY] == 0 || this.map[currX - 1][currY] == 4)) {
+            while (true) {
+                if (this.map[currY][currX] == 4)
+                    break;
+                if (currX - 1 >= startX && currX - 1 != prevX && (this.map[currY][currX - 1] == 0 || this.map[currY][currX - 1] == 4)) {
                     prevX = currX;
                     prevY = currY;
                     currX = currX - 1;
                     path.push({ x: currX, y: currY });
                 }
-                else if (currX + 1 < endX && currX + 1 != prevX && (this.map[currX + 1][currY] == 0 || this.map[currX + 1][currY] == 4)) {
+                else if (currX + 1 < endX && currX + 1 != prevX && (this.map[currY][currX + 1] == 0 || this.map[currY][currX + 1] == 4)) {
                     prevX = currX;
                     prevY = currY;
                     currX = currX + 1;
                     path.push({ x: currX, y: currY });
                 }
-                else if (currY - 1 >= startY && currY - 1 != prevY && (this.map[currX][currY - 1] == 0 || this.map[currX][currY - 1] == 4)) {
+                else if (currY - 1 >= startY && currY - 1 != prevY && (this.map[currY - 1][currX] == 0 || this.map[currY - 1][currX] == 4)) {
                     prevX = currX;
                     prevY = currY;
                     currY = currY - 1;
                     path.push({ x: currX, y: currY });
                 }
-                else if (currY + 1 < endY && currY + 1 != prevY && (this.map[currX][currY + 1] == 0 || this.map[currX][currY + 1] == 4)) {
+                else if (currY + 1 < endY && currY + 1 != prevY && (this.map[currY + 1][currX] == 0 || this.map[currY + 1][currX] == 4)) {
                     prevX = currX;
                     prevY = currY;
                     currY = currY + 1;
                     path.push({ x: currX, y: currY });
+                }
+                else {
+                    if (this.map[currY][currX] != 4) {
+                        throw 420;
+                    }
+                    else {
+                        break;
+                    }
                 }
             }
             return path;
@@ -398,7 +410,7 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
                 bullet.setScale(scale);
                 bullet.setOrigin(0.5);
                 bullet.setCircle(20 * scale, bullet.width / 2, bullet.height / 2);
-                this.physics.moveTo(bullet, closestMonster.x + this.rectSize / 2, closestMonster.y + this.rectSize / 2, 150);
+                this.physics.moveTo(bullet, closestMonster.x + this.rectSize / 2, closestMonster.y + this.rectSize / 2, this.rectSize * 4);
             }
         }
         bulletHit(o1, o2) {
@@ -434,7 +446,7 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
                 return;
             let mfc = this.getMFC();
             let spawnpoint = spawn['spawn'];
-            let path = this.buildPath([spawnpoint, { x: spawnpoint.x, y: this.towergame.mainframe.y }, this.towergame.mainframe]);
+            let path = this.buildPath(this.towergame.createMonsterPass(spawnpoint));
             let monster = this.add.follower(path, spawn.x, spawn.y, 'monster');
             this.monsters.add(monster);
             this.scaleSprite(monster, this.rectSize);
@@ -442,7 +454,7 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
             monster.x = spawn.x;
             monster.y = spawn.y;
             monster.startFollow({
-                duration: 3000,
+                duration: 11000,
                 from: 0,
                 to: 1
             });

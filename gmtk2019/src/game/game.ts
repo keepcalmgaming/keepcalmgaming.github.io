@@ -21,7 +21,7 @@ const labs = [
         [ 1, 3, 1, 1, 0 ],
         [ 1, 1, 0, 0, 0 ],
         [ 0, 0, 0, 3, 1 ],
-        [ 0, 3, 1, 0, 0 ],
+        [ 0, 3, 1, 1, 0 ],
         [ 0, 0, 0, 0, 4 ]
     ],
     [
@@ -173,32 +173,34 @@ export class Game {
     }
 
     createMonsterPass(spawn: Cell) {
+    	console.log("start")
     	let startX, startY, endX, endY
-    	if (spawn.x < this.map.length / 2) {
-	    	if (spawn.y < this.map[0].length / 2) {
+    	if (spawn.x < this.map[0].length / 2) {
+	    	if (spawn.y < this.map.length / 2) {
 	    		startX = 0
 	    		startY = 0
-	    		endX = this.map.length / 2
-	    		endY = this.map[0].length / 2
+	    		endX = this.map[0].length / 2
+	    		endY = this.map.length / 2
 	    	} else {
 	    		startX = 0
-	    		startY = this.map[0].length / 2 + 1
-	    		endX = this.map.length / 2
-	    		endY = this.map[0].length
+	    		startY = this.map.length / 2
+	    		endX = this.map[0].length / 2
+	    		endY = this.map.length
 	    	}
     	} else {
-	    	if (spawn.y < this.map[0].length / 2) {
-	    		startX = this.map.length / 2 + 1
+	    	if (spawn.y < this.map.length / 2) {
+	    		startX = this.map[0].length / 2
 	    		startY = 0
-	    		endX = this.map.length
-	    		endY = this.map[0].length / 2
+	    		endX = this.map[0].length
+	    		endY = this.map.length / 2
 	    	} else {
-	    		startX = 0
-	    		startY = this.map[0].length / 2 + 1
-	    		endX = this.map.length / 2
-	    		endY = this.map[0].length
+	    		startX = this.map[0].length / 2
+	    		startY = this.map.length / 2
+	    		endX = this.map[0].length
+	    		endY = this.map.length
 	    	}
     	}
+    	console.log(startX, endX, startY, endY)
 
     	let currX, currY
     	let prevX, prevY
@@ -208,27 +210,34 @@ export class Game {
     	prevX = currX
     	prevY = currY
     	path.push({ x: currX, y: currY })
-    	while (this.map[currX][currY] != 4) {
-	    	if (currX - 1 >= startX && currX - 1 != prevX && (this.map[currX - 1][currY] == 0 || this.map[currX - 1][currY] == 4)) {
+    	while (true) {
+    		if (this.map[currY][currX] == 4) break;
+	    	if (currX - 1 >= startX && currX - 1 != prevX && (this.map[currY][currX - 1] == 0 || this.map[currY][currX - 1] == 4)) {
 		    	prevX = currX
 		    	prevY = currY
 		    	currX = currX - 1
 		    	path.push({ x: currX, y: currY })
-	    	} else if (currX + 1 < endX && currX + 1 != prevX && (this.map[currX + 1][currY] == 0 || this.map[currX + 1][currY] == 4)) {
+	    	} else if (currX + 1 < endX && currX + 1 != prevX && (this.map[currY][currX + 1] == 0 || this.map[currY][currX + 1] == 4)) {
 		    	prevX = currX
 		    	prevY = currY
 		    	currX = currX + 1
 		    	path.push({ x: currX, y: currY })
-	    	} else if (currY - 1 >= startY && currY - 1 != prevY && (this.map[currX][currY - 1] == 0 || this.map[currX][currY - 1] == 4)) {
+	    	} else if (currY - 1 >= startY && currY - 1 != prevY && (this.map[currY - 1][currX] == 0 || this.map[currY - 1][currX] == 4)) {
 		    	prevX = currX
 		    	prevY = currY
 		    	currY = currY - 1
 		    	path.push({ x: currX, y: currY })
-	    	} else if (currY + 1 < endY && currY + 1 != prevY && (this.map[currX][currY + 1] == 0 || this.map[currX][currY + 1] == 4)) {
+	    	} else if (currY + 1 < endY && currY + 1 != prevY && (this.map[currY + 1][currX] == 0 || this.map[currY + 1][currX] == 4)) {
 		    	prevX = currX
 		    	prevY = currY
 		    	currY = currY + 1
 		    	path.push({ x: currX, y: currY })
+	    	} else {
+	    		if (this.map[currY][currX] != 4) { 
+	    			throw 420
+	    		} else {
+	    			break
+	    		}
 	    	}
 	    }
     	return path
