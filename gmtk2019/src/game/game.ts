@@ -18,17 +18,17 @@ const labs = [
 
 export class Game {
     private LIVES = 20
-    private NUM_SPAWNS = 3
-    private NUM_TOWER_SPAWNS = 7
 
     public isVertical: boolean
     public score: number = 0
     public lives: number
     public X: number
     public Y: number
+    public map: number[][]
 
     public spawns: Cell[] = []
     public towerSpawns: Cell[] = []
+    public walls: Cell[] = []
 
     public mainframe: Cell
 
@@ -37,10 +37,9 @@ export class Game {
         this.lives = this.LIVES
         this.X = x
         this.Y = y
-        this.map = this.generateMap();
+        this.map = this.generateMap()
 
-        this.createSpawns(this.NUM_SPAWNS)
-        this.createTowerSpawns(this.NUM_TOWER_SPAWNS)
+        this.createEntities()
 
         this.mainframe = {
             x: Math.floor(this.X / 2) - 1,
@@ -64,6 +63,22 @@ export class Game {
         result[i] = downLeft[i-8].concat(t.reverse().flat())
       }
 
+      if (!this.isVertical) {
+          let newResult = []
+
+          for (let y = 0; y<this.Y; y++) {
+              let row = []
+              for (let x = 0; x<this.X; x++) {
+                  row.push(result[x][y])
+              }
+              newResult.push(row)
+          }
+
+          console.log('result', result)
+          console.log('newResult', newResult)
+          result = newResult
+      }
+
       return result
     }
 
@@ -71,17 +86,22 @@ export class Game {
         return this.lives > 0
     }
 
-    createTowerSpawns(num: number) {
-        this.towerSpawns = []
-        for (let i=0; i<num; i++) {
-            this.towerSpawns.push(this.randomCoords())
-        }
-    }
-
-    createSpawns(num: number) {
-        this.spawns = []
-        for (let i=0; i<num; i++) {
-            this.spawns.push(this.randomCoords())
+    createEntities() {
+        for (let i = 0; i<this.map.length; i++) {
+            let row = this.map[i]
+            for (let j = 0; j<row.length; j++) {
+                switch (row[j]) {
+                    case 1: // wall
+                        this.walls.push({x: j, y: i})
+                        break;
+                    case 2: // monster spawn
+                        this.spawns.push({x: j, y: i})
+                        break;
+                    case 3: // tower spawn
+                        this.towerSpawns.push({x: j, y: i})
+                        break;
+                }
+            }
         }
     }
 

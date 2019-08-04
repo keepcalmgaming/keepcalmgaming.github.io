@@ -46,18 +46,16 @@ define("game/game", ["require", "exports"], function (require, exports) {
     class Game {
         constructor(x, y, isVertical) {
             this.LIVES = 20;
-            this.NUM_SPAWNS = 3;
-            this.NUM_TOWER_SPAWNS = 7;
             this.score = 0;
             this.spawns = [];
             this.towerSpawns = [];
+            this.walls = [];
             this.isVertical = isVertical;
             this.lives = this.LIVES;
             this.X = x;
             this.Y = y;
             this.map = this.generateMap();
-            this.createSpawns(this.NUM_SPAWNS);
-            this.createTowerSpawns(this.NUM_TOWER_SPAWNS);
+            this.createEntities();
             this.mainframe = {
                 x: Math.floor(this.X / 2) - 1,
                 y: Math.floor(this.Y / 2) - 1
@@ -77,21 +75,40 @@ define("game/game", ["require", "exports"], function (require, exports) {
                 let t = Object.create(downLeft[i - 8]);
                 result[i] = downLeft[i - 8].concat(t.reverse().flat());
             }
+            if (!this.isVertical) {
+                let newResult = [];
+                for (let y = 0; y < this.Y; y++) {
+                    let row = [];
+                    for (let x = 0; x < this.X; x++) {
+                        row.push(result[x][y]);
+                    }
+                    newResult.push(row);
+                }
+                console.log('result', result);
+                console.log('newResult', newResult);
+                result = newResult;
+            }
             return result;
         }
         active() {
             return this.lives > 0;
         }
-        createTowerSpawns(num) {
-            this.towerSpawns = [];
-            for (let i = 0; i < num; i++) {
-                this.towerSpawns.push(this.randomCoords());
-            }
-        }
-        createSpawns(num) {
-            this.spawns = [];
-            for (let i = 0; i < num; i++) {
-                this.spawns.push(this.randomCoords());
+        createEntities() {
+            for (let i = 0; i < this.map.length; i++) {
+                let row = this.map[i];
+                for (let j = 0; j < row.length; j++) {
+                    switch (row[j]) {
+                        case 1: // wall
+                            this.walls.push({ x: j, y: i });
+                            break;
+                        case 2: // monster spawn
+                            this.spawns.push({ x: j, y: i });
+                            break;
+                        case 3: // tower spawn
+                            this.towerSpawns.push({ x: j, y: i });
+                            break;
+                    }
+                }
             }
         }
         randomCoords() {
@@ -143,6 +160,7 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
             this.cameras.main.setBackgroundColor('#E8745A');
             let field = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0x000000 } });
             this.setupMainframe();
+            this.setupWalls();
             this.setupTowerSpawns();
             this.setupTower();
             this.setupMonsterSpawns();
@@ -161,6 +179,17 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
             this.mainframe.x = position.x;
             this.mainframe.y = position.y;
             this.mainframe['refreshBody'].call(this.mainframe);
+        }
+        setupWalls() {
+            for (let i = 0; i < this.towergame.walls.length; i++) {
+                let wall = this.towergame.walls[i];
+                let sprite = this.physics.add.sprite(0, 0, 'wallbrick');
+                this.scaleSprite(sprite, this.rectSize);
+                sprite.setOrigin(0);
+                let position = this.getC(wall);
+                sprite.x = position.x;
+                sprite.y = position.y;
+            }
         }
         setupTower() {
             this.tower = this.physics.add.sprite(0, 0, 'tower');
@@ -327,6 +356,7 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
             this.load.image('monsterplace', 'images/monsterplace.png');
             this.load.image('tower', 'images/tower.png');
             this.load.image('towerplace', 'images/towerplace.png');
+            this.load.image('wallbrick', 'images/wallbrick.png');
         }
         debugDrawGrid() {
             let field = this.add.graphics({ lineStyle: { width: 2, color: 0x000000 }, fillStyle: { color: 0x000000 } });

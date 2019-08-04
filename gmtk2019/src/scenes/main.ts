@@ -31,7 +31,6 @@ export class MainScene extends Phaser.Scene {
 
     public towergame: Game
 
-
     private mfGroup?: Phaser.Physics.Arcade.StaticGroup
     private mainframe?: Phaser.GameObjects.Sprite
     private tower?: Phaser.GameObjects.Sprite
@@ -76,6 +75,7 @@ export class MainScene extends Phaser.Scene {
         let field: Phaser.GameObjects.Graphics = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0x000000 }})
 
         this.setupMainframe()
+        this.setupWalls()
 
         this.setupTowerSpawns()
         this.setupTower()
@@ -103,6 +103,20 @@ export class MainScene extends Phaser.Scene {
         this.mainframe.y = position.y;
 
         (this.mainframe as any)['refreshBody'].call(this.mainframe)
+    }
+
+    setupWalls() {
+        for (let i=0; i<this.towergame.walls.length; i++) {
+            let wall = this.towergame.walls[i]
+
+            let sprite = this.physics.add.sprite(0, 0, 'wallbrick')
+            this.scaleSprite(sprite, this.rectSize)
+            sprite.setOrigin(0)
+
+            let position = this.getC(wall)
+            sprite.x = position.x
+            sprite.y = position.y
+        }
     }
 
     setupTower() {
@@ -310,6 +324,7 @@ export class MainScene extends Phaser.Scene {
         this.load.image('monsterplace', 'images/monsterplace.png')
         this.load.image('tower', 'images/tower.png')
         this.load.image('towerplace', 'images/towerplace.png')
+        this.load.image('wallbrick', 'images/wallbrick.png')
     }
 
     debugDrawGrid() {
