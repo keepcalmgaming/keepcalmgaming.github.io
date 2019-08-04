@@ -24,8 +24,8 @@ export class MainScene extends Phaser.Scene {
     private isVertical: boolean
 
     private rectSize: number
-    private cellH: number
-    private cellW: number
+    private offsetX: number = 0
+    private offsetY: number = 0
     private x: number
     private y: number
 
@@ -50,20 +50,20 @@ export class MainScene extends Phaser.Scene {
         // super({key: 'main'})
         super(sceneConfig)
 
-        let biggerSide = gameHeight > gameWidth ? gameWidth : gameHeight
-        this.rectSize = biggerSide / minSide
-        if (biggerSide == gameWidth) {
-            this.isVertical = false
+        this.isVertical = gameHeight > gameWidth
+
+        if (this.isVertical) {
             this.x = minSide
             this.y = maxSide
         } else {
-            this.isVertical = true
             this.x = maxSide
             this.y = minSide
         }
 
-        this.cellW = this.rectSize
-        this.cellH = this.rectSize
+        let rw = gameWidth / this.x, rh = gameHeight / this.y
+        this.rectSize = rh < rw ? rh : rw
+        this.offsetX = (gameWidth - this.rectSize * this.x) / 2
+        this.offsetY = (gameHeight - this.rectSize * this.y) / 2
 
         this.towergame = new Game(this.x, this.y, this.isVertical)
 
@@ -71,7 +71,7 @@ export class MainScene extends Phaser.Scene {
     }
 
     create() {
-        this.cameras.main.setBackgroundColor('#ffffff');
+        this.cameras.main.setBackgroundColor('#E8745A');
 
         let field: Phaser.GameObjects.Graphics = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0x000000 }})
 
@@ -246,15 +246,30 @@ export class MainScene extends Phaser.Scene {
         if (!this.towergame) return
         if (!this.towergame.active()) return
 
-        let monster = this.monsters.create(0, 0, 'monster')
+
+        let mfc = this.getMFC()
+
+        let path = this.add.path(spawn.x, spawn.y)
+
+        let p1 = new Phaser.Math.Vector2(spawn.x, spawn.y)
+        let p2 = new Phaser.Math.Vector2(mfc.x, spawn.y)
+        let p3 = new Phaser.Math.Vector2(mfc.x, mfc.y)
+        path.add(new Phaser.Curves.Line(p1, p2))
+        path.add(new Phaser.Curves.Line(p2, p3))
+
+        let monster = this.add.follower(path, spawn.x, spawn.y, 'monster')
+        this.monsters.add(monster)
         this.scaleSprite(monster, this.rectSize)
         monster.setOrigin(0)
 
         monster.x = spawn.x
         monster.y = spawn.y
 
-        let mfc = this.getMFC()
-        this.physics.moveTo(monster, mfc.x, mfc.y, 50)
+        monster.startFollow({
+            duration: 3000,
+            from: 0,
+            to: 1
+        })
     }
 
     setupText() {
@@ -283,9 +298,9 @@ export class MainScene extends Phaser.Scene {
         }
     }
 
-    getCX(x: number): number { return x*this.cellW }
+    getCX(x: number): number { return this.offsetX + x*this.rectSize }
 
-    getCY(y: number): number { return y*this.cellH }
+    getCY(y: number): number { return this.offsetY + y*this.rectSize }
 
 
     preload() {
@@ -302,7 +317,7 @@ export class MainScene extends Phaser.Scene {
 
         for (let i=0; i<this.x; i++) {
             for (let j=0; j<this.y; j++) {
-                field.strokeRect(this.getCX(i), this.getCY(j), this.cellW, this.cellH)
+                field.strokeRect(this.getCX(i), this.getCY(j), this.rectSize, this.rectSize)
             }
         }
     }

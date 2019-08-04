@@ -34,12 +34,12 @@ define("game/game", ["require", "exports"], function (require, exports) {
     const labs = [
         [
             [2, 0, 0, 0, 0],
-            [1, 3, 1, 1, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
+            [1, 1, 1, 3, 0],
+            [0, 0, 0, 1, 0],
+            [0, 3, 0, 1, 0],
+            [0, 1, 0, 3, 0],
+            [0, 1, 0, 0, 0],
+            [0, 3, 1, 1, 1],
             [0, 0, 0, 0, 4]
         ]
     ];
@@ -119,27 +119,28 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
         constructor(sceneConfig) {
             // super({key: 'main'})
             super(sceneConfig);
+            this.offsetX = 0;
+            this.offsetY = 0;
             this.towerSpawns = [];
             this.monsterSpawns = [];
-            let biggerSide = gameHeight > gameWidth ? gameWidth : gameHeight;
-            this.rectSize = biggerSide / minSide;
-            if (biggerSide == gameWidth) {
-                this.isVertical = false;
+            this.isVertical = gameHeight > gameWidth;
+            if (this.isVertical) {
                 this.x = minSide;
                 this.y = maxSide;
             }
             else {
-                this.isVertical = true;
                 this.x = maxSide;
                 this.y = minSide;
             }
-            this.cellW = this.rectSize;
-            this.cellH = this.rectSize;
+            let rw = gameWidth / this.x, rh = gameHeight / this.y;
+            this.rectSize = rh < rw ? rh : rw;
+            this.offsetX = (gameWidth - this.rectSize * this.x) / 2;
+            this.offsetY = (gameHeight - this.rectSize * this.y) / 2;
             this.towergame = new game_1.Game(this.x, this.y, this.isVertical);
             console.log('Game Created', this.x, this.y, this.towergame);
         }
         create() {
-            this.cameras.main.setBackgroundColor('#ffffff');
+            this.cameras.main.setBackgroundColor('#E8745A');
             let field = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0x000000 } });
             this.setupMainframe();
             this.setupTowerSpawns();
@@ -278,13 +279,24 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
                 return;
             if (!this.towergame.active())
                 return;
-            let monster = this.monsters.create(0, 0, 'monster');
+            let mfc = this.getMFC();
+            let path = this.add.path(spawn.x, spawn.y);
+            let p1 = new Phaser.Math.Vector2(spawn.x, spawn.y);
+            let p2 = new Phaser.Math.Vector2(mfc.x, spawn.y);
+            let p3 = new Phaser.Math.Vector2(mfc.x, mfc.y);
+            path.add(new Phaser.Curves.Line(p1, p2));
+            path.add(new Phaser.Curves.Line(p2, p3));
+            let monster = this.add.follower(path, spawn.x, spawn.y, 'monster');
+            this.monsters.add(monster);
             this.scaleSprite(monster, this.rectSize);
             monster.setOrigin(0);
             monster.x = spawn.x;
             monster.y = spawn.y;
-            let mfc = this.getMFC();
-            this.physics.moveTo(monster, mfc.x, mfc.y, 50);
+            monster.startFollow({
+                duration: 3000,
+                from: 0,
+                to: 1
+            });
         }
         setupText() {
             this.textLives = this.add.text(20, 20, `LIVES: ${this.towergame.lives}`, { fontFamily: 'Verdana', fontSize: 20, color: '#4C191B', align: 'center' });
@@ -306,8 +318,8 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
                 y: this.getCY(c.y)
             };
         }
-        getCX(x) { return x * this.cellW; }
-        getCY(y) { return y * this.cellH; }
+        getCX(x) { return this.offsetX + x * this.rectSize; }
+        getCY(y) { return this.offsetY + y * this.rectSize; }
         preload() {
             this.load.image('bullet', 'images/bullet2.png');
             this.load.image('mainframe', 'images/mainframe.png');
@@ -320,7 +332,7 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
             let field = this.add.graphics({ lineStyle: { width: 2, color: 0x000000 }, fillStyle: { color: 0x000000 } });
             for (let i = 0; i < this.x; i++) {
                 for (let j = 0; j < this.y; j++) {
-                    field.strokeRect(this.getCX(i), this.getCY(j), this.cellW, this.cellH);
+                    field.strokeRect(this.getCX(i), this.getCY(j), this.rectSize, this.rectSize);
                 }
             }
         }
