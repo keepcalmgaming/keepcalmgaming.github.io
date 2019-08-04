@@ -3,6 +3,19 @@ type Cell = {
     y: number
 }
 
+const labs = [
+    [
+        [ 2, 0, 0, 0, 0 ],
+        [ 1, 3, 1, 1, 0 ],
+        [ 0, 0, 0, 0, 0 ],
+        [ 0, 0, 0, 0, 0 ],
+        [ 0, 0, 0, 0, 0 ],
+        [ 0, 0, 0, 0, 0 ],
+        [ 0, 0, 0, 0, 0 ],
+        [ 0, 0, 0, 0, 4 ]
+    ]
+]
+
 export class Game {
     private LIVES = 20
     private NUM_SPAWNS = 3

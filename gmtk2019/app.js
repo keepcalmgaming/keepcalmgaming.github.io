@@ -31,6 +31,18 @@ define("scenes/greeting", ["require", "exports"], function (require, exports) {
 define("game/game", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    const labs = [
+        [
+            [2, 0, 0, 0, 0],
+            [1, 3, 1, 1, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 4]
+        ]
+    ];
     class Game {
         constructor(x, y, isVertical) {
             this.LIVES = 20;
