@@ -40,6 +40,7 @@ export class Game {
         this.map = this.generateMap()
 
         this.createEntities()
+        this.createMonsterPass(labs[0])
 
         this.mainframe = {
             x: Math.floor(this.X / 2) - 1,
@@ -145,5 +146,50 @@ export class Game {
 
     getRandNum(n: number) {
         return Math.floor(Math.random() * Math.floor(n));
+    }
+
+    createMonsterPass(maze: number[][]): Cell[] {
+    	let spawnX = 0, spawnY = 0 
+    	let currX, currY
+    	let prevX, prevY
+    	let path = []
+    	for (let i = 0; i < maze.length; i++) {
+	    	for (let j = 0; j < maze[0].length; j++) {
+	    		if (maze[i][j]==2) {
+	    			spawnX = i
+	    			spawnY = j
+	    			break
+	    		}
+	    	}
+    	}
+    	currX = spawnX
+    	currY = spawnY
+    	prevX = currX
+    	prevY = currY
+    	path.push({ x: currX, y: currY })
+    	while (maze[currX][currY] != 4) {
+	    	if (currX - 1 >= 0 && currX - 1 != prevX && (maze[currX - 1][currY] == 0 || maze[currX - 1][currY] == 4)) {
+		    	prevX = currX
+		    	prevY = currY
+		    	currX = currX - 1
+		    	path.push({ x: currX, y: currY })
+	    	} else if (currX + 1 < maze.length && currX + 1 != prevX && (maze[currX + 1][currY] == 0 || maze[currX + 1][currY] == 4)) {
+		    	prevX = currX
+		    	prevY = currY
+		    	currX = currX + 1
+		    	path.push({ x: currX, y: currY })
+	    	} else if (currY - 1 >= 0 && currY - 1 != prevY && (maze[currX][currY - 1] == 0 || maze[currX][currY - 1] == 4)) {
+		    	prevX = currX
+		    	prevY = currY
+		    	currY = currY - 1
+		    	path.push({ x: currX, y: currY })
+	    	} else if (currY + 1 < maze[0].length && currY + 1 != prevY && (maze[currX][currY + 1] == 0 || maze[currX][currY + 1] == 4)) {
+		    	prevX = currX
+		    	prevY = currY
+		    	currY = currY + 1
+		    	path.push({ x: currX, y: currY })
+	    	}
+	    }
+    	return path
     }
 }
