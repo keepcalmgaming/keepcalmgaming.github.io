@@ -6,7 +6,7 @@ const gameWidth = window.innerWidth
 const halfWidth = gameWidth / 2
 const halfHeight = gameHeight / 2
 
-const debug = false
+const debug = true
 const minSide = 10
 
 type Cell = {
@@ -293,7 +293,7 @@ export class MainScene extends Phaser.Scene {
     }
 
     debugDrawGrid() {
-        let field: Phaser.GameObjects.Graphics = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0x000000 }})
+        let field: Phaser.GameObjects.Graphics = this.add.graphics({ lineStyle: { width: 2, color: 0x000000 }, fillStyle: { color: 0x000000 }})
 
         for (let i=0; i<this.x; i++) {
             for (let j=0; j<this.y; j++) {
