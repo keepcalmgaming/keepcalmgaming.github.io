@@ -28,7 +28,8 @@ export class GreetingScene extends Phaser.Scene {
 
         this.input.on('pointerdown', () => {
             if (!clicked) {
-              this.scene.switch('main');
+			  window.a = 2;
+              this.scene.switch('Level');
               clicked = true
             }
         });

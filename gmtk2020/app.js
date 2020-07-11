@@ -25,7 +25,8 @@ define("scenes/greeting", ["require", "exports"], function (require, exports) {
             let clicked = false;
             this.input.on('pointerdown', () => {
                 if (!clicked) {
-                    this.scene.switch('main');
+                    window.a = 2;
+                    this.scene.switch('Level');
                     clicked = true;
                 }
             });
@@ -36,100 +37,22 @@ define("scenes/greeting", ["require", "exports"], function (require, exports) {
 define("game/game", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const labs = [
-        [
-            [2, 0, 0, 0, 0],
-            [1, 1, 1, 3, 0],
-            [0, 0, 0, 1, 0],
-            [0, 3, 0, 1, 0],
-            [0, 1, 0, 3, 0],
-            [0, 1, 0, 0, 0],
-            [0, 3, 1, 1, 1],
-            [0, 0, 0, 0, 4]
-        ],
-        [
-            [2, 1, 0, 0, 0],
-            [0, 3, 1, 1, 1],
-            [0, 0, 0, 0, 0],
-            [1, 1, 1, 3, 0],
-            [1, 1, 0, 0, 0],
-            [0, 0, 0, 1, 1],
-            [0, 3, 1, 1, 1],
-            [0, 0, 0, 0, 4]
-        ],
-        [
-            [2, 1, 0, 0, 0],
-            [0, 0, 0, 3, 0],
-            [1, 1, 1, 0, 0],
-            [1, 3, 0, 0, 1],
-            [1, 0, 0, 1, 1],
-            [0, 0, 1, 1, 1],
-            [0, 3, 0, 0, 0],
-            [0, 0, 0, 1, 4]
-        ]
-    ];
     class Game {
         constructor(x, y, isVertical) {
-            this.LIVES = 20;
-            this.score = 0;
-            this.spawns = [];
-            this.towerSpawns = [];
-            this.walls = [];
             this.isVertical = isVertical;
-            this.lives = this.LIVES;
             this.X = x;
             this.Y = y;
             this.map = this.generateMap();
-            this.createEntities();
-            this.createMonsterPass({ x: 0, y: 0 });
-            this.mainframe = {
-                x: Math.floor(this.X / 2) - 1,
-                y: Math.floor(this.Y / 2) - 1
-            };
         }
         randomLabs() {
             return labs[0];
         }
         generateMap() {
-            let clone = Object.create(labs);
-            let upLeft = this.generateQuorter(clone[this.getRandNum(labs.length - 1)], false, false);
-            let upRight = this.generateQuorter(clone[this.getRandNum(labs.length - 1)], true, false);
-            let downLeft = this.generateQuorter(clone[this.getRandNum(labs.length - 1)], false, true);
-            let downRight = this.generateQuorter(clone[this.getRandNum(labs.length - 1)], true, true);
             let result = [];
-            for (var i = 0; i < 8; i++) {
-                result[i] = upLeft[i].concat(upRight[i].flat());
-            }
-            for (var i = 8; i < 16; i++) {
-                result[i] = downLeft[i - 8].concat(downRight[i - 8].flat());
-            }
-            if (!this.isVertical) {
+            if (!this.isVertical && false) {
                 result = this.rotateMap(result);
             }
             return result;
-        }
-        generateQuorter(upLeft, flipX, flipY) {
-            let quorter = [];
-            if (!flipX && !flipY) {
-                quorter = Object.create(upLeft);
-            }
-            if (flipX && !flipY) {
-                for (var i = 0; i < 8; i++) {
-                    let t = Object.create(upLeft[i]);
-                    quorter[i] = t.reverse().flat();
-                }
-            }
-            if (!flipX && flipY) {
-                quorter = Object.create(upLeft).reverse();
-            }
-            if (flipX && flipY) {
-                let downLeft = Object.create(upLeft).reverse();
-                for (var i = 0; i < 8; i++) {
-                    let t = Object.create(downLeft[i]);
-                    quorter[i] = t.reverse();
-                }
-            }
-            return quorter;
         }
         rotateMap(map) {
             let rotatedMap = [];
@@ -143,25 +66,7 @@ define("game/game", ["require", "exports"], function (require, exports) {
             return rotatedMap;
         }
         active() {
-            return this.lives > 0;
-        }
-        createEntities() {
-            for (let i = 0; i < this.map.length; i++) {
-                let row = this.map[i];
-                for (let j = 0; j < row.length; j++) {
-                    switch (row[j]) {
-                        case 1: // wall
-                            this.walls.push({ x: j, y: i });
-                            break;
-                        case 2: // monster spawn
-                            this.spawns.push({ x: j, y: i });
-                            break;
-                        case 3: // tower spawn
-                            this.towerSpawns.push({ x: j, y: i });
-                            break;
-                    }
-                }
-            }
+            return true;
         }
         randomCoords() {
             let spawnX = this.getRandNum(this.X);
@@ -171,88 +76,146 @@ define("game/game", ["require", "exports"], function (require, exports) {
         getRandNum(n) {
             return Math.floor(Math.random() * Math.floor(n));
         }
-        createMonsterPass(spawn) {
-            console.log("start");
-            let startX, startY, endX, endY;
-            if (spawn.x < this.map[0].length / 2) {
-                if (spawn.y < this.map.length / 2) {
-                    startX = 0;
-                    startY = 0;
-                    endX = this.map[0].length / 2;
-                    endY = this.map.length / 2;
-                }
-                else {
-                    startX = 0;
-                    startY = this.map.length / 2;
-                    endX = this.map[0].length / 2;
-                    endY = this.map.length;
-                }
-            }
-            else {
-                if (spawn.y < this.map.length / 2) {
-                    startX = this.map[0].length / 2;
-                    startY = 0;
-                    endX = this.map[0].length;
-                    endY = this.map.length / 2;
-                }
-                else {
-                    startX = this.map[0].length / 2;
-                    startY = this.map.length / 2;
-                    endX = this.map[0].length;
-                    endY = this.map.length;
-                }
-            }
-            console.log(startX, endX, startY, endY);
-            let currX, currY;
-            let prevX, prevY;
-            let path = [];
-            currX = spawn.x;
-            currY = spawn.y;
-            prevX = currX;
-            prevY = currY;
-            path.push({ x: currX, y: currY });
-            while (true) {
-                if (this.map[currY][currX] == 4)
-                    break;
-                if (currX - 1 >= startX && currX - 1 != prevX && (this.map[currY][currX - 1] == 0 || this.map[currY][currX - 1] == 4)) {
-                    prevX = currX;
-                    prevY = currY;
-                    currX = currX - 1;
-                    path.push({ x: currX, y: currY });
-                }
-                else if (currX + 1 < endX && currX + 1 != prevX && (this.map[currY][currX + 1] == 0 || this.map[currY][currX + 1] == 4)) {
-                    prevX = currX;
-                    prevY = currY;
-                    currX = currX + 1;
-                    path.push({ x: currX, y: currY });
-                }
-                else if (currY - 1 >= startY && currY - 1 != prevY && (this.map[currY - 1][currX] == 0 || this.map[currY - 1][currX] == 4)) {
-                    prevX = currX;
-                    prevY = currY;
-                    currY = currY - 1;
-                    path.push({ x: currX, y: currY });
-                }
-                else if (currY + 1 < endY && currY + 1 != prevY && (this.map[currY + 1][currX] == 0 || this.map[currY + 1][currX] == 4)) {
-                    prevX = currX;
-                    prevY = currY;
-                    currY = currY + 1;
-                    path.push({ x: currX, y: currY });
-                }
-                else {
-                    if (this.map[currY][currX] != 4) {
-                        throw 420;
-                    }
-                    else {
-                        break;
-                    }
-                }
-            }
-            return path;
-        }
     }
     exports.Game = Game;
 });
-define("scenes/main", ["require", "exports", "game/game"], function (require, exports, game_1) {
+define("scenes/Level", ["require", "exports", "game/game"], function (require, exports, game_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    const gameHeight = window.innerHeight;
+    const gameWidth = window.innerWidth;
+    const halfWidth = gameWidth / 2;
+    const halfHeight = gameHeight / 2;
+    const debug = true;
+    const minSide = 8;
+    const maxSide = 9;
+    class LevelScene extends Phaser.Scene {
+        constructor(sceneConfig) {
+            super({ key: 'Level' });
+            this.offsetX = 0;
+            this.offsetY = 0;
+            // super(sceneConfig)
+            this.isVertical = gameHeight > gameWidth;
+            if (this.isVertical) {
+                this.x = minSide;
+                this.y = maxSide;
+            }
+            else {
+                this.x = maxSide;
+                this.y = minSide;
+            }
+            let rw = gameWidth / (this.x * 3 + 1);
+            let rh = gameHeight / (this.y * 3 + 1);
+            this.rectSize = rh < rw ? rh : rw;
+            this.offsetX = (gameWidth - this.rectSize * (this.x * 3 + 1)) / 2;
+            this.offsetY = (gameHeight - this.rectSize * (this.y * 3 + 1)) / 2;
+            this.towergame = new game_1.Game(this.x, this.y, this.isVertical);
+            console.log('Game Created', this.x, this.y, this.towergame);
+        }
+        create() {
+            console.log('Create()', window.a);
+            this.cameras.main.setBackgroundColor('#FFFFFF');
+            this.setupHouses();
+            this.setupText();
+            this.setupEvents();
+            this.music = this.sound.add('music');
+            this.music.play();
+        }
+        update() {
+            this.input.on('pointerup', () => {
+                if (!this.towergame.active()) {
+                    if (this.music) {
+                        this.music.destroy();
+                    }
+                    this.towergame = new game_1.Game(this.x, this.y, this.isVertical);
+                    this.scene.restart();
+                }
+            });
+        }
+        setupHouses() {
+            let rows = 9;
+            let cols = 8;
+            let field = this.add.graphics({ lineStyle: { width: 2, color: 0x000000 }, fillStyle: { color: 0x000000 } });
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    field.fillRect(this.offsetX + this.rectSize * (3 * i + 1), this.offsetY + this.rectSize * (3 * j + 1), this.rectSize * 2, this.rectSize * 2);
+                }
+            }
+        }
+        setupEvents() {
+            if (!this.mainframe || !this.mfGroup)
+                return;
+        }
+        setupText() {
+            this.textLives = this.add.text(20, 20, `LIVES: ${this.towergame.lives}`, { fontFamily: 'Verdana', fontSize: 20, color: '#4C191B', align: 'center' });
+            this.textScore = this.add.text(gameWidth - 120, 20, `SCORE: ${this.towergame.score}`, { fontFamily: 'Verdana', fontSize: 20, color: '#4C191B', align: 'center' });
+        }
+        getScale(sprite, dim) {
+            return dim / sprite.width;
+        }
+        scaleSprite(sprite, dim) {
+            sprite.setScale(this.getScale(sprite, dim));
+        }
+        getMFC() {
+            let mf = this.towergame.mainframe;
+            return this.getC({ x: mf.x + 1, y: mf.y + 1 });
+        }
+        getC(c) {
+            return {
+                x: this.getCX(c.x),
+                y: this.getCY(c.y)
+            };
+        }
+        getCX(x) { return this.offsetX + x * this.rectSize; }
+        getCY(y) { return this.offsetY + y * this.rectSize; }
+        preload() {
+            this.load.image('bullet', 'images/bullet2.png');
+            this.load.image('mainframe', 'images/mainframe.png');
+            this.load.image('monster', 'images/monster.png');
+            this.load.image('monsterplace', 'images/monsterplace.png');
+            this.load.image('tower', 'images/tower.png');
+            this.load.image('towerplace', 'images/towerplace.png');
+            this.load.image('wallbrick', 'images/wallbrick.png');
+            this.load.audio('music', 'sounds/GameOST.mp3');
+        }
+    }
+    exports.LevelScene = LevelScene;
+});
+define("app", ["require", "exports", "scenes/greeting", "scenes/Level"], function (require, exports, greeting_1, Level_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    const gameHeight = window.innerHeight;
+    const gameWidth = window.innerWidth;
+    let config = {
+        type: Phaser.AUTO,
+        width: gameWidth,
+        height: gameHeight,
+        physics: {
+            default: 'arcade',
+            arcade: {
+                debug: false
+            }
+        },
+        scene: [greeting_1.GreetingScene, Level_1.LevelScene]
+    };
+    class App {
+        constructor() {
+            this.isDebug = true;
+        }
+        start() {
+            this.log('Generating game...');
+            let g = new Phaser.Game(config);
+            this.log('Ready to play');
+        }
+        log(...args) {
+            if (this.isDebug) {
+                console.log(...args);
+            }
+        }
+    }
+    exports.App = App;
+});
+define("scenes/main", ["require", "exports", "game/game"], function (require, exports, game_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const gameHeight = window.innerHeight;
@@ -283,7 +246,7 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
             this.rectSize = rh < rw ? rh : rw;
             this.offsetX = (gameWidth - this.rectSize * this.x) / 2;
             this.offsetY = (gameHeight - this.rectSize * this.y) / 2;
-            this.towergame = new game_1.Game(this.x, this.y, this.isVertical);
+            this.towergame = new game_2.Game(this.x, this.y, this.isVertical);
             console.log('Game Created', this.x, this.y, this.towergame);
         }
         create() {
@@ -308,7 +271,7 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
                     if (this.music) {
                         this.music.destroy();
                     }
-                    this.towergame = new game_1.Game(this.x, this.y, this.isVertical);
+                    this.towergame = new game_2.Game(this.x, this.y, this.isVertical);
                     this.scene.restart();
                 }
             });
@@ -522,39 +485,5 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
         }
     }
     exports.MainScene = MainScene;
-});
-define("app", ["require", "exports", "scenes/greeting", "scenes/main"], function (require, exports, greeting_1, main_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    const gameHeight = window.innerHeight;
-    const gameWidth = window.innerWidth;
-    let config = {
-        type: Phaser.AUTO,
-        width: gameWidth,
-        height: gameHeight,
-        physics: {
-            default: 'arcade',
-            arcade: {
-                debug: false
-            }
-        },
-        scene: [greeting_1.GreetingScene, main_1.MainScene]
-    };
-    class App {
-        constructor() {
-            this.isDebug = true;
-        }
-        start() {
-            this.log('Generating game...');
-            let g = new Phaser.Game(config);
-            this.log('Ready to play');
-        }
-        log(...args) {
-            if (this.isDebug) {
-                console.log(...args);
-            }
-        }
-    }
-    exports.App = App;
 });
 //# sourceMappingURL=app.js.map
