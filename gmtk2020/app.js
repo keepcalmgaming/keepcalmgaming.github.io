@@ -25,8 +25,7 @@ define("scenes/greeting", ["require", "exports"], function (require, exports) {
             let clicked = false;
             this.input.on('pointerdown', () => {
                 if (!clicked) {
-                    window.a = 2;
-                    this.scene.switch('Level');
+                    this.scene.switch('level_select');
                     clicked = true;
                 }
             });
@@ -181,7 +180,78 @@ define("scenes/Level", ["require", "exports", "game/game"], function (require, e
     }
     exports.LevelScene = LevelScene;
 });
-define("app", ["require", "exports", "scenes/greeting", "scenes/Level"], function (require, exports, greeting_1, Level_1) {
+define("scenes/level_select", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    const gameHeight = window.innerHeight;
+    const gameWidth = window.innerWidth;
+    const halfHeight = gameHeight / 2;
+    const halfWidth = gameWidth / 2;
+    class LevelSelectScene extends Phaser.Scene {
+        constructor(sceneConfig) {
+            super({ key: 'level_select' });
+            // this.isVertical = gameHeight > gameWidth
+            // if (this.isVertical) {
+            //     this.x = minSide
+            //     this.y = maxSide
+            // } else {
+            //     this.x = maxSide
+            //     this.y = minSide
+            // }
+            // let rw = gameWidth / this.x, rh = gameHeight / this.y
+            // this.rectSize = rh < rw ? rh : rw
+            // this.offsetX = (gameWidth - this.rectSize * this.x) / 2
+            // this.offsetY = (gameHeight - this.rectSize * this.y) / 2
+        }
+        create() {
+            let sprite = this.physics.add.sprite(0, 0, 'profile').setInteractive();
+            sprite.x = halfWidth - 300;
+            sprite.y = halfHeight;
+            sprite.on('pointerdown', (pointer) => {
+                console.log('profile clicked');
+                window.a = 2;
+                this.scene.switch('Level');
+            });
+        }
+        preload() {
+            this.load.image('profile', 'images/menu/profile.png');
+        }
+    }
+    exports.LevelSelectScene = LevelSelectScene;
+});
+// setupTowerSpawns() {
+//     this.towerSpawns = []
+//     for (let i=0; i<this.towergame.towerSpawns.length; i++) {
+//         let towerSpawn = this.towergame.towerSpawns[i]
+//         let sprite = this.physics.add.sprite(0, 0, 'towerplace').setInteractive()
+//         this.scaleSprite(sprite, this.rectSize)
+//         sprite.setOrigin(0)
+//         let position = this.getC(towerSpawn)
+//         sprite.x = position.x
+//         sprite.y = position.y
+//         sprite.on('pointerdown', (pointer: any) => {
+//             if (!this.tower) return
+//             this.tower.x = sprite.x
+//             this.tower.y = sprite.y
+//         })
+//         this.towerSpawns.push(sprite)
+//     }
+// }
+// setupMonsterSpawns() {
+//     this.monsterSpawns = []
+//     for (let i=0; i<this.towergame.spawns.length; i++) {
+//         let spawn = this.towergame.spawns[i]
+//         let sprite = this.physics.add.sprite(0, 0, 'monsterplace')
+//         this.scaleSprite(sprite, this.rectSize)
+//         sprite.setOrigin(0)
+//         let position = this.getC(spawn)
+//         sprite.x = position.x;
+//         sprite.y = position.y;
+//         (sprite as any)['spawn'] = spawn
+//         this.monsterSpawns.push(sprite)
+//     }
+// }
+define("app", ["require", "exports", "scenes/greeting", "scenes/Level", "scenes/level_select"], function (require, exports, greeting_1, Level_1, level_select_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const gameHeight = window.innerHeight;
@@ -196,7 +266,7 @@ define("app", ["require", "exports", "scenes/greeting", "scenes/Level"], functio
                 debug: false
             }
         },
-        scene: [greeting_1.GreetingScene, Level_1.LevelScene]
+        scene: [greeting_1.GreetingScene, Level_1.LevelScene, level_select_1.LevelSelectScene]
     };
     class App {
         constructor() {
