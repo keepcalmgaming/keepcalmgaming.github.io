@@ -1,6 +1,7 @@
 import { GreetingScene } from './scenes/greeting'
 import { LevelScene } from './scenes/Level'
 import { LevelSelectScene } from './scenes/level_select'
+import { HeroScene } from './scenes/hero_scene'
 
 const gameHeight = window.innerHeight
 const gameWidth = window.innerWidth
@@ -15,7 +16,7 @@ let config: GameConfig = {
             debug: false
         }
     },
-    scene: [ GreetingScene, LevelScene, LevelSelectScene ]
+    scene: [ GreetingScene, LevelScene, LevelSelectScene, HeroScene ]
 }
 
 export class App {

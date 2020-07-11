@@ -5,6 +5,12 @@ const halfHeight = gameHeight / 2
 const halfWidth = gameWidth / 2
 
 export class GreetingScene extends Phaser.Scene {
+    constructor(
+        sceneConfig: object
+    ) {
+        super({key: 'greeting'})
+    }
+
     create() {
         var content = [
             "Wingman",
@@ -27,10 +33,16 @@ export class GreetingScene extends Phaser.Scene {
         let clicked = false
 
         this.input.on('pointerdown', () => {
-            if (!clicked) {
-              this.scene.switch('level_select');
+            if (!clicked || true) {
+              this.goHero()
               clicked = true
             }
         });
+    }
+
+    goHero() {
+        window.heroPic = 'images/menu/profile.png'
+        window.heroTxt = 'This is you. You need to get to the Finish.'
+        this.scene.switch('hero')
     }
 }

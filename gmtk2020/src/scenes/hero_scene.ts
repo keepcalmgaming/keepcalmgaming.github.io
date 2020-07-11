@@ -4,38 +4,40 @@ const gameWidth = window.innerWidth
 const halfHeight = gameHeight / 2
 const halfWidth = gameWidth / 2
 
-export class LevelSelectScene extends Phaser.Scene {
+export class HeroScene extends Phaser.Scene {
     constructor(
         sceneConfig: object
     ) {
-        super({key: 'level_select'})
-
-        // this.isVertical = gameHeight > gameWidth
-
-        // if (this.isVertical) {
-        //     this.x = minSide
-        //     this.y = maxSide
-        // } else {
-        //     this.x = maxSide
-        //     this.y = minSide
-        // }
-
-        // let rw = gameWidth / this.x, rh = gameHeight / this.y
-        // this.rectSize = rh < rw ? rh : rw
-        // this.offsetX = (gameWidth - this.rectSize * this.x) / 2
-        // this.offsetY = (gameHeight - this.rectSize * this.y) / 2
+        super({key: 'hero'})
     }
 
     create() {
-        console.log('create called')
+        let imgPath = (<any>window).heroPic
+        
+        this.load.once('complete', this.renderScene, this);
+        this.load.image('img', imgPath)
+        this.load.start();
+    }
 
-        let sprite = this.physics.add.sprite(0, 0, 'profile').setInteractive()
+    renderScene() {
+        let sprite = this.physics.add.sprite(0, 0, 'img').setInteractive()
         sprite.x = halfWidth - 300
         sprite.y = halfHeight
-        sprite.on('pointerdown', (pointer: any) => {
-            console.log('profile clicked')
-            window.a = 2;
-            this.scene.switch('greeting')
+
+        let content = (<any>window).heroTxt
+        var text = this.add.text(0, 0, content, { align: 'left' })
+        var bounds = text.getBounds()
+
+        text.x = halfWidth - 100
+        text.y = halfHeight - bounds.height/2
+
+        let clicked = false
+
+        this.input.on('pointerdown', () => {
+            if (!clicked || true) {
+                window.a = 2
+                this.scene.switch('Level')
+            }
         })
     }
 

@@ -6,6 +6,9 @@ define("scenes/greeting", ["require", "exports"], function (require, exports) {
     const halfHeight = gameHeight / 2;
     const halfWidth = gameWidth / 2;
     class GreetingScene extends Phaser.Scene {
+        constructor(sceneConfig) {
+            super({ key: 'greeting' });
+        }
         create() {
             var content = [
                 "Wingman",
@@ -24,11 +27,16 @@ define("scenes/greeting", ["require", "exports"], function (require, exports) {
             text.y = halfHeight - bounds.height / 2;
             let clicked = false;
             this.input.on('pointerdown', () => {
-                if (!clicked) {
-                    this.scene.switch('level_select');
+                if (!clicked || true) {
+                    this.goHero();
                     clicked = true;
                 }
             });
+        }
+        goHero() {
+            window.heroPic = 'images/menu/profile.png';
+            window.heroTxt = 'This is you. You need to get to the Finish.';
+            this.scene.switch('hero');
         }
     }
     exports.GreetingScene = GreetingScene;
@@ -204,13 +212,14 @@ define("scenes/level_select", ["require", "exports"], function (require, exports
             // this.offsetY = (gameHeight - this.rectSize * this.y) / 2
         }
         create() {
+            console.log('create called');
             let sprite = this.physics.add.sprite(0, 0, 'profile').setInteractive();
             sprite.x = halfWidth - 300;
             sprite.y = halfHeight;
             sprite.on('pointerdown', (pointer) => {
                 console.log('profile clicked');
                 window.a = 2;
-                this.scene.switch('Level');
+                this.scene.switch('greeting');
             });
         }
         preload() {
@@ -251,7 +260,79 @@ define("scenes/level_select", ["require", "exports"], function (require, exports
 //         this.monsterSpawns.push(sprite)
 //     }
 // }
-define("app", ["require", "exports", "scenes/greeting", "scenes/Level", "scenes/level_select"], function (require, exports, greeting_1, Level_1, level_select_1) {
+define("scenes/hero_scene", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    const gameHeight = window.innerHeight;
+    const gameWidth = window.innerWidth;
+    const halfHeight = gameHeight / 2;
+    const halfWidth = gameWidth / 2;
+    class HeroScene extends Phaser.Scene {
+        constructor(sceneConfig) {
+            super({ key: 'hero' });
+        }
+        create() {
+            let imgPath = window.heroPic;
+            this.load.once('complete', this.renderScene, this);
+            this.load.image('img', imgPath);
+            this.load.start();
+        }
+        renderScene() {
+            let sprite = this.physics.add.sprite(0, 0, 'img').setInteractive();
+            sprite.x = halfWidth - 300;
+            sprite.y = halfHeight;
+            let content = window.heroTxt;
+            var text = this.add.text(0, 0, content, { align: 'left' });
+            var bounds = text.getBounds();
+            text.x = halfWidth - 100;
+            text.y = halfHeight - bounds.height / 2;
+            let clicked = false;
+            this.input.on('pointerdown', () => {
+                if (!clicked || true) {
+                    window.a = 2;
+                    this.scene.switch('Level');
+                }
+            });
+        }
+        preload() {
+            this.load.image('profile', 'images/menu/profile.png');
+        }
+    }
+    exports.HeroScene = HeroScene;
+});
+// setupTowerSpawns() {
+//     this.towerSpawns = []
+//     for (let i=0; i<this.towergame.towerSpawns.length; i++) {
+//         let towerSpawn = this.towergame.towerSpawns[i]
+//         let sprite = this.physics.add.sprite(0, 0, 'towerplace').setInteractive()
+//         this.scaleSprite(sprite, this.rectSize)
+//         sprite.setOrigin(0)
+//         let position = this.getC(towerSpawn)
+//         sprite.x = position.x
+//         sprite.y = position.y
+//         sprite.on('pointerdown', (pointer: any) => {
+//             if (!this.tower) return
+//             this.tower.x = sprite.x
+//             this.tower.y = sprite.y
+//         })
+//         this.towerSpawns.push(sprite)
+//     }
+// }
+// setupMonsterSpawns() {
+//     this.monsterSpawns = []
+//     for (let i=0; i<this.towergame.spawns.length; i++) {
+//         let spawn = this.towergame.spawns[i]
+//         let sprite = this.physics.add.sprite(0, 0, 'monsterplace')
+//         this.scaleSprite(sprite, this.rectSize)
+//         sprite.setOrigin(0)
+//         let position = this.getC(spawn)
+//         sprite.x = position.x;
+//         sprite.y = position.y;
+//         (sprite as any)['spawn'] = spawn
+//         this.monsterSpawns.push(sprite)
+//     }
+// }
+define("app", ["require", "exports", "scenes/greeting", "scenes/Level", "scenes/level_select", "scenes/hero_scene"], function (require, exports, greeting_1, Level_1, level_select_1, hero_scene_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const gameHeight = window.innerHeight;
@@ -266,7 +347,7 @@ define("app", ["require", "exports", "scenes/greeting", "scenes/Level", "scenes/
                 debug: false
             }
         },
-        scene: [greeting_1.GreetingScene, Level_1.LevelScene, level_select_1.LevelSelectScene]
+        scene: [greeting_1.GreetingScene, Level_1.LevelScene, level_select_1.LevelSelectScene, hero_scene_1.HeroScene]
     };
     class App {
         constructor() {
