@@ -89,39 +89,6 @@ define("game/driver", ["require", "exports", "game/utils", "game/car"], function
         }
     }
     exports.EchoDriver = EchoDriver;
-    class SimpleDriver {
-        constructor() {
-            this.car = new car_1.Car();
-            this.nextDirection = utils_2.Direction.Forward;
-        }
-        input(di) {
-            switch (di) {
-                case utils_2.DriverInput.Left:
-                    this.nextDirection = utils_2.Direction.Left;
-                    break;
-                case utils_2.DriverInput.Right:
-                    this.nextDirection = utils_2.Direction.Right;
-                    break;
-                case utils_2.DriverInput.Cool:
-                    this.car.setSpeed(this.car.speed + 1);
-                    break;
-                case utils_2.DriverInput.Crap:
-                    let newSpeed = this.car.speed - 1;
-                    if (newSpeed >= 0)
-                        this.car.setSpeed(this.car.speed - 1);
-                    break;
-            }
-        }
-        getNextStep() {
-            let result = this.nextDirection;
-            this.flushDirection();
-            return result;
-        }
-        flushDirection() {
-            this.nextDirection = utils_2.Direction.Forward;
-        }
-    }
-    exports.SimpleDriver = SimpleDriver;
 });
 define("game/utils", ["require", "exports", "game/driver"], function (require, exports, driver_1) {
     "use strict";
@@ -171,31 +138,36 @@ define("game/utils", ["require", "exports", "game/driver"], function (require, e
     exports.LevelConfig = {
         danny: new LevelInfo(() => new driver_1.EchoDriver(), level1, 'danny', {
             pic: 'images/profile_danny.png',
-            text: "But you are not the driver.\n\nYour driver was Danny. He is a nice guy and always listens.\n\nOther won't.",
+            text: "But you are not the driver.\n\nYour driver Danny listens carefully to all your commands and executes them. He is a reliable driver.\n\nOthers are not.",
             name: 'intro'
         }, {
             pic: 'images/profile_player.png',
             text: 'This is you.\n\nYou need to get to the Finish.',
             name: 'beginning'
         }),
-        alex: new LevelInfo(() => new driver_1.SimpleDriver(), level1, 'alex', {
+        alex: new LevelInfo(() => new driver_1.EchoDriver(), level1, 'alex', {
             pic: 'images/profile_alex.png',
-            text: 'Alex does not like to listen',
+            text: 'Your driver Ahmed always performs reversed commands. If you swear or compliment, he performs commands normally. If you swear or compliment once more, he performs commands reversely.',
             name: 'alex'
         }),
-        yappie: new LevelInfo(() => new driver_1.SimpleDriver(), level1, 'yappie', {
+        yappie: new LevelInfo(() => new driver_1.EchoDriver(), level1, 'yappie', {
             pic: 'images/profile_yappie.png',
-            text: 'Yappie always does the opposite',
+            text: `Your driver Jessica always turns left if he doesn't hear any command. Command "right" makes he move forward. Command "left" makes him turn right. Classic Jessica.`,
             name: 'yappie'
         }),
-        misha: new LevelInfo(() => new driver_1.SimpleDriver(), level1, 'misha', {
+        misha: new LevelInfo(() => new driver_1.EchoDriver(), level1, 'misha', {
             pic: 'images/profile_misha.png',
-            text: 'Misha never listens',
+            text: 'Your driver Misha always performs reversed commands. He had a tough childhood.',
             name: 'misha'
         }),
-        elon: new LevelInfo(() => new driver_1.SimpleDriver(), level1, 'elon', {
+        elon: new LevelInfo(() => new driver_1.EchoDriver(), level1, 'elon', {
             pic: 'images/profile_elon.png',
-            text: 'Elon is the smartest',
+            text: "Your driver Floyd always performs your penultimate command. His first move is random.",
+            name: 'elon'
+        }),
+        lloyd: new LevelInfo(() => new driver_1.EchoDriver(), level1, 'lloyd', {
+            pic: 'images/profile_elon.png',
+            text: "Your driver Elon always goes with perfect route ignoring all your commands. He's out of control.",
             name: 'elon'
         })
     };
@@ -261,10 +233,10 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             this.offsetY = 0;
             this.carX = 0;
             this.carY = 0;
-            this.stars = 1;
+            this.stars = 0;
             this.levelInfo = utils_4.LevelConfig.danny;
             this.car = new car_2.Car();
-            this.driver = new driver_2.SimpleDriver();
+            this.driver = new driver_2.EchoDriver();
             // super(sceneConfig)
             this.isVertical = gameHeight > gameWidth;
             if (this.isVertical) {
@@ -333,7 +305,7 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
                     this.carSprite.setAngle(180);
                     break;
             }
-            this.scaleSprite(this.carSprite, this.rectSize * 0.5);
+            this.scaleSprite(this.carSprite, this.rectSize * 0.9);
             this.setupControls();
             // TODO: set start/finish/flags from here
             let startSprite = this.physics.add.sprite(this.getX(ls.start.x), this.getY(ls.start.y), 'start');
@@ -346,7 +318,7 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             finishSprite.setDepth(15);
             this.physics.add.collider(finishSprite, this.carSprite, () => {
                 this.time.addEvent({
-                    delay: 600,
+                    delay: 300,
                     loop: false,
                     callback: () => {
                         this.finishLevel();
@@ -402,14 +374,14 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             });
             sprite = this.physics.add.sprite(0, 0, 'arrow_down').setInteractive();
             sprite.setDepth(100);
-            sprite.x = gameWidth - 50 - 60;
-            sprite.y = gameHeight - 50;
+            sprite.x = gameWidth - 50;
+            sprite.y = gameHeight - 50 - 60;
             sprite.on('pointerdown', (pointer) => {
                 this.processInput(utils_4.DriverInput.Crap);
             });
             sprite = this.physics.add.sprite(0, 0, 'arrow_left').setInteractive();
             sprite.setDepth(100);
-            sprite.x = gameWidth - 50 - 120;
+            sprite.x = gameWidth - 50 - 60;
             sprite.y = gameHeight - 50;
             sprite.on('pointerdown', (pointer) => {
                 this.processInput(utils_4.DriverInput.Left);
@@ -500,11 +472,18 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             //     }
             // });
         }
+        randomTile() {
+            let tiles = ['tile_1', 'tile_2', 'tile_3', 'tile_4'];
+            return tiles[Math.floor(Math.random() * tiles.length)];
+        }
         setupHouses() {
             let field = this.add.graphics({ lineStyle: { width: 2, color: 0x000000 }, fillStyle: { color: 0x000000 } });
             for (let i = 0; i < maxSide; i++) {
                 for (let j = 0; j < minSide; j++) {
-                    field.fillRect(this.offsetX + this.rectSize * (3 * i + 1), this.offsetY + this.rectSize * (3 * j + 1), this.rectSize * 2, this.rectSize * 2);
+                    // field.fillRect(this.offsetX + this.rectSize * (3 * i + 1), this.offsetY + this.rectSize * (3 * j + 1), this.rectSize * 2, this.rectSize * 2);
+                    let sprite = this.physics.add.sprite(this.offsetX + this.rectSize * (3 * i + 1), this.offsetY + this.rectSize * (3 * j + 1), this.randomTile());
+                    sprite.setOrigin(0);
+                    this.scaleSprite(sprite, this.rectSize * 2);
                 }
             }
         }
@@ -522,6 +501,7 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             });
         }
         flagHit(carSprite, flag) {
+            this.stars++;
             let flagSprite = this.physics.add.sprite(flag.x, flag.y, 'flag_empty');
             flagSprite.setOrigin(0.5);
             this.scaleSprite(flagSprite, this.rectSize);
@@ -740,7 +720,7 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             this.scene.switch('hero');
         }
         preload() {
-            this.load.image('car', 'images/monster.png');
+            this.load.image('car', 'images/car.png');
             this.load.image('arrow_left', 'images/arrow_left.png');
             this.load.image('arrow_right', 'images/arrow_right.png');
             this.load.image('arrow_up', 'images/arrow_up.png');
@@ -758,6 +738,10 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             this.load.image('finish', 'images/finish.png');
             this.load.image('flag_ready', 'images/flag_ready.png');
             this.load.image('flag_empty', 'images/flag_empty.png');
+            this.load.image('tile_1', 'images/tile_1.png');
+            this.load.image('tile_2', 'images/tile_2.png');
+            this.load.image('tile_3', 'images/tile_3.png');
+            this.load.image('tile_4', 'images/tile_4.png');
             // this.load.audio('music', 'sounds/NavigatorOST.mp3')
         }
     }
@@ -788,6 +772,9 @@ define("scenes/level_select", ["require", "exports", "game/utils"], function (re
         }
         create() {
             console.log('create called');
+            window.SaveState[window.Result.name] = {
+                stars: window.Result.stars
+            };
             window.Result = null;
             let positions = [
                 [halfWidth - 140, halfHeight - 90],
@@ -796,14 +783,30 @@ define("scenes/level_select", ["require", "exports", "game/utils"], function (re
                 [halfWidth - 70, halfHeight + 90],
                 [halfWidth + 70, halfHeight + 90]
             ];
-            let i = 0;
+            let i = 0, prevName = null;
             for (let name of utils_5.LevelOrder) {
-                let sprite = this.physics.add.sprite(positions[i][0], positions[i][1], 'level_' + name).setInteractive();
-                sprite.setOrigin(0.5);
-                sprite.on('pointerdown', (pointer) => {
-                    window.LevelSetup = utils_5.LevelConfig[name];
-                    this.scene.start('Level');
-                });
+                if (!prevName || window.SaveState[prevName]) {
+                    let stars = window.SaveState[name] ? window.SaveState[name].stars : 0;
+                    let sprite = this.physics.add.sprite(positions[i][0], positions[i][1], 'level_' + name).setInteractive();
+                    sprite.setOrigin(0.5);
+                    sprite.on('pointerdown', (pointer) => {
+                        window.LevelSetup = utils_5.LevelConfig[name];
+                        this.scene.start('Level');
+                    });
+                    for (let j = 0; j < 3; j++) {
+                        let fl = j < stars ? 'flag_ready' : 'flag_empty';
+                        let offsetX = 18, stepX = 20, offsetY = 53;
+                        let flag = this.physics.add.sprite(positions[i][0] - offsetX + stepX * j, positions[i][1] + offsetY, fl);
+                        flag.setScale(0.4);
+                        flag.setOrigin(0.5);
+                        flag.setDepth(20);
+                    }
+                }
+                else {
+                    let sprite = this.physics.add.sprite(positions[i][0], positions[i][1], 'level_locked');
+                    sprite.setOrigin(0.5);
+                }
+                prevName = name;
                 i++;
             }
         }
@@ -814,6 +817,8 @@ define("scenes/level_select", ["require", "exports", "game/utils"], function (re
             }
             this.load.image('level_locked', 'images/profile_locked.png');
             this.load.image('profile', 'images/menu/profile.png');
+            this.load.image('flag_ready', 'images/flag_ready.png');
+            this.load.image('flag_empty', 'images/flag_empty.png');
         }
     }
     exports.LevelSelectScene = LevelSelectScene;

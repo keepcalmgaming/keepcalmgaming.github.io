@@ -1,4 +1,4 @@
-import { Driver, SimpleDriver, EchoDriver } from 'driver'
+import { Driver, EchoDriver } from 'driver'
 
 export enum DriverInput { Left, Right, Cool, Crap}
 export enum Direction { Left, Right, Forward }
@@ -56,7 +56,7 @@ export let LevelConfig = {
         'danny',
         {
             pic: 'images/profile_danny.png',
-            text: "But you are not the driver.\n\nYour driver was Danny. He is a nice guy and always listens.\n\nOther won't.",
+            text: "But you are not the driver.\n\nYour driver Danny listens carefully to all your commands and executes them. He is a reliable driver.\n\nOthers are not.",
             name: 'intro'
         },
         {
@@ -65,28 +65,34 @@ export let LevelConfig = {
             name: 'beginning'
         }
     ),
-    alex: new LevelInfo(() => new SimpleDriver(), level1, 'alex',
+    alex: new LevelInfo(() => new EchoDriver(), level1, 'alex',
         {
             pic: 'images/profile_alex.png',
-            text: 'Alex does not like to listen',
+            text: 'Your driver Ahmed always performs reversed commands. If you swear or compliment, he performs commands normally. If you swear or compliment once more, he performs commands reversely.',
             name: 'alex'
         }),
-    yappie: new LevelInfo(() => new SimpleDriver(), level1, 'yappie',
+    yappie: new LevelInfo(() => new EchoDriver(), level1, 'yappie',
         {
             pic: 'images/profile_yappie.png',
-            text: 'Yappie always does the opposite',
+            text: `Your driver Jessica always turns left if he doesn't hear any command. Command "right" makes he move forward. Command "left" makes him turn right. Classic Jessica.`,
             name: 'yappie'
         }),
-    misha: new LevelInfo(() => new SimpleDriver(), level1, 'misha',
+    misha: new LevelInfo(() => new EchoDriver(), level1, 'misha',
         {
             pic: 'images/profile_misha.png',
-            text: 'Misha never listens',
+            text: 'Your driver Misha always performs reversed commands. He had a tough childhood.',
             name: 'misha'
         }),
-    elon: new LevelInfo(() => new SimpleDriver(), level1, 'elon',
+    elon: new LevelInfo(() => new EchoDriver(), level1, 'elon',
         {
             pic: 'images/profile_elon.png',
-            text: 'Elon is the smartest',
+            text: "Your driver Floyd always performs your penultimate command. His first move is random.",
+            name: 'elon'
+        }),
+    lloyd: new LevelInfo(() => new EchoDriver(), level1, 'lloyd',
+        {
+            pic: 'images/profile_elon.png',
+            text: "Your driver Elon always goes with perfect route ignoring all your commands. He's out of control.",
             name: 'elon'
         })
 }

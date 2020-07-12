@@ -31,6 +31,10 @@ export class LevelSelectScene extends Phaser.Scene {
     create() {
         console.log('create called')
 
+        window.SaveState[window.Result.name] = {
+            stars: window.Result.stars
+        }
+
         window.Result = null
 
         let positions = [
@@ -41,15 +45,34 @@ export class LevelSelectScene extends Phaser.Scene {
             [halfWidth + 70, halfHeight + 90]
         ]
 
-        let i = 0
+        let i = 0, prevName = null
         for (let name of LevelOrder) {
-            let sprite = this.physics.add.sprite(positions[i][0], positions[i][1], 'level_'+name).setInteractive()
-            sprite.setOrigin(0.5)
-            sprite.on('pointerdown', (pointer: any) => {
-                (<any>window).LevelSetup = LevelConfig[name]
-                this.scene.start('Level')
-            })
+            if (!prevName || window.SaveState[prevName]) {
+                let stars = window.SaveState[name] ? window.SaveState[name].stars : 0
 
+                let sprite = this.physics.add.sprite(positions[i][0], positions[i][1], 'level_'+name).setInteractive()
+                sprite.setOrigin(0.5)
+                sprite.on('pointerdown', (pointer: any) => {
+                    (<any>window).LevelSetup = LevelConfig[name]
+                    this.scene.start('Level')
+                })
+
+                for (let j=0; j<3; j++) {
+                    let fl = j < stars ? 'flag_ready' : 'flag_empty'
+
+                    let offsetX = 18, stepX = 20, offsetY = 53;
+
+                    let flag = this.physics.add.sprite(positions[i][0] - offsetX + stepX * j, positions[i][1] + offsetY, fl)
+                    flag.setScale(0.4)
+                    flag.setOrigin(0.5)
+                    flag.setDepth(20)
+                }
+            } else {
+                let sprite = this.physics.add.sprite(positions[i][0], positions[i][1], 'level_locked')
+                sprite.setOrigin(0.5)
+            }
+
+            prevName = name
             i++
         }
     }
@@ -63,6 +86,10 @@ export class LevelSelectScene extends Phaser.Scene {
         this.load.image('level_locked', 'images/profile_locked.png')
 
         this.load.image('profile', 'images/menu/profile.png')
+
+        this.load.image('flag_ready', 'images/flag_ready.png')
+        this.load.image('flag_empty', 'images/flag_empty.png')
+
     }
 }
 

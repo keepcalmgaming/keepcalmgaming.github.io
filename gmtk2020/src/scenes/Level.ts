@@ -10,7 +10,7 @@ import {
     Movement
 } from '../game/utils'
 import { Car } from '../game/car'
-import { Driver, SimpleDriver } from '../game/driver'
+import { Driver, EchoDriver } from '../game/driver'
 
 const gameHeight = window.innerHeight
 const gameWidth = window.innerWidth
@@ -37,7 +37,7 @@ export class LevelScene extends Phaser.Scene {
     private carX: number = 0
     private carY: number = 0
 
-    private stars: number = 1
+    private stars: number = 0
 
     private carSprite: Phaser.GameObjects.Sprite
 
@@ -106,7 +106,7 @@ export class LevelScene extends Phaser.Scene {
 
     levelInfo: LevelInfo = LevelConfig.danny
     car: Car = new Car()
-    driver: Driver = new SimpleDriver()
+    driver: Driver = new EchoDriver()
 
     loadLevel(): void {
         let li: LevelInfo = (<any>window).LevelSetup
@@ -137,7 +137,7 @@ export class LevelScene extends Phaser.Scene {
                 this.carSprite.setAngle(180)
                 break;
         }
-        this.scaleSprite(this.carSprite, this.rectSize * 0.5)
+        this.scaleSprite(this.carSprite, this.rectSize * 0.9)
 
         this.setupControls()
 
@@ -158,7 +158,7 @@ export class LevelScene extends Phaser.Scene {
             this.carSprite,
             () => {
                 this.time.addEvent({
-                    delay: 600,
+                    delay: 300,
                     loop: false,
                     callback: () => {
                         this.finishLevel();
@@ -221,15 +221,15 @@ export class LevelScene extends Phaser.Scene {
 
         sprite = this.physics.add.sprite(0, 0, 'arrow_down').setInteractive()
         sprite.setDepth(100)
-        sprite.x = gameWidth - 50 - 60
-        sprite.y = gameHeight - 50
+        sprite.x = gameWidth - 50
+        sprite.y = gameHeight - 50 -60
         sprite.on('pointerdown', (pointer: any) => {
             this.processInput(DriverInput.Crap)
         })
 
         sprite = this.physics.add.sprite(0, 0, 'arrow_left').setInteractive()
         sprite.setDepth(100)
-        sprite.x = gameWidth - 50 - 120
+        sprite.x = gameWidth - 50 - 60
         sprite.y = gameHeight - 50
         sprite.on('pointerdown', (pointer: any) => {
             this.processInput(DriverInput.Left)
@@ -333,12 +333,21 @@ export class LevelScene extends Phaser.Scene {
         // });
     }
 
+    randomTile(): string {
+        let tiles = ['tile_1', 'tile_2', 'tile_3', 'tile_4']
+        return tiles[Math.floor(Math.random() * tiles.length)]
+    }
+
     setupHouses() {
         let field: Phaser.GameObjects.Graphics = this.add.graphics({ lineStyle: { width: 2, color: 0x000000 }, fillStyle: { color: 0x000000 }})
 		
 		for (let i = 0; i < maxSide; i++) {
 			for (let j = 0; j < minSide; j++) {
-				field.fillRect(this.offsetX + this.rectSize * (3 * i + 1), this.offsetY + this.rectSize * (3 * j + 1), this.rectSize * 2, this.rectSize * 2);
+				// field.fillRect(this.offsetX + this.rectSize * (3 * i + 1), this.offsetY + this.rectSize * (3 * j + 1), this.rectSize * 2, this.rectSize * 2);
+
+                let sprite = this.physics.add.sprite(this.offsetX + this.rectSize * (3 * i + 1), this.offsetY + this.rectSize * (3 * j + 1), this.randomTile());
+                sprite.setOrigin(0)
+                this.scaleSprite(sprite, this.rectSize * 2)
 			}
 		}
     }
@@ -358,6 +367,8 @@ export class LevelScene extends Phaser.Scene {
     }
 
     flagHit(carSprite: Phaser.GameObjects.GameObject, flag: Phaser.GameObjects.GameObject) {
+        this.stars++;
+
         let flagSprite = this.physics.add.sprite(flag.x, flag.y, 'flag_empty')
         flagSprite.setOrigin(0.5)
         this.scaleSprite(flagSprite, this.rectSize)
@@ -606,7 +617,7 @@ export class LevelScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('car', 'images/monster.png')
+        this.load.image('car', 'images/car.png')
         this.load.image('arrow_left', 'images/arrow_left.png')
         this.load.image('arrow_right', 'images/arrow_right.png')
         this.load.image('arrow_up', 'images/arrow_up.png')
@@ -627,6 +638,10 @@ export class LevelScene extends Phaser.Scene {
         this.load.image('flag_ready', 'images/flag_ready.png')
         this.load.image('flag_empty', 'images/flag_empty.png')
 
+        this.load.image('tile_1', 'images/tile_1.png')
+        this.load.image('tile_2', 'images/tile_2.png')
+        this.load.image('tile_3', 'images/tile_3.png')
+        this.load.image('tile_4', 'images/tile_4.png')
         // this.load.audio('music', 'sounds/NavigatorOST.mp3')
     }
 }
