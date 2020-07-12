@@ -17,6 +17,9 @@ define("game/car", ["require", "exports", "game/utils"], function (require, expo
         getNextStep() {
             return this.driver ? this.driver.getNextStep() : utils_1.Direction.Forward;
         }
+        flushDirection() {
+            this.driver.flushDirection();
+        }
         getMovementDirection() {
             if (this.horizontalSpeed > 0) {
                 return utils_1.Movement.Right;
@@ -65,6 +68,9 @@ define("game/driver", ["require", "exports", "game/utils", "game/car"], function
         getNextStep() {
             return this.direction;
         }
+        flushDirection() {
+            this.direction = utils_2.Direction.Forward;
+        }
     }
     exports.EchoDriver = EchoDriver;
     class SimpleDriver {
@@ -92,8 +98,11 @@ define("game/driver", ["require", "exports", "game/utils", "game/car"], function
         }
         getNextStep() {
             let result = this.nextDirection;
-            this.nextDirection = utils_2.Direction.Forward;
+            this.flushDirection();
             return result;
+        }
+        flushDirection() {
+            this.nextDirection = utils_2.Direction.Forward;
         }
     }
     exports.SimpleDriver = SimpleDriver;
@@ -123,7 +132,7 @@ define("game/utils", ["require", "exports", "game/driver"], function (require, e
     })(Movement = exports.Movement || (exports.Movement = {}));
     let level1 = {
         start: { x: 1, y: 1 },
-        finish: { x: 1, y: 0 },
+        finish: { x: 5, y: 5 },
         flags: [{ x: 3, y: 3 }, { x: 2, y: 5 }, { x: 5, y: 1 }]
     };
     let defaultHero = {
@@ -255,6 +264,18 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             }, this);
             this.load.audio('music', 'sounds/NavigatorOST.mp3');
             this.load.start();
+        }
+        getRows() {
+            if (this.isVertical) {
+                return maxSide;
+            }
+            return minSide;
+        }
+        getCols() {
+            if (this.isVertical) {
+                return minSide;
+            }
+            return maxSide;
         }
         loadLevel() {
             let li = window.LevelSetup;
@@ -461,7 +482,11 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             this.car.speed;
             let angleChange = 0;
             this.currentNextStep = this.car.getNextStep();
-            switch (this.car.getNextStep()) {
+            if (!this.canGo(this.currentNextStep)) {
+                this.currentNextStep = this.resolveCurrentNextStep();
+            }
+            this.car.flushDirection();
+            switch (this.currentNextStep) {
                 case utils_4.Direction.Left:
                     angleChange = -90;
                     break;
@@ -479,6 +504,56 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
                     carSprite.setAngle(value);
                 }
             });
+        }
+        resolveCurrentNextStep() {
+            if (this.canGo(utils_4.Direction.Right)) {
+                return utils_4.Direction.Right;
+            }
+            else if (this.canGo(utils_4.Direction.Left)) {
+                return utils_4.Direction.Left;
+            }
+            return utils_4.Direction.Forward;
+        }
+        canGo(d) {
+            debugger;
+            switch (d) {
+                case utils_4.Direction.Forward:
+                    switch (this.car.getMovementDirection()) {
+                        case utils_4.Movement.Down:
+                            return this.prevBigCrossRoad.mapPositionY < this.getRows();
+                        case utils_4.Movement.Left:
+                            return this.prevBigCrossRoad.mapPositionX > 0;
+                        case utils_4.Movement.Right:
+                            return this.prevBigCrossRoad.mapPositionX > this.getCols();
+                        case utils_4.Movement.Up:
+                            return this.prevBigCrossRoad.mapPositionY > 0;
+                    }
+                    break;
+                case utils_4.Direction.Left:
+                    switch (this.car.getMovementDirection()) {
+                        case utils_4.Movement.Down:
+                            return this.prevBigCrossRoad.mapPositionX != this.getCols();
+                        case utils_4.Movement.Left:
+                            return this.prevBigCrossRoad.mapPositionY != this.getRows();
+                        case utils_4.Movement.Right:
+                            return this.prevBigCrossRoad.mapPositionY != 0;
+                        case utils_4.Movement.Up:
+                            return this.prevBigCrossRoad.mapPositionX != 0;
+                    }
+                    break;
+                case utils_4.Direction.Right:
+                    switch (this.car.getMovementDirection()) {
+                        case utils_4.Movement.Down:
+                            return this.prevBigCrossRoad.mapPositionX != 0;
+                        case utils_4.Movement.Left:
+                            return this.prevBigCrossRoad.mapPositionY != 0;
+                        case utils_4.Movement.Right:
+                            return this.prevBigCrossRoad.mapPositionY != this.getRows();
+                        case utils_4.Movement.Up:
+                            return this.prevBigCrossRoad.mapPositionX != this.getCols();
+                    }
+                    break;
+            }
         }
         smallCrossroadHit(carSprite, crossroad) {
             if (crossroad === this.prevSmallCrossRoad)
@@ -525,7 +600,7 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
                             this.tweens.addCounter(horizontalCounter);
                         }
                     }
-                    this.driver.input(utils_4.DriverInput.Right);
+                    // this.driver.input(DriverInput.Right)
                     break;
                 case utils_4.Direction.Right:
                     if (this.car.verticalSpeed > 0) {
@@ -550,7 +625,7 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
                             this.tweens.addCounter(horizontalCounter);
                         }
                     }
-                    this.driver.input(utils_4.DriverInput.Left);
+                    // this.driver.input(DriverInput.Left)
                     break;
             }
         }
@@ -567,6 +642,8 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
                 for (let j = 0; j <= minSide; j++) {
                     let crossroad = this.bigCrossroads.create(this.offsetX + this.rectSize * (3 * i + 0.5), this.offsetY + this.rectSize * (3 * j + 0.5), 'towerplace');
                     crossroad.alpha = 0;
+                    crossroad.mapPositionX = i;
+                    crossroad.mapPositionY = j;
                     this.scaleSprite(crossroad, this.rectSize * 2);
                     if (!this.prevBigCrossRoad) {
                         this.prevBigCrossRoad = crossroad;

@@ -19,6 +19,10 @@ export class Car {
     public getNextStep(): Direction {
         return this.driver ? this.driver.getNextStep() : Direction.Forward
     }
+
+    public flushDirection(): void {
+        this.driver.flushDirection()
+    }
  
     public getMovementDirection(): Movement {
         if (this.horizontalSpeed > 0) {

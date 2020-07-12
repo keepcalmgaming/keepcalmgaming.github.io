@@ -88,6 +88,20 @@ export class LevelScene extends Phaser.Scene {
         this.load.start();
     }
 
+    getRows(): integer { 
+        if (this.isVertical) {
+            return maxSide
+        }
+        return minSide
+    }
+
+    getCols(): integer {
+        if (this.isVertical) {
+            return minSide
+        }
+        return maxSide
+    }
+
 
     levelInfo: LevelInfo = LevelsSettings[0]
     car: Car = new Car()
@@ -337,7 +351,11 @@ export class LevelScene extends Phaser.Scene {
 
         let angleChange = 0;
         this.currentNextStep = this.car.getNextStep();
-        switch(this.car.getNextStep()) {
+        if (!this.canGo(this.currentNextStep)) {
+            this.currentNextStep = this.resolveCurrentNextStep();
+        }
+        this.car.flushDirection()
+        switch(this.currentNextStep) {
             case Direction.Left:
                 angleChange = -90;
                 break;
@@ -355,6 +373,57 @@ export class LevelScene extends Phaser.Scene {
                 (<any>carSprite).setAngle(value);
             }
         })
+    }
+
+    private resolveCurrentNextStep(): Direction {
+        if (this.canGo(Direction.Right)) {
+            return Direction.Right
+        } else if (this.canGo(Direction.Left)) {
+            return Direction.Left
+        }
+        return Direction.Forward
+    }
+
+    private canGo(d: Direction): Boolean {
+        debugger
+        switch(d) {
+            case Direction.Forward:
+                switch (this.car.getMovementDirection()) {
+                    case Movement.Down:
+                        return this.prevBigCrossRoad.mapPositionY < this.getRows()
+                    case Movement.Left:
+                        return this.prevBigCrossRoad.mapPositionX > 0
+                    case Movement.Right:
+                        return this.prevBigCrossRoad.mapPositionX > this.getCols()
+                    case Movement.Up:
+                        return this.prevBigCrossRoad.mapPositionY > 0
+                }
+                break;
+            case Direction.Left:
+                switch (this.car.getMovementDirection()) {
+                    case Movement.Down:
+                        return this.prevBigCrossRoad.mapPositionX != this.getCols()
+                    case Movement.Left:
+                        return this.prevBigCrossRoad.mapPositionY != this.getRows()
+                    case Movement.Right:
+                        return this.prevBigCrossRoad.mapPositionY != 0
+                    case Movement.Up:
+                        return this.prevBigCrossRoad.mapPositionX != 0
+                }
+                break;
+            case Direction.Right:
+                switch (this.car.getMovementDirection()) {
+                    case Movement.Down:
+                        return this.prevBigCrossRoad.mapPositionX != 0
+                    case Movement.Left:
+                        return this.prevBigCrossRoad.mapPositionY != 0
+                    case Movement.Right:
+                        return this.prevBigCrossRoad.mapPositionY != this.getRows()
+                    case Movement.Up:
+                        return this.prevBigCrossRoad.mapPositionX != this.getCols()
+                }
+                break;
+        }
     }
 
     smallCrossroadHit(carSprite: Phaser.GameObjects.GameObject, crossroad: Phaser.GameObjects.GameObject) {
@@ -406,7 +475,7 @@ export class LevelScene extends Phaser.Scene {
                         this.tweens.addCounter(horizontalCounter)
                     }
                 }
-                this.driver.input(DriverInput.Right)
+                // this.driver.input(DriverInput.Right)
                 break;
             case Direction.Right:
                 if (this.car.verticalSpeed > 0) {
@@ -432,7 +501,7 @@ export class LevelScene extends Phaser.Scene {
                         this.tweens.addCounter(horizontalCounter)
                     }
                 }
-                this.driver.input(DriverInput.Left)
+                // this.driver.input(DriverInput.Left)
                 break;
             }
     }
@@ -451,6 +520,9 @@ export class LevelScene extends Phaser.Scene {
 			for (let j = 0; j <= minSide; j++) {
                 let crossroad = this.bigCrossroads.create(this.offsetX + this.rectSize * (3 * i + 0.5), this.offsetY + this.rectSize * (3 * j + 0.5), 'towerplace')
                 crossroad.alpha = 0
+                crossroad.mapPositionX = i
+                crossroad.mapPositionY = j
+                
                 this.scaleSprite(crossroad, this.rectSize * 2)
                 if (!this.prevBigCrossRoad) {
                     this.prevBigCrossRoad = crossroad

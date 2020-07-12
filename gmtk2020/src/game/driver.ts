@@ -7,6 +7,8 @@ export interface Driver {
     input(di: DriverInput): void
 
     getNextStep(): Direction
+
+    flushDirection(): void
 }
 
 export class EchoDriver implements Driver {
@@ -35,6 +37,10 @@ export class EchoDriver implements Driver {
     public getNextStep(): Direction {
         return this.direction
     }
+
+    public flushDirection(): void {
+        this.direction = Direction.Forward
+    }
 }
 
 export class SimpleDriver implements Driver {
@@ -62,7 +68,11 @@ export class SimpleDriver implements Driver {
 
     public getNextStep(): Direction {
         let result = this.nextDirection
-        this.nextDirection = Direction.Forward
+        this.flushDirection();
         return result
+    }
+
+    public flushDirection():void {
+        this.nextDirection = Direction.Forward
     }
 }
