@@ -356,7 +356,7 @@ define("game/utils", ["require", "exports", "game/driver"], function (require, e
             text: 'Your driver Misha always performs reversed commands. He had a tough childhood.',
             name: 'misha'
         }),
-        elon: new LevelInfo(() => new driver_1.EchoDriver(), level6, 'elon', {
+        elon: new LevelInfo(() => new driver_1.Lloyd(), level6, 'elon', {
             pic: 'images/profile_elon.png',
             text: "Your driver Floyd always performs your penultimate command. His first move is random.",
             name: 'elon'
@@ -384,16 +384,23 @@ define("scenes/greeting", ["require", "exports", "game/utils"], function (requir
                 "Left! Right! Cool! Crap!",
                 "",
                 "Topic of GMTK Game Jam 2020 is “Out of Control”.",
-                "Here's our small",
+                "Here's our small game about driving in a city.",
                 "",
                 "Enjoy!",
                 "",
                 "https://keepcalmgaming.github.io"
             ];
-            var text = this.add.text(0, 0, content, { align: 'center', font: '25px', wordWrap: { width: gameWidth - 100 } });
+            this.cameras.main.setBackgroundColor('#FFFFFF');
+            var text = this.add.text(0, 0, content, { align: 'center', font: '25px', color: '#000000', wordWrap: { width: gameWidth - 100 } });
             var bounds = text.getBounds();
             text.x = halfWidth - bounds.width / 2;
             text.y = halfHeight - bounds.height / 2;
+            this.load.once('complete', () => {
+                let music = this.sound.add('music');
+                music.play();
+            }, this);
+            this.load.audio('music', 'sounds/NavigatorOST.mp3');
+            this.load.start();
             let clicked = false;
             if (!window.SaveState) {
                 window.SaveState = {};
@@ -452,17 +459,12 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             console.log('Game Created', this.x, this.y);
         }
         create() {
+            this.stars = 0;
             this.loadLevel();
             this.cameras.main.setBackgroundColor('#FFFFFF');
             this.setupHouses();
             this.setupCrossRoads();
             this.setupEvents();
-            this.load.once('complete', () => {
-                // let music = this.sound.add('music')
-                // music.play()
-            }, this);
-            this.load.audio('music', 'sounds/NavigatorOST.mp3');
-            this.load.start();
         }
         getRows() {
             if (this.isVertical) {
@@ -969,9 +971,19 @@ define("scenes/level_select", ["require", "exports", "game/utils"], function (re
         }
         create() {
             console.log('create called');
-            window.SaveState[window.Result.name] = {
-                stars: window.Result.stars
-            };
+            this.cameras.main.setBackgroundColor('#FFFFFF');
+            if (window.Result) {
+                if (window.SaveState[window.Result.name]) {
+                    if (window.Result.stars > window.SaveState[window.Result.name].stars) {
+                        window.SaveState[window.Result.name].stars = window.Result.stars;
+                    }
+                }
+                else {
+                    window.SaveState[window.Result.name] = {
+                        stars: window.Result.stars
+                    };
+                }
+            }
             window.Result = null;
             let positions = [
                 [halfWidth - 140, halfHeight - 90],
@@ -1080,9 +1092,11 @@ define("scenes/hero_scene", ["require", "exports", "game/utils"], function (requ
             sprite.x = halfWidth - 20;
             sprite.y = halfHeight;
             let content = this.text;
+            this.cameras.main.setBackgroundColor('#FFFFFF');
             var text = this.add.text(0, 0, content, {
                 align: 'left',
                 font: 'bold 25px Arial',
+                color: '#000000',
                 wordWrap: { width: halfWidth }
             });
             var bounds = text.getBounds();

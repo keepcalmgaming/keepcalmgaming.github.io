@@ -116,7 +116,7 @@ export let LevelConfig = {
             text: 'Your driver Misha always performs reversed commands. He had a tough childhood.',
             name: 'misha'
         }),
-    elon: new LevelInfo(() => new EchoDriver(), level6, 'elon',
+    elon: new LevelInfo(() => new Lloyd(), level6, 'elon',
         {
             pic: 'images/profile_elon.png',
             text: "Your driver Floyd always performs your penultimate command. His first move is random.",

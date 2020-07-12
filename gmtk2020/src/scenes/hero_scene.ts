@@ -39,9 +39,11 @@ export class HeroScene extends Phaser.Scene {
         sprite.y = halfHeight
 
         let content = this.text
+        this.cameras.main.setBackgroundColor('#FFFFFF');
         var text = this.add.text(0, 0, content, { 
             align: 'left',
             font: 'bold 25px Arial',
+            color: '#000000',
             wordWrap: { width: halfWidth }
         })
         var bounds = text.getBounds()

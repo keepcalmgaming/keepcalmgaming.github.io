@@ -31,8 +31,18 @@ export class LevelSelectScene extends Phaser.Scene {
     create() {
         console.log('create called')
 
-        window.SaveState[window.Result.name] = {
-            stars: window.Result.stars
+        this.cameras.main.setBackgroundColor('#FFFFFF');
+        
+        if (window.Result) {
+            if (window.SaveState[window.Result.name]) {
+                if (window.Result.stars > window.SaveState[window.Result.name].stars) {
+                    window.SaveState[window.Result.name].stars = window.Result.stars
+                }
+            } else {
+                window.SaveState[window.Result.name] = {
+                    stars: window.Result.stars
+                }
+            }
         }
 
         window.Result = null

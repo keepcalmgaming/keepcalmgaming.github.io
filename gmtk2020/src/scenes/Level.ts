@@ -73,6 +73,7 @@ export class LevelScene extends Phaser.Scene {
     private music?: Phaser.Sound.BaseSound
 
     create() {
+        this.stars = 0
         this.loadLevel()
         this.cameras.main.setBackgroundColor('#FFFFFF');
 
@@ -80,13 +81,6 @@ export class LevelScene extends Phaser.Scene {
         this.setupCrossRoads()
 
         this.setupEvents()
-
-        this.load.once('complete', () => {
-            // let music = this.sound.add('music')
-            // music.play()
-        }, this);
-        this.load.audio('music', 'sounds/NavigatorOST.mp3')
-        this.load.start();
     }
 
     getRows(): integer { 
