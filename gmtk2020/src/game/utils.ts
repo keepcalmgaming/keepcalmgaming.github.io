@@ -19,7 +19,7 @@ export type LevelSetup = {
 let level1: LevelSetup = {
     start: { x: 1, y: 1 },
     finish: { x: 5, y: 5},
-    flags: [{ x: 3, y: 3}, { x: 3, y: 3}, { x: 3, y: 3}]
+    flags: [{ x: 3, y: 3}, { x: 2, y: 5}, { x: 5, y: 1}]
 }
 
 

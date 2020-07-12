@@ -124,7 +124,7 @@ define("game/utils", ["require", "exports", "game/driver"], function (require, e
     let level1 = {
         start: { x: 1, y: 1 },
         finish: { x: 5, y: 5 },
-        flags: [{ x: 3, y: 3 }, { x: 3, y: 3 }, { x: 3, y: 3 }]
+        flags: [{ x: 3, y: 3 }, { x: 2, y: 5 }, { x: 5, y: 1 }]
     };
     let defaultHero = {
         pic: 'images/menu/profile.png',
@@ -218,6 +218,7 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             this.offsetY = 0;
             this.carX = 0;
             this.carY = 0;
+            this.stars = 0;
             this.levelInfo = utils_4.LevelsSettings[0];
             this.car = new car_2.Car();
             this.driver = new driver_2.SimpleDriver();
@@ -266,16 +267,16 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             let ls = li.level;
             let startSprite = this.physics.add.sprite(this.getX(ls.start.x), this.getY(ls.start.y), 'start');
             startSprite.setOrigin(0.5);
-            startSprite.setScale(0.5);
+            this.scaleSprite(startSprite, this.rectSize);
             startSprite.setDepth(15);
             let finishSprite = this.physics.add.sprite(this.getX(ls.finish.x), this.getY(ls.finish.y), 'finish');
             finishSprite.setOrigin(0.5);
-            finishSprite.setScale(0.5);
+            this.scaleSprite(finishSprite, this.rectSize);
             finishSprite.setDepth(15);
             for (let flag of ls.flags) {
                 let flagSprite = this.physics.add.sprite(this.getX(flag.x), this.getY(flag.y), 'flag_ready');
                 flagSprite.setOrigin(0.5);
-                flagSprite.setScale(0.5);
+                this.scaleSprite(flagSprite, this.rectSize);
                 flagSprite.setDepth(15);
             }
         }
@@ -362,7 +363,7 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
                     a = 'cool';
                     break;
             }
-            let bubble = this.physics.add.sprite(this.carSprite.x + 15, this.carSprite.y + 15 + 50, s);
+            let bubble = this.physics.add.sprite(this.carSprite.x + 15, this.carSprite.y + 15, s);
             bubble.setOrigin(0, 1);
             bubble.setDepth(30);
             bubble.setScale(0.1);
@@ -389,7 +390,7 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
                 duration: 1000,
                 onUpdate: (tween) => {
                     bubble.x = this.carSprite.x + 15;
-                    bubble.y = this.carSprite.y + 15 + 50;
+                    bubble.y = this.carSprite.y + 15;
                 }
             });
             this.time.addEvent({
@@ -552,6 +553,13 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
         }
         scaleSprite(sprite, dim) {
             sprite.setScale(this.getScale(sprite, dim));
+        }
+        finishLevel() {
+            window.Result;
+            LevelResults = {
+                stars: this.stars,
+                name: this.levelInfo.name
+            };
         }
         preload() {
             this.load.image('car', 'images/car.png');

@@ -3,6 +3,7 @@ import {
     LevelInfo, 
     LevelSetup, 
     LevelsSettings,
+    LevelConfig,
     Direction,
     DriverInput,
     Movement
@@ -32,6 +33,8 @@ export class LevelScene extends Phaser.Scene {
 
     private carX: number = 0
     private carY: number = 0
+
+    private stars: number = 0
 
     private carSprite?: Phaser.GameObjects.Sprite
 
@@ -107,18 +110,18 @@ export class LevelScene extends Phaser.Scene {
 
         let startSprite = this.physics.add.sprite(this.getX(ls.start.x), this.getY(ls.start.y), 'start')
         startSprite.setOrigin(0.5)
-        startSprite.setScale(0.5)
+        this.scaleSprite(startSprite, this.rectSize)
         startSprite.setDepth(15)
 
         let finishSprite = this.physics.add.sprite(this.getX(ls.finish.x), this.getY(ls.finish.y), 'finish')
         finishSprite.setOrigin(0.5)
-        finishSprite.setScale(0.5)
+        this.scaleSprite(finishSprite, this.rectSize)
         finishSprite.setDepth(15)
 
         for (let flag of ls.flags) {
             let flagSprite = this.physics.add.sprite(this.getX(flag.x), this.getY(flag.y), 'flag_ready')
             flagSprite.setOrigin(0.5)
-            flagSprite.setScale(0.5)
+            this.scaleSprite(flagSprite, this.rectSize)
             flagSprite.setDepth(15)
         }
     }
@@ -213,7 +216,7 @@ export class LevelScene extends Phaser.Scene {
                 break
         }
 
-        let bubble = this.physics.add.sprite(this.carSprite.x + 15, this.carSprite.y + 15 + 50, s);
+        let bubble = this.physics.add.sprite(this.carSprite.x + 15, this.carSprite.y + 15, s);
         bubble.setOrigin(0, 1)
         bubble.setDepth(30)
 
@@ -244,7 +247,7 @@ export class LevelScene extends Phaser.Scene {
             duration: 1000,
             onUpdate: (tween: any) => {
                 bubble.x = this.carSprite.x + 15
-                bubble.y = this.carSprite.y + 15 + 50
+                bubble.y = this.carSprite.y + 15
             }
         })
 
@@ -424,6 +427,13 @@ export class LevelScene extends Phaser.Scene {
 
     scaleSprite(sprite: Phaser.GameObjects.Sprite, dim: number) {
         sprite.setScale(this.getScale(sprite, dim))
+    }
+
+    finishLevel() {
+        window.Result: LevelResults = {
+            stars: this.stars,
+            name: this.levelInfo.name
+        }
     }
 
     preload() {
