@@ -261,7 +261,9 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             this.carSprite = this.physics.add.sprite(this.offsetX + this.rectSize * 0.5, this.offsetY + this.rectSize * 0.5, 'car');
             this.carSprite.setDepth(20);
             this.carSprite.setAngle(90);
+            console.log(this.carSprite.width, this.carSprite.height);
             this.scaleSprite(this.carSprite, this.rectSize * 0.5);
+            console.log(this.carSprite.width, this.carSprite.height);
             this.setupControls();
             // TODO: set start/finish/flags from here
             let ls = li.level;
@@ -455,7 +457,8 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             this.tweens.addCounter({
                 from: angle,
                 to: angle + angleChange,
-                duration: 500,
+                delay: 400,
+                duration: 600,
                 onUpdate: (tween) => {
                     let value = tween.getValue();
                     carSprite.setAngle(value);
@@ -465,25 +468,46 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
         smallCrossroadHit(carSprite, crossroad) {
             if (crossroad === this.prevSmallCrossRoad)
                 return;
+            let duration = 600;
+            let verticalCounter = {
+                from: this.carSprite.y,
+                to: crossroad.y,
+                duration: duration,
+                onUpdate: (tween) => {
+                    this.carSprite.y = tween.getValue();
+                }
+            };
+            let horizontalCounter = {
+                from: this.carSprite.x,
+                to: crossroad.x,
+                duration: duration,
+                onUpdate: (tween) => {
+                    this.carSprite.x = tween.getValue();
+                }
+            };
             this.prevSmallCrossRoad = crossroad;
             switch (this.car.getNextStep()) {
                 case utils_4.Direction.Left:
                     if (this.car.verticalSpeed > 0) {
                         this.car.verticalSpeed = 0;
                         this.car.horizontalSpeed = 1;
+                        this.tweens.addCounter(verticalCounter);
                     }
                     else if (this.car.verticalSpeed < 0) {
                         this.car.verticalSpeed = 0;
                         this.car.horizontalSpeed = -1;
+                        this.tweens.addCounter(verticalCounter);
                     }
                     else {
                         if (this.car.horizontalSpeed > 0) {
                             this.car.verticalSpeed = -1;
                             this.car.horizontalSpeed = 0;
+                            this.tweens.addCounter(horizontalCounter);
                         }
                         else {
                             this.car.verticalSpeed = 1;
                             this.car.horizontalSpeed = 0;
+                            this.tweens.addCounter(horizontalCounter);
                         }
                     }
                     this.driver.input(utils_4.DriverInput.Right);
@@ -492,19 +516,23 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
                     if (this.car.verticalSpeed > 0) {
                         this.car.verticalSpeed = 0;
                         this.car.horizontalSpeed = -1;
+                        this.tweens.addCounter(verticalCounter);
                     }
                     else if (this.car.verticalSpeed < 0) {
                         this.car.verticalSpeed = 0;
                         this.car.horizontalSpeed = 1;
+                        this.tweens.addCounter(verticalCounter);
                     }
                     else {
                         if (this.car.horizontalSpeed > 0) {
                             this.car.verticalSpeed = 1;
                             this.car.horizontalSpeed = 0;
+                            this.tweens.addCounter(horizontalCounter);
                         }
                         else {
                             this.car.verticalSpeed = -1;
                             this.car.horizontalSpeed = 0;
+                            this.tweens.addCounter(horizontalCounter);
                         }
                     }
                     this.driver.input(utils_4.DriverInput.Left);
@@ -534,7 +562,7 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             for (let i = 0; i <= maxSide; i++) {
                 for (let j = 0; j <= minSide; j++) {
                     let crossroad = this.smallCrossroads.create(this.offsetX + this.rectSize * (3 * i + 0.5), this.offsetY + this.rectSize * (3 * j + 0.5), 'towerplace');
-                    // crossroad.alpha = 0
+                    crossroad.alpha = 0;
                     this.scaleSprite(crossroad, this.rectSize * 0.75);
                     if (!this.prevSmallCrossRoad) {
                         this.prevSmallCrossRoad = crossroad;
@@ -562,7 +590,7 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             };
         }
         preload() {
-            this.load.image('car', 'images/car.png');
+            this.load.image('car', 'images/monster.png');
             this.load.image('arrow_left', 'images/arrow_left.png');
             this.load.image('arrow_right', 'images/arrow_right.png');
             this.load.image('arrow_up', 'images/arrow_up.png');

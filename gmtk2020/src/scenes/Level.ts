@@ -36,7 +36,7 @@ export class LevelScene extends Phaser.Scene {
 
     private stars: number = 0
 
-    private carSprite?: Phaser.GameObjects.Sprite
+    private carSprite: Phaser.GameObjects.Sprite
 
     private bigCrossroads?: Phaser.Physics.Arcade.Group
     private smallCrossroads?: Phaser.Physics.Arcade.Group
@@ -101,7 +101,9 @@ export class LevelScene extends Phaser.Scene {
         this.carSprite = this.physics.add.sprite(this.offsetX + this.rectSize * 0.5, this.offsetY + this.rectSize * 0.5, 'car')
         this.carSprite.setDepth(20)
         this.carSprite.setAngle(90)
+        console.log(this.carSprite.width, this.carSprite.height)
         this.scaleSprite(this.carSprite, this.rectSize * 0.5)
+        console.log(this.carSprite.width, this.carSprite.height)
 
         this.setupControls()
 
@@ -327,7 +329,8 @@ export class LevelScene extends Phaser.Scene {
         this.tweens.addCounter({
             from: angle,
             to: angle + angleChange,
-            duration: 500,
+            delay: 400,
+            duration: 600,
             onUpdate: (tween: any) => {
                 let value = tween.getValue();
                 (<any>carSprite).setAngle(value);
@@ -338,22 +341,50 @@ export class LevelScene extends Phaser.Scene {
     smallCrossroadHit(carSprite: Phaser.GameObjects.GameObject, crossroad: Phaser.GameObjects.GameObject) {
         if (crossroad === this.prevSmallCrossRoad) return
 
+        let duration = 600
+
+        let verticalCounter = {
+            from: this.carSprite.y,
+            to: crossroad.y,
+            duration: duration,
+            onUpdate: (tween: any) => {
+                this.carSprite.y = tween.getValue();
+            }
+        }
+
+        let horizontalCounter = {
+            from: this.carSprite.x,
+            to: crossroad.x,
+            duration: duration,
+            onUpdate: (tween: any) => {
+                this.carSprite.x = tween.getValue();
+            }
+        }
+
         this.prevSmallCrossRoad = crossroad;
         switch (this.car.getNextStep()) {
             case Direction.Left:
                 if (this.car.verticalSpeed > 0) {
                     this.car.verticalSpeed = 0;
                     this.car.horizontalSpeed = 1;
+
+                    this.tweens.addCounter(verticalCounter)
                 } else if (this.car.verticalSpeed < 0) {
                     this.car.verticalSpeed = 0;
                     this.car.horizontalSpeed = -1;
+
+                    this.tweens.addCounter(verticalCounter)
                 } else {
                     if (this.car.horizontalSpeed > 0) {
                         this.car.verticalSpeed = -1;
                         this.car.horizontalSpeed = 0;
+
+                        this.tweens.addCounter(horizontalCounter)
                     } else {
                         this.car.verticalSpeed = 1;
                         this.car.horizontalSpeed = 0;
+
+                        this.tweens.addCounter(horizontalCounter)
                     }
                 }
                 this.driver.input(DriverInput.Right)
@@ -362,16 +393,24 @@ export class LevelScene extends Phaser.Scene {
                 if (this.car.verticalSpeed > 0) {
                     this.car.verticalSpeed = 0;
                     this.car.horizontalSpeed = -1;
+
+                    this.tweens.addCounter(verticalCounter)
                 } else if (this.car.verticalSpeed < 0) {
                     this.car.verticalSpeed = 0;
                     this.car.horizontalSpeed = 1;
+
+                    this.tweens.addCounter(verticalCounter)
                 } else {
                     if (this.car.horizontalSpeed > 0) {
                         this.car.verticalSpeed = 1;
                         this.car.horizontalSpeed = 0;
+
+                        this.tweens.addCounter(horizontalCounter)
                     } else {
                         this.car.verticalSpeed = -1;
                         this.car.horizontalSpeed = 0;
+
+                        this.tweens.addCounter(horizontalCounter)
                     }
                 }
                 this.driver.input(DriverInput.Left)
@@ -404,7 +443,7 @@ export class LevelScene extends Phaser.Scene {
 		for (let i = 0; i <= maxSide; i++) {
 			for (let j = 0; j <= minSide; j++) {
                 let crossroad = this.smallCrossroads.create(this.offsetX + this.rectSize * (3 * i + 0.5), this.offsetY + this.rectSize * (3 * j + 0.5), 'towerplace')
-                // crossroad.alpha = 0
+                crossroad.alpha = 0
                 this.scaleSprite(crossroad, this.rectSize * 0.75)
                 if (!this.prevSmallCrossRoad) {
                     this.prevSmallCrossRoad = crossroad
@@ -437,7 +476,7 @@ export class LevelScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('car', 'images/car.png')
+        this.load.image('car', 'images/monster.png')
         this.load.image('arrow_left', 'images/arrow_left.png')
         this.load.image('arrow_right', 'images/arrow_right.png')
         this.load.image('arrow_up', 'images/arrow_up.png')
