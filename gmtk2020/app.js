@@ -160,15 +160,27 @@ define("game/utils", ["require", "exports", "game/driver"], function (require, e
             text: 'This is you.\n\nYou need to get to the Finish.',
             name: 'beginning'
         }),
-        alex: new LevelInfo(() => new driver_1.SimpleDriver(), level1, 'alex'),
-        yappie: new LevelInfo(() => new driver_1.SimpleDriver(), level1, 'yappie'),
-        misha: new LevelInfo(() => new driver_1.SimpleDriver(), level1, 'misha'),
-        elon: new LevelInfo(() => new driver_1.SimpleDriver(), level1, 'elon')
+        alex: new LevelInfo(() => new driver_1.SimpleDriver(), level1, 'alex', {
+            pic: 'images/profile_alex.png',
+            text: 'Alex does not like to listen',
+            name: 'alex'
+        }),
+        yappie: new LevelInfo(() => new driver_1.SimpleDriver(), level1, 'yappie', {
+            pic: 'images/profile_yappie.png',
+            text: 'Yappie always does the opposite',
+            name: 'yappie'
+        }),
+        misha: new LevelInfo(() => new driver_1.SimpleDriver(), level1, 'misha', {
+            pic: 'images/profile_misha.png',
+            text: 'Misha never listens',
+            name: 'misha'
+        }),
+        elon: new LevelInfo(() => new driver_1.SimpleDriver(), level1, 'elon', {
+            pic: 'images/profile_elon.png',
+            text: 'Elon is the smartest',
+            name: 'elon'
+        })
     };
-    exports.LevelsSettings = [
-        new LevelInfo(() => new driver_1.EchoDriver(), level1, 'alex'),
-        new LevelInfo(() => new driver_1.SimpleDriver(), level1, 'alex')
-    ];
 });
 define("scenes/greeting", ["require", "exports", "game/utils"], function (require, exports, utils_3) {
     "use strict";
@@ -232,7 +244,7 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             this.carX = 0;
             this.carY = 0;
             this.stars = 1;
-            this.levelInfo = utils_4.LevelsSettings[0];
+            this.levelInfo = utils_4.LevelConfig.danny;
             this.car = new car_2.Car();
             this.driver = new driver_2.SimpleDriver();
             // super(sceneConfig)
@@ -832,17 +844,22 @@ define("scenes/hero_scene", ["require", "exports", "game/utils"], function (requ
         }
         renderScene() {
             let sprite = this.physics.add.sprite(0, 0, this.imgName).setInteractive();
-            sprite.x = halfWidth - 300;
+            sprite.setOrigin(1, 0.5);
+            sprite.x = halfWidth - 20;
             sprite.y = halfHeight;
             let content = this.text;
             var text = this.add.text(0, 0, content, {
                 align: 'left',
                 font: 'bold 25px Arial',
-                wordWrap: { width: 400 }
+                wordWrap: { width: halfWidth }
             });
             var bounds = text.getBounds();
-            text.x = halfWidth - 100;
+            text.x = halfWidth;
             text.y = halfHeight - bounds.height / 2;
+            if (halfWidth > 300) {
+                sprite.x -= 100;
+                text.x -= 100;
+            }
             let clicked = false;
             this.input.on('pointerdown', () => {
                 if (!clicked) {

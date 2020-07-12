@@ -62,18 +62,33 @@ export let LevelConfig = {
             name: 'beginning'
         }
     ),
-    alex: new LevelInfo(() => new SimpleDriver(), level1, 'alex'),
-    yappie: new LevelInfo(() => new SimpleDriver(), level1, 'yappie'),
-    misha: new LevelInfo(() => new SimpleDriver(), level1, 'misha'),
-    elon: new LevelInfo(() => new SimpleDriver(), level1, 'elon')
+    alex: new LevelInfo(() => new SimpleDriver(), level1, 'alex',
+        {
+            pic: 'images/profile_alex.png',
+            text: 'Alex does not like to listen',
+            name: 'alex'
+        }),
+    yappie: new LevelInfo(() => new SimpleDriver(), level1, 'yappie',
+        {
+            pic: 'images/profile_yappie.png',
+            text: 'Yappie always does the opposite',
+            name: 'yappie'
+        }),
+    misha: new LevelInfo(() => new SimpleDriver(), level1, 'misha',
+        {
+            pic: 'images/profile_misha.png',
+            text: 'Misha never listens',
+            name: 'misha'
+        }),
+    elon: new LevelInfo(() => new SimpleDriver(), level1, 'elon',
+        {
+            pic: 'images/profile_elon.png',
+            text: 'Elon is the smartest',
+            name: 'elon'
+        })
 }
 
 export type LevelResults = {
     stars: number,
     name: string
 }
-
-export let LevelsSettings: LevelInfo[] = [
-    new LevelInfo(() => new EchoDriver(), level1, 'alex'),
-    new LevelInfo(() => new SimpleDriver(), level1, 'alex')
-]

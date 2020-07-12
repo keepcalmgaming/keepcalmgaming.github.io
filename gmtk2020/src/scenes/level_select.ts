@@ -1,4 +1,4 @@
-import { LevelsSettings, LevelConfig, LevelOrder } from '../game/utils'
+import { LevelConfig, LevelOrder } from '../game/utils'
 
 const gameHeight = window.innerHeight
 const gameWidth = window.innerWidth

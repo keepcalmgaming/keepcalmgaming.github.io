@@ -1,4 +1,4 @@
-import { LevelsSettings, HeroSceneInfo, LevelConfig, LevelOrder } from '../game/utils'
+import { HeroSceneInfo, LevelConfig, LevelOrder } from '../game/utils'
 
 const gameHeight = window.innerHeight
 const gameWidth = window.innerWidth
@@ -34,19 +34,25 @@ export class HeroScene extends Phaser.Scene {
 
     renderScene() {
         let sprite = this.physics.add.sprite(0, 0, this.imgName).setInteractive()
-        sprite.x = halfWidth - 300
+        sprite.setOrigin(1, 0.5)
+        sprite.x = halfWidth - 20
         sprite.y = halfHeight
 
         let content = this.text
         var text = this.add.text(0, 0, content, { 
             align: 'left',
             font: 'bold 25px Arial',
-            wordWrap: { width: 400 }
+            wordWrap: { width: halfWidth }
         })
         var bounds = text.getBounds()
 
-        text.x = halfWidth - 100
+        text.x = halfWidth
         text.y = halfHeight - bounds.height/2
+
+        if (halfWidth > 300) {
+            sprite.x -= 100
+            text.x -= 100
+        }
 
         let clicked = false
 

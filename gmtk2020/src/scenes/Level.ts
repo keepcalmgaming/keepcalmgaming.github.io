@@ -2,7 +2,6 @@ import { Game } from '../game/game'
 import { 
     LevelInfo, 
     LevelSetup, 
-    LevelsSettings,
     LevelConfig,
     LevelResults,
     Direction,
@@ -103,7 +102,7 @@ export class LevelScene extends Phaser.Scene {
     }
 
 
-    levelInfo: LevelInfo = LevelsSettings[0]
+    levelInfo: LevelInfo = LevelConfig.danny
     car: Car = new Car()
     driver: Driver = new SimpleDriver()
 
