@@ -1,4 +1,4 @@
-import { LevelsSettings } from '../game/utils'
+import { LevelsSettings, LevelConfig, LevelOrder } from '../game/utils'
 
 const gameHeight = window.innerHeight
 const gameWidth = window.innerWidth
@@ -33,16 +33,35 @@ export class LevelSelectScene extends Phaser.Scene {
 
         window.Result = null
 
-        let sprite = this.physics.add.sprite(0, 0, 'profile').setInteractive()
-        sprite.x = halfWidth - 300
-        sprite.y = halfHeight
-        sprite.on('pointerdown', (pointer: any) => {
-            (<any>window).LevelSetup = LevelsSettings[0]
-            this.scene.start('Level')
-        })
+        let positions = [
+            [halfWidth - 140, halfHeight - 90],
+            [halfWidth, halfHeight - 90],
+            [halfWidth + 140, halfHeight - 90],
+            [halfWidth - 70, halfHeight + 90],
+            [halfWidth + 70, halfHeight + 90]
+        ]
+
+        let i = 0
+        for (let name of LevelOrder) {
+            let sprite = this.physics.add.sprite(positions[i][0], positions[i][1], 'level_'+name).setInteractive()
+            sprite.setOrigin(0.5)
+            sprite.on('pointerdown', (pointer: any) => {
+                (<any>window).LevelSetup = LevelConfig[name]
+                this.scene.start('Level')
+            })
+
+            i++
+        }
     }
 
     preload() {
+        for (let name of LevelOrder) {
+            let data = LevelConfig[name]
+            this.load.image('level_'+name, data.heroOutro.pic)
+        }
+
+        this.load.image('level_locked', 'images/profile_locked.png')
+
         this.load.image('profile', 'images/menu/profile.png')
     }
 }

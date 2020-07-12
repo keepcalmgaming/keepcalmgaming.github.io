@@ -36,7 +36,7 @@ export class LevelScene extends Phaser.Scene {
     private carX: number = 0
     private carY: number = 0
 
-    private stars: number = 0
+    private stars: number = 1
 
     private carSprite: Phaser.GameObjects.Sprite
 
@@ -234,7 +234,8 @@ export class LevelScene extends Phaser.Scene {
                 break
         }
 
-        let bubble = this.physics.add.sprite(this.carSprite.x + 15, this.carSprite.y + 15, s);
+        let bubble = this.physics.add.sprite(this.carSprite.x + 10, this.carSprite.y - 10, s);
+        this.scaleSprite(bubble, this.rectSize * 2)
         bubble.setOrigin(0, 1)
         bubble.setDepth(30)
 
@@ -264,8 +265,8 @@ export class LevelScene extends Phaser.Scene {
         this.tweens.addCounter({
             duration: 1000,
             onUpdate: (tween: any) => {
-                bubble.x = this.carSprite.x + 15
-                bubble.y = this.carSprite.y + 15
+                bubble.x = this.carSprite.x + 10
+                bubble.y = this.carSprite.y -10
             }
         })
 
@@ -496,8 +497,9 @@ export class LevelScene extends Phaser.Scene {
         if (this.stars == 0) {
             heroInfo.text = 'You finished the level! Get at least one flag to get to know your driver better.'
         }
+        window.HeroSettings = heroInfo
 
-        this.scene.restart()
+        this.scene.stop('Level')
 
         this.scene.switch('hero')
     }

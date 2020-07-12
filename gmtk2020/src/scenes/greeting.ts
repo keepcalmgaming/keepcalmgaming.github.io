@@ -19,14 +19,12 @@ export class GreetingScene extends Phaser.Scene {
             "",
             "Topic of GMTK Game Jam 2020 is “out of control”.",
             "",
-            "We hope you’ll have as much fun as we did while developing B#.",
-            "",
             "Enjoy!",
             "",
             "https://keepcalmgaming.github.io"
         ];
 
-        var text = this.add.text(0, 0, content, { align: 'center' });
+        var text = this.add.text(0, 0, content, { align: 'center', font: '25px', wordWrap: { width: gameWidth - 100 } });
         var bounds = text.getBounds();
 
         text.x = halfWidth - bounds.width/2;

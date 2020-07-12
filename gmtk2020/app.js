@@ -123,7 +123,7 @@ define("game/utils", ["require", "exports", "game/driver"], function (require, e
     })(Movement = exports.Movement || (exports.Movement = {}));
     let level1 = {
         start: { x: 1, y: 1 },
-        finish: { x: 5, y: 5 },
+        finish: { x: 1, y: 0 },
         flags: [{ x: 3, y: 3 }, { x: 2, y: 5 }, { x: 5, y: 1 }]
     };
     let defaultHero = {
@@ -140,20 +140,25 @@ define("game/utils", ["require", "exports", "game/driver"], function (require, e
         }
     }
     exports.LevelInfo = LevelInfo;
-    exports.LevelOrder = ['echo', 'danny'];
+    exports.LevelOrder = ['danny', 'alex', 'yappie', 'misha', 'elon'];
     exports.LevelConfig = {
-        echo: new LevelInfo(() => new driver_1.EchoDriver(), level1, 'echo', {
-            pic: 'images/menu/profile.png',
-            text: "But you are not the driver. Your driver was Danny, he is a nice guy and always listens. Other won't."
+        danny: new LevelInfo(() => new driver_1.EchoDriver(), level1, 'danny', {
+            pic: 'images/profile_danny.png',
+            text: "But you are not the driver.\n\nYour driver was Danny. He is a nice guy and always listens.\n\nOther won't.",
+            name: 'intro'
         }, {
-            pic: 'images/menu/profile.png',
-            text: 'This is you. You need to get to the Finish.'
+            pic: 'images/profile_player.png',
+            text: 'This is you.\n\nYou need to get to the Finish.',
+            name: 'beginning'
         }),
-        danny: new LevelInfo(() => new driver_1.SimpleDriver(), level1, 'danny')
+        alex: new LevelInfo(() => new driver_1.SimpleDriver(), level1, 'alex'),
+        yappie: new LevelInfo(() => new driver_1.SimpleDriver(), level1, 'yappie'),
+        misha: new LevelInfo(() => new driver_1.SimpleDriver(), level1, 'misha'),
+        elon: new LevelInfo(() => new driver_1.SimpleDriver(), level1, 'elon')
     };
     exports.LevelsSettings = [
-        new LevelInfo(() => new driver_1.EchoDriver(), level1, 'danny'),
-        new LevelInfo(() => new driver_1.SimpleDriver(), level1, 'echo')
+        new LevelInfo(() => new driver_1.EchoDriver(), level1, 'alex'),
+        new LevelInfo(() => new driver_1.SimpleDriver(), level1, 'alex')
     ];
 });
 define("scenes/greeting", ["require", "exports", "game/utils"], function (require, exports, utils_3) {
@@ -173,13 +178,11 @@ define("scenes/greeting", ["require", "exports", "game/utils"], function (requir
                 "",
                 "Topic of GMTK Game Jam 2020 is “out of control”.",
                 "",
-                "We hope you’ll have as much fun as we did while developing B#.",
-                "",
                 "Enjoy!",
                 "",
                 "https://keepcalmgaming.github.io"
             ];
-            var text = this.add.text(0, 0, content, { align: 'center' });
+            var text = this.add.text(0, 0, content, { align: 'center', font: '25px', wordWrap: { width: gameWidth - 100 } });
             var bounds = text.getBounds();
             text.x = halfWidth - bounds.width / 2;
             text.y = halfHeight - bounds.height / 2;
@@ -219,7 +222,7 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             this.offsetY = 0;
             this.carX = 0;
             this.carY = 0;
-            this.stars = 0;
+            this.stars = 1;
             this.levelInfo = utils_4.LevelsSettings[0];
             this.car = new car_2.Car();
             this.driver = new driver_2.SimpleDriver();
@@ -375,7 +378,8 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
                     a = 'cool';
                     break;
             }
-            let bubble = this.physics.add.sprite(this.carSprite.x + 15, this.carSprite.y + 15, s);
+            let bubble = this.physics.add.sprite(this.carSprite.x + 10, this.carSprite.y - 10, s);
+            this.scaleSprite(bubble, this.rectSize * 2);
             bubble.setOrigin(0, 1);
             bubble.setDepth(30);
             bubble.setScale(0.1);
@@ -401,8 +405,8 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             this.tweens.addCounter({
                 duration: 1000,
                 onUpdate: (tween) => {
-                    bubble.x = this.carSprite.x + 15;
-                    bubble.y = this.carSprite.y + 15;
+                    bubble.x = this.carSprite.x + 10;
+                    bubble.y = this.carSprite.y - 10;
                 }
             });
             this.time.addEvent({
@@ -602,7 +606,8 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             if (this.stars == 0) {
                 heroInfo.text = 'You finished the level! Get at least one flag to get to know your driver better.';
             }
-            this.scene.restart();
+            window.HeroSettings = heroInfo;
+            this.scene.stop('Level');
             this.scene.switch('hero');
         }
         preload() {
@@ -655,15 +660,30 @@ define("scenes/level_select", ["require", "exports", "game/utils"], function (re
         create() {
             console.log('create called');
             window.Result = null;
-            let sprite = this.physics.add.sprite(0, 0, 'profile').setInteractive();
-            sprite.x = halfWidth - 300;
-            sprite.y = halfHeight;
-            sprite.on('pointerdown', (pointer) => {
-                window.LevelSetup = utils_5.LevelsSettings[0];
-                this.scene.start('Level');
-            });
+            let positions = [
+                [halfWidth - 140, halfHeight - 90],
+                [halfWidth, halfHeight - 90],
+                [halfWidth + 140, halfHeight - 90],
+                [halfWidth - 70, halfHeight + 90],
+                [halfWidth + 70, halfHeight + 90]
+            ];
+            let i = 0;
+            for (let name of utils_5.LevelOrder) {
+                let sprite = this.physics.add.sprite(positions[i][0], positions[i][1], 'level_' + name).setInteractive();
+                sprite.setOrigin(0.5);
+                sprite.on('pointerdown', (pointer) => {
+                    window.LevelSetup = utils_5.LevelConfig[name];
+                    this.scene.start('Level');
+                });
+                i++;
+            }
         }
         preload() {
+            for (let name of utils_5.LevelOrder) {
+                let data = utils_5.LevelConfig[name];
+                this.load.image('level_' + name, data.heroOutro.pic);
+            }
+            this.load.image('level_locked', 'images/profile_locked.png');
             this.load.image('profile', 'images/menu/profile.png');
         }
     }
@@ -717,27 +737,34 @@ define("scenes/hero_scene", ["require", "exports", "game/utils"], function (requ
             this.pic = heroSceneInfo.pic;
             this.text = heroSceneInfo.text;
             let imgPath = this.pic;
+            this.imgName = 'heroImg' + heroSceneInfo.name;
+            console.log('loading', this.pic, this.imgName);
             this.load.once('complete', this.renderScene, this);
-            this.load.image('img', imgPath);
+            this.load.image(this.imgName, imgPath);
             this.load.start();
         }
         renderScene() {
-            let sprite = this.physics.add.sprite(0, 0, 'img').setInteractive();
+            let sprite = this.physics.add.sprite(0, 0, this.imgName).setInteractive();
             sprite.x = halfWidth - 300;
             sprite.y = halfHeight;
             let content = this.text;
-            var text = this.add.text(0, 0, content, { align: 'left' });
+            var text = this.add.text(0, 0, content, {
+                align: 'left',
+                font: 'bold 25px Arial',
+                wordWrap: { width: 400 }
+            });
             var bounds = text.getBounds();
             text.x = halfWidth - 100;
             text.y = halfHeight - bounds.height / 2;
             let clicked = false;
             this.input.on('pointerdown', () => {
                 if (!clicked) {
+                    this.scene.stop('hero_scene');
                     if (window.Result) {
                         this.scene.start('level_select');
                     }
                     else {
-                        window.LevelSetup = utils_6.LevelsSettings[0];
+                        window.LevelSetup = utils_6.LevelConfig[utils_6.LevelOrder[0]];
                         this.scene.start('Level');
                     }
                 }
@@ -749,38 +776,6 @@ define("scenes/hero_scene", ["require", "exports", "game/utils"], function (requ
     }
     exports.HeroScene = HeroScene;
 });
-// setupTowerSpawns() {
-//     this.towerSpawns = []
-//     for (let i=0; i<this.towergame.towerSpawns.length; i++) {
-//         let towerSpawn = this.towergame.towerSpawns[i]
-//         let sprite = this.physics.add.sprite(0, 0, 'towerplace').setInteractive()
-//         this.scaleSprite(sprite, this.rectSize)
-//         sprite.setOrigin(0)
-//         let position = this.getC(towerSpawn)
-//         sprite.x = position.x
-//         sprite.y = position.y
-//         sprite.on('pointerdown', (pointer: any) => {
-//             if (!this.tower) return
-//             this.tower.x = sprite.x
-//             this.tower.y = sprite.y
-//         })
-//         this.towerSpawns.push(sprite)
-//     }
-// }
-// setupMonsterSpawns() {
-//     this.monsterSpawns = []
-//     for (let i=0; i<this.towergame.spawns.length; i++) {
-//         let spawn = this.towergame.spawns[i]
-//         let sprite = this.physics.add.sprite(0, 0, 'monsterplace')
-//         this.scaleSprite(sprite, this.rectSize)
-//         sprite.setOrigin(0)
-//         let position = this.getC(spawn)
-//         sprite.x = position.x;
-//         sprite.y = position.y;
-//         (sprite as any)['spawn'] = spawn
-//         this.monsterSpawns.push(sprite)
-//     }
-// }
 define("app", ["require", "exports", "scenes/greeting", "scenes/Level", "scenes/level_select", "scenes/hero_scene"], function (require, exports, greeting_1, Level_1, level_select_1, hero_scene_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });

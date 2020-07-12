@@ -1,4 +1,4 @@
-import { LevelsSettings, HeroSceneInfo } from '../game/utils'
+import { LevelsSettings, HeroSceneInfo, LevelConfig, LevelOrder } from '../game/utils'
 
 const gameHeight = window.innerHeight
 const gameWidth = window.innerWidth
@@ -15,26 +15,34 @@ export class HeroScene extends Phaser.Scene {
 
     pic: string
     text: string
+    imgName: string
 
     create() {
-        let heroSceneInfo = window.HeroSettings
+        let heroSceneInfo: HeroSceneInfo = window.HeroSettings
         this.pic = heroSceneInfo.pic
         this.text = heroSceneInfo.text
 
         let imgPath = this.pic
+
+        this.imgName = 'heroImg'+heroSceneInfo.name
         
+        console.log('loading', this.pic, this.imgName)
         this.load.once('complete', this.renderScene, this);
-        this.load.image('img', imgPath)
+        this.load.image(this.imgName, imgPath)
         this.load.start();
     }
 
     renderScene() {
-        let sprite = this.physics.add.sprite(0, 0, 'img').setInteractive()
+        let sprite = this.physics.add.sprite(0, 0, this.imgName).setInteractive()
         sprite.x = halfWidth - 300
         sprite.y = halfHeight
 
         let content = this.text
-        var text = this.add.text(0, 0, content, { align: 'left' })
+        var text = this.add.text(0, 0, content, { 
+            align: 'left',
+            font: 'bold 25px Arial',
+            wordWrap: { width: 400 }
+        })
         var bounds = text.getBounds()
 
         text.x = halfWidth - 100
@@ -44,10 +52,11 @@ export class HeroScene extends Phaser.Scene {
 
         this.input.on('pointerdown', () => {
             if (!clicked) {
+                this.scene.stop('hero_scene')
                 if (window.Result) {
                     this.scene.start('level_select')
                 } else {
-                    (<any>window).LevelSetup = LevelsSettings[0]
+                    (<any>window).LevelSetup = LevelConfig[LevelOrder[0]]
                     this.scene.start('Level')
                 }
             }
@@ -58,49 +67,3 @@ export class HeroScene extends Phaser.Scene {
         this.load.image('profile', 'images/menu/profile.png')
     }
 }
-
-// setupTowerSpawns() {
-//     this.towerSpawns = []
-
-//     for (let i=0; i<this.towergame.towerSpawns.length; i++) {
-//         let towerSpawn = this.towergame.towerSpawns[i]
-
-//         let sprite = this.physics.add.sprite(0, 0, 'towerplace').setInteractive()
-//         this.scaleSprite(sprite, this.rectSize)
-//         sprite.setOrigin(0)
-
-//         let position = this.getC(towerSpawn)
-//         sprite.x = position.x
-//         sprite.y = position.y
-
-//         sprite.on('pointerdown', (pointer: any) => {
-//             if (!this.tower) return
-
-//             this.tower.x = sprite.x
-//             this.tower.y = sprite.y
-//         })
-
-//         this.towerSpawns.push(sprite)
-//     }
-// }
-
-// setupMonsterSpawns() {
-//     this.monsterSpawns = []
-
-//     for (let i=0; i<this.towergame.spawns.length; i++) {
-
-//         let spawn = this.towergame.spawns[i]
-
-//         let sprite = this.physics.add.sprite(0, 0, 'monsterplace')
-//         this.scaleSprite(sprite, this.rectSize)
-//         sprite.setOrigin(0)
-
-//         let position = this.getC(spawn)
-//         sprite.x = position.x;
-//         sprite.y = position.y;
-
-//         (sprite as any)['spawn'] = spawn
-
-//         this.monsterSpawns.push(sprite)
-//     }
-// }
