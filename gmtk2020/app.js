@@ -446,6 +446,7 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             let angle = carSprite.angle;
             this.car.speed;
             let angleChange = 0;
+            this.currentNextStep = this.car.getNextStep();
             switch (this.car.getNextStep()) {
                 case utils_4.Direction.Left:
                     angleChange = -90;
@@ -486,7 +487,7 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
                 }
             };
             this.prevSmallCrossRoad = crossroad;
-            switch (this.car.getNextStep()) {
+            switch (this.currentNextStep) {
                 case utils_4.Direction.Left:
                     if (this.car.verticalSpeed > 0) {
                         this.car.verticalSpeed = 0;

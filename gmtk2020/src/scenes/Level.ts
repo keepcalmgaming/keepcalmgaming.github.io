@@ -307,6 +307,7 @@ export class LevelScene extends Phaser.Scene {
 
     private prevBigCrossRoad?: Phaser.GameObjects.GameObject
     private prevSmallCrossRoad?: Phaser.GameObjects.GameObject
+    private currentNextStep?: Direction
 
     bigCrossroadHit(carSprite: Phaser.GameObjects.GameObject, crossroad: Phaser.GameObjects.GameObject) {
         if (crossroad === this.prevBigCrossRoad) return
@@ -318,6 +319,7 @@ export class LevelScene extends Phaser.Scene {
         this.car.speed
 
         let angleChange = 0;
+        this.currentNextStep = this.car.getNextStep();
         switch(this.car.getNextStep()) {
             case Direction.Left:
                 angleChange = -90;
@@ -362,7 +364,7 @@ export class LevelScene extends Phaser.Scene {
         }
 
         this.prevSmallCrossRoad = crossroad;
-        switch (this.car.getNextStep()) {
+        switch (this.currentNextStep) {
             case Direction.Left:
                 if (this.car.verticalSpeed > 0) {
                     this.car.verticalSpeed = 0;
