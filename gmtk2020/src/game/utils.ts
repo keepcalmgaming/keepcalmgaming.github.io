@@ -38,8 +38,8 @@ export class LevelInfo {
         public driverConstructor: () => Driver,
         public level: LevelSetup,
         public name: string = 'default',
-        public heroIntro: HeroSceneInfo = defaultHero,
         public heroOutro: HeroSceneInfo = defaultHero
+        public heroIntro: HeroSceneInfo = defaultHero,
     ) { }
 }
 
@@ -50,6 +50,10 @@ export let LevelConfig = {
         () => new EchoDriver(), 
         level1, 
         'echo',
+        {
+            pic: 'images/menu/profile.png',
+            text: 'This is you. You need to get to the Finish.'
+        },
         {
             pic: 'images/menu/profile.png',
             text: 'This is you. You need to get to the Finish.'

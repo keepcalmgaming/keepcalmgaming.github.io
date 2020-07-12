@@ -131,18 +131,21 @@ define("game/utils", ["require", "exports", "game/driver"], function (require, e
         text: 'Dummy Text for Hero Screen'
     };
     class LevelInfo {
-        constructor(driverConstructor, level, name = 'default', heroIntro = defaultHero, heroOutro = defaultHero) {
+        constructor(driverConstructor, level, name = 'default', heroOutro = defaultHero, heroIntro = defaultHero) {
             this.driverConstructor = driverConstructor;
             this.level = level;
             this.name = name;
-            this.heroIntro = heroIntro;
             this.heroOutro = heroOutro;
+            this.heroIntro = heroIntro;
         }
     }
     exports.LevelInfo = LevelInfo;
     exports.LevelOrder = ['echo', 'danny'];
     exports.LevelConfig = {
         echo: new LevelInfo(() => new driver_1.EchoDriver(), level1, 'echo', {
+            pic: 'images/menu/profile.png',
+            text: 'This is you. You need to get to the Finish.'
+        }, {
             pic: 'images/menu/profile.png',
             text: 'This is you. You need to get to the Finish.'
         }),
@@ -194,8 +197,6 @@ define("scenes/greeting", ["require", "exports", "game/utils"], function (requir
         }
         goHero() {
             window.HeroSettings = utils_3.LevelConfig[window.CurrentLevel].heroIntro;
-            window.heroPic = 'images/menu/profile.png';
-            window.heroTxt = 'This is you. You need to get to the Finish.';
             this.scene.switch('hero');
         }
     }
@@ -275,6 +276,15 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             finishSprite.setOrigin(0.5);
             this.scaleSprite(finishSprite, this.rectSize);
             finishSprite.setDepth(15);
+            this.physics.add.collider(finishSprite, this.carSprite, () => {
+                this.time.addEvent({
+                    delay: 600,
+                    loop: false,
+                    callback: () => {
+                        this.finishLevel();
+                    }
+                });
+            });
             for (let flag of ls.flags) {
                 let flagSprite = this.physics.add.sprite(this.getX(flag.x), this.getY(flag.y), 'flag_ready');
                 flagSprite.setOrigin(0.5);
@@ -584,11 +594,15 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             sprite.setScale(this.getScale(sprite, dim));
         }
         finishLevel() {
-            window.Result;
-            LevelResults = {
+            window.Result = {
                 stars: this.stars,
                 name: this.levelInfo.name
             };
+            let heroInfo = Object.assign({}, utils_4.LevelConfig[this.levelInfo.name].heroOutro);
+            if (this.stars == 0) {
+                heroInfo.text = 'You finished the level! Get at least one flag to get to know your driver better.';
+            }
+            this.scene.switch('hero');
         }
         preload() {
             this.load.image('car', 'images/monster.png');
@@ -644,7 +658,7 @@ define("scenes/level_select", ["require", "exports", "game/utils"], function (re
             sprite.y = halfHeight;
             sprite.on('pointerdown', (pointer) => {
                 window.LevelSetup = utils_5.LevelsSettings[0];
-                this.scene.switch('Level');
+                this.scene.start('Level');
             });
         }
         preload() {
@@ -715,10 +729,13 @@ define("scenes/hero_scene", ["require", "exports", "game/utils"], function (requ
             text.x = halfWidth - 100;
             text.y = halfHeight - bounds.height / 2;
             let clicked = false;
-            this.input.on('pointerdown', () => {
-                if (!clicked || true) {
+            this.input.on('pointerup', () => {
+                if (window.Result) {
+                    this.scene.start('level_select');
+                }
+                else {
                     window.LevelSetup = utils_6.LevelsSettings[0];
-                    this.scene.switch('Level');
+                    this.scene.start('Level');
                 }
             });
         }

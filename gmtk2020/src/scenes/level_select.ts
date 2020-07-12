@@ -36,7 +36,7 @@ export class LevelSelectScene extends Phaser.Scene {
         sprite.y = halfHeight
         sprite.on('pointerdown', (pointer: any) => {
             (<any>window).LevelSetup = LevelsSettings[0]
-            this.scene.switch('Level')
+            this.scene.start('Level')
         })
     }
 

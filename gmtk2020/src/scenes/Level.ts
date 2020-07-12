@@ -4,8 +4,10 @@ import {
     LevelSetup, 
     LevelsSettings,
     LevelConfig,
+    LevelResults,
     Direction,
     DriverInput,
+    HeroSceneInfo,
     Movement
 } from '../game/utils'
 import { Car } from '../game/car'
@@ -119,6 +121,20 @@ export class LevelScene extends Phaser.Scene {
         finishSprite.setOrigin(0.5)
         this.scaleSprite(finishSprite, this.rectSize)
         finishSprite.setDepth(15)
+
+        this.physics.add.collider(
+            finishSprite,
+            this.carSprite,
+            () => {
+                this.time.addEvent({
+                    delay: 600,
+                    loop: false,
+                    callback: () => {
+                        this.finishLevel();
+                    }
+                })
+            }
+        )
 
         for (let flag of ls.flags) {
             let flagSprite = this.physics.add.sprite(this.getX(flag.x), this.getY(flag.y), 'flag_ready')
@@ -471,10 +487,17 @@ export class LevelScene extends Phaser.Scene {
     }
 
     finishLevel() {
-        window.Result: LevelResults = {
+        window.Result = {
             stars: this.stars,
             name: this.levelInfo.name
         }
+        let heroInfo: HeroSceneInfo = Object.assign({}, LevelConfig[this.levelInfo.name].heroOutro)
+
+        if (this.stars == 0) {
+            heroInfo.text = 'You finished the level! Get at least one flag to get to know your driver better.'
+        }
+
+        this.scene.switch('hero')
     }
 
     preload() {
