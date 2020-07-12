@@ -313,10 +313,39 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
                 this.processInput(utils_3.DriverInput.Cool);
             });
         }
+        showBubble(d) {
+            if (!this.carSprite) {
+                return;
+            }
+            let s = '', a = '';
+            switch (d) {
+                case utils_3.DriverInput.Left:
+                    s = 'bubble_left';
+                    a = 'left';
+                    break;
+                case utils_3.DriverInput.Right:
+                    s = 'bubble_right';
+                    a = 'right';
+                    break;
+                case utils_3.DriverInput.Crap:
+                    s = 'bubble_down';
+                    a = 'crap';
+                    break;
+                case utils_3.DriverInput.Cool:
+                    s = 'bubble_up';
+                    a = 'cool';
+                    break;
+            }
+            let bubble = this.physics.add.sprite(this.carSprite.x + 15, this.carSprite.y + 15, s);
+            bubble.setOrigin(0);
+            let audio = this.sound.add(a);
+            audio.play();
+        }
         processInput(d) {
             console.log('LEVEL SCENE, PROCESS INPUT', d);
             // TODO: Draw bubbles here
             this.driver.input(d);
+            this.showBubble(d);
         }
         update() {
             // console.log('update()')
@@ -384,6 +413,10 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
             this.load.image('bubble_up', 'images/bubble_up.png');
             this.load.image('bubble_down', 'images/bubble_down.png');
             this.load.image('towerplace', 'images/towerplace.png');
+            this.load.audio('left', 'sounds/left.mp3');
+            this.load.audio('right', 'sounds/right.mp3');
+            this.load.audio('cool', 'sounds/nice.mp3');
+            this.load.audio('crap', 'sounds/crap.mp3');
             // this.load.audio('music', 'sounds/NavigatorOST.mp3')
         }
     }
