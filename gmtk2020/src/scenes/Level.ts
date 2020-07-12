@@ -19,15 +19,6 @@ const debug = true
 const minSide = 8
 const maxSide = 9
 
-type Cell = {
-    x: number,
-    y: number
-}
-
-type Position = {
-    x: number,
-    y: number
-}
 
 export class LevelScene extends Phaser.Scene {
     private isVertical: boolean
@@ -39,12 +30,6 @@ export class LevelScene extends Phaser.Scene {
     private y: number
 
     public towergame: Game
-
-    private mfGroup?: Phaser.Physics.Arcade.StaticGroup
-    private mainframe?: Phaser.GameObjects.Sprite
-
-    public textLives?: Phaser.GameObjects.Text
-    public textScore?: Phaser.GameObjects.Text
 
     constructor(
         sceneConfig: object
@@ -77,12 +62,9 @@ export class LevelScene extends Phaser.Scene {
 
     create() {
         this.loadLevel()
-        console.log('Create()', window.a)
         this.cameras.main.setBackgroundColor('#FFFFFF');
 
         this.setupHouses()
-
-        this.setupText()
 
         this.setupEvents()
 
@@ -104,6 +86,7 @@ export class LevelScene extends Phaser.Scene {
 
         // TODO: set start/finish/flags from here
         let ls = li.level
+        
     }
 
     update() {
@@ -132,12 +115,6 @@ export class LevelScene extends Phaser.Scene {
     }
 
     setupEvents() {
-        if (!this.mainframe || !this.mfGroup) return
-    }
-
-    setupText() {
-        this.textLives = this.add.text(20, 20, `LIVES: ${this.towergame.lives}`, { fontFamily: 'Verdana', fontSize: 20, color: '#4C191B', align: 'center' })
-        this.textScore = this.add.text(gameWidth - 120, 20, `SCORE: ${this.towergame.score}`, { fontFamily: 'Verdana', fontSize: 20, color: '#4C191B', align: 'center' })
     }
 
     getScale(sprite: Phaser.GameObjects.Sprite, dim: number) {
@@ -147,23 +124,6 @@ export class LevelScene extends Phaser.Scene {
     scaleSprite(sprite: Phaser.GameObjects.Sprite, dim: number) {
         sprite.setScale(this.getScale(sprite, dim))
     }
-
-    getMFC(): Position {
-        let mf = this.towergame.mainframe
-        return this.getC({ x: mf.x + 1, y: mf.y + 1 })
-    }
-
-    getC(c: Cell): Position {
-        return {
-            x: this.getCX(c.x),
-            y: this.getCY(c.y)
-        }
-    }
-
-    getCX(x: number): number { return this.offsetX + x*this.rectSize }
-
-    getCY(y: number): number { return this.offsetY + y*this.rectSize }
-
 
     preload() {
         this.load.image('bullet', 'images/bullet2.png')

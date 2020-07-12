@@ -13,4 +13,8 @@ export class Car {
     public setSpeed(speed: number) {
         this.speed = speed
     }
+
+    public getNextStep(): Direction {
+        return this.driver ? this.driver.getNextStep() : Direction.Forward
+    }
 }
