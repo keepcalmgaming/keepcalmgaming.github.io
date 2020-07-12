@@ -4,7 +4,7 @@ define("game/car", ["require", "exports", "game/utils"], function (require, expo
     class Car {
         constructor() {
             this.speed = 0;
-            this.horizontalSpeed = 1;
+            this.horizontalSpeed = 0;
             this.verticalSpeed = 0;
         }
         setDriver(d) {
@@ -13,6 +13,22 @@ define("game/car", ["require", "exports", "game/utils"], function (require, expo
         }
         setSpeed(speed) {
             this.speed = speed;
+        }
+        setMovementDirection(m) {
+            switch (m) {
+                case utils_1.Movement.Down:
+                    this.verticalSpeed = this.speed;
+                    break;
+                case utils_1.Movement.Up:
+                    this.verticalSpeed = -this.speed;
+                    break;
+                case utils_1.Movement.Right:
+                    this.horizontalSpeed = this.speed;
+                    break;
+                case utils_1.Movement.Left:
+                    this.horizontalSpeed = -this.speed;
+                    break;
+            }
         }
         getNextStep() {
             return this.driver ? this.driver.getNextStep() : utils_1.Direction.Forward;
@@ -295,12 +311,25 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             this.car = new car_2.Car();
             this.driver = li.driverConstructor();
             this.car.setDriver(this.driver);
+            this.defaultSpeed = this.rectSize / 11;
+            this.car.setSpeed(this.defaultSpeed);
+            let initialDirection;
+            initialDirection = utils_4.Movement.Down;
+            this.car.setMovementDirection(initialDirection);
             this.carSprite = this.physics.add.sprite(this.offsetX + this.rectSize * 0.5, this.offsetY + this.rectSize * 0.5, 'car');
             this.carSprite.setDepth(20);
-            this.carSprite.setAngle(90);
-            console.log(this.carSprite.width, this.carSprite.height);
+            switch (initialDirection) {
+                case utils_4.Movement.Right:
+                    this.carSprite.setAngle(90);
+                    break;
+                case utils_4.Movement.Left:
+                    this.carSprite.setAngle(270);
+                    break;
+                case utils_4.Movement.Down:
+                    this.carSprite.setAngle(180);
+                    break;
+            }
             this.scaleSprite(this.carSprite, this.rectSize * 0.5);
-            console.log(this.carSprite.width, this.carSprite.height);
             this.setupControls();
             // TODO: set start/finish/flags from here
             let ls = li.level;
@@ -519,8 +548,8 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             this.tweens.addCounter({
                 from: angle,
                 to: angle + angleChange,
-                delay: 400,
-                duration: 600,
+                delay: 150,
+                duration: 100,
                 onUpdate: (tween) => {
                     let value = tween.getValue();
                     carSprite.setAngle(value);
@@ -579,7 +608,7 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
         smallCrossroadHit(carSprite, crossroad) {
             if (crossroad === this.prevSmallCrossRoad)
                 return;
-            let duration = 600;
+            let duration = 200;
             let verticalCounter = {
                 from: this.carSprite.y,
                 to: crossroad.y,
@@ -596,57 +625,56 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
                     this.carSprite.x = tween.getValue();
                 }
             };
+            let speedStep = this.defaultSpeed;
             this.prevSmallCrossRoad = crossroad;
             switch (this.currentNextStep) {
                 case utils_4.Direction.Left:
                     if (this.car.verticalSpeed > 0) {
                         this.car.verticalSpeed = 0;
-                        this.car.horizontalSpeed = 1;
+                        this.car.horizontalSpeed = speedStep;
                         this.tweens.addCounter(verticalCounter);
                     }
                     else if (this.car.verticalSpeed < 0) {
                         this.car.verticalSpeed = 0;
-                        this.car.horizontalSpeed = -1;
+                        this.car.horizontalSpeed = -speedStep;
                         this.tweens.addCounter(verticalCounter);
                     }
                     else {
                         if (this.car.horizontalSpeed > 0) {
-                            this.car.verticalSpeed = -1;
+                            this.car.verticalSpeed = -speedStep;
                             this.car.horizontalSpeed = 0;
                             this.tweens.addCounter(horizontalCounter);
                         }
                         else {
-                            this.car.verticalSpeed = 1;
+                            this.car.verticalSpeed = speedStep;
                             this.car.horizontalSpeed = 0;
                             this.tweens.addCounter(horizontalCounter);
                         }
                     }
-                    // this.driver.input(DriverInput.Right)
                     break;
                 case utils_4.Direction.Right:
                     if (this.car.verticalSpeed > 0) {
                         this.car.verticalSpeed = 0;
-                        this.car.horizontalSpeed = -1;
+                        this.car.horizontalSpeed = -speedStep;
                         this.tweens.addCounter(verticalCounter);
                     }
                     else if (this.car.verticalSpeed < 0) {
                         this.car.verticalSpeed = 0;
-                        this.car.horizontalSpeed = 1;
+                        this.car.horizontalSpeed = speedStep;
                         this.tweens.addCounter(verticalCounter);
                     }
                     else {
                         if (this.car.horizontalSpeed > 0) {
-                            this.car.verticalSpeed = 1;
+                            this.car.verticalSpeed = speedStep;
                             this.car.horizontalSpeed = 0;
                             this.tweens.addCounter(horizontalCounter);
                         }
                         else {
-                            this.car.verticalSpeed = -1;
+                            this.car.verticalSpeed = -speedStep;
                             this.car.horizontalSpeed = 0;
                             this.tweens.addCounter(horizontalCounter);
                         }
                     }
-                    // this.driver.input(DriverInput.Left)
                     break;
             }
         }

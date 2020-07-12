@@ -32,6 +32,8 @@ export class LevelScene extends Phaser.Scene {
     private x: number
     private y: number
 
+    private defaultSpeed: number
+
     private carX: number = 0
     private carY: number = 0
 
@@ -112,13 +114,28 @@ export class LevelScene extends Phaser.Scene {
         this.car = new Car()
         this.driver = li.driverConstructor()
         this.car.setDriver(this.driver)
+        this.defaultSpeed = this.rectSize / 11;
+        this.car.setSpeed(this.defaultSpeed)
+
+        let initialDirection: Movement;
+        initialDirection = Movement.Down;
+
+        this.car.setMovementDirection(initialDirection)
 
         this.carSprite = this.physics.add.sprite(this.offsetX + this.rectSize * 0.5, this.offsetY + this.rectSize * 0.5, 'car')
         this.carSprite.setDepth(20)
-        this.carSprite.setAngle(90)
-        console.log(this.carSprite.width, this.carSprite.height)
+        switch (initialDirection) {
+            case Movement.Right:
+                this.carSprite.setAngle(90)
+                break;
+            case Movement.Left:
+                this.carSprite.setAngle(270)
+                break;
+            case Movement.Down:
+                this.carSprite.setAngle(180)
+                break;
+        }
         this.scaleSprite(this.carSprite, this.rectSize * 0.5)
-        console.log(this.carSprite.width, this.carSprite.height)
 
         this.setupControls()
 
@@ -378,8 +395,8 @@ export class LevelScene extends Phaser.Scene {
         this.tweens.addCounter({
             from: angle,
             to: angle + angleChange,
-            delay: 400,
-            duration: 600,
+            delay: 150,
+            duration: 100,
             onUpdate: (tween: any) => {
                 let value = tween.getValue();
                 (<any>carSprite).setAngle(value);
@@ -440,7 +457,7 @@ export class LevelScene extends Phaser.Scene {
     smallCrossroadHit(carSprite: Phaser.GameObjects.GameObject, crossroad: Phaser.GameObjects.GameObject) {
         if (crossroad === this.prevSmallCrossRoad) return
 
-        let duration = 600
+        let duration = 200
 
         let verticalCounter = {
             from: this.carSprite.y,
@@ -460,59 +477,59 @@ export class LevelScene extends Phaser.Scene {
             }
         }
 
+        let speedStep = this.defaultSpeed;
+
         this.prevSmallCrossRoad = crossroad;
         switch (this.currentNextStep) {
             case Direction.Left:
                 if (this.car.verticalSpeed > 0) {
                     this.car.verticalSpeed = 0;
-                    this.car.horizontalSpeed = 1;
+                    this.car.horizontalSpeed = speedStep;
 
                     this.tweens.addCounter(verticalCounter)
                 } else if (this.car.verticalSpeed < 0) {
                     this.car.verticalSpeed = 0;
-                    this.car.horizontalSpeed = -1;
+                    this.car.horizontalSpeed = -speedStep;
 
                     this.tweens.addCounter(verticalCounter)
                 } else {
                     if (this.car.horizontalSpeed > 0) {
-                        this.car.verticalSpeed = -1;
+                        this.car.verticalSpeed = -speedStep;
                         this.car.horizontalSpeed = 0;
 
                         this.tweens.addCounter(horizontalCounter)
                     } else {
-                        this.car.verticalSpeed = 1;
+                        this.car.verticalSpeed = speedStep;
                         this.car.horizontalSpeed = 0;
 
                         this.tweens.addCounter(horizontalCounter)
                     }
                 }
-                // this.driver.input(DriverInput.Right)
                 break;
             case Direction.Right:
                 if (this.car.verticalSpeed > 0) {
                     this.car.verticalSpeed = 0;
-                    this.car.horizontalSpeed = -1;
+                    this.car.horizontalSpeed = -speedStep;
 
                     this.tweens.addCounter(verticalCounter)
                 } else if (this.car.verticalSpeed < 0) {
                     this.car.verticalSpeed = 0;
-                    this.car.horizontalSpeed = 1;
+                    this.car.horizontalSpeed = speedStep;
 
                     this.tweens.addCounter(verticalCounter)
                 } else {
                     if (this.car.horizontalSpeed > 0) {
-                        this.car.verticalSpeed = 1;
+                        this.car.verticalSpeed = speedStep;
                         this.car.horizontalSpeed = 0;
 
                         this.tweens.addCounter(horizontalCounter)
                     } else {
-                        this.car.verticalSpeed = -1;
+                        this.car.verticalSpeed = -speedStep;
                         this.car.horizontalSpeed = 0;
 
                         this.tweens.addCounter(horizontalCounter)
                     }
                 }
-                // this.driver.input(DriverInput.Left)
                 break;
             }
     }

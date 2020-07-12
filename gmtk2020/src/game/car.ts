@@ -3,7 +3,7 @@ import { Driver } from 'driver'
 
 export class Car {
     public speed: number = 0;
-    public horizontalSpeed: number = 1;
+    public horizontalSpeed: number = 0;
     public verticalSpeed: number = 0;
     public driver?: Driver;
 
@@ -14,6 +14,23 @@ export class Car {
 
     public setSpeed(speed: number) {
         this.speed = speed
+    }
+
+    public setMovementDirection(m: Movement): void {
+        switch(m) {
+            case Movement.Down:
+                this.verticalSpeed = this.speed;
+                break;
+            case Movement.Up:
+                this.verticalSpeed = -this.speed;
+                break;
+            case Movement.Right:
+                this.horizontalSpeed = this.speed;
+                break;
+            case Movement.Left:
+                this.horizontalSpeed = -this.speed;
+                break;
+        }
     }
 
     public getNextStep(): Direction {
