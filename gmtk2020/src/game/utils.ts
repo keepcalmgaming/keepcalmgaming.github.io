@@ -1,4 +1,4 @@
-import { Driver, SimpleDriver } from 'driver'
+import { Driver, SimpleDriver, EchoDriver } from 'driver'
 
 export enum DriverInput { Left, Right, Cool, Crap}
 export enum Direction { Left, Right, Forward }
@@ -28,6 +28,6 @@ let level1: LevelSetup = {
 }
 
 export let LevelsSettings: LevelInfo[] = [
-    new LevelInfo(() => new SimpleDriver(), level1),
+    new LevelInfo(() => new EchoDriver(), level1),
     new LevelInfo(() => new SimpleDriver(), level1)
 ]

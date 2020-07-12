@@ -9,6 +9,31 @@ export interface Driver {
     getNextStep(): Direction
 }
 
+export class EchoDriver implements Driver {
+    public car = new Car()
+
+    public input(di: DriverInput) {
+        switch (di) {
+            case DriverInput.Left:
+                console.log('ECHO LEFT')
+                break;
+            case DriverInput.Right:
+                console.log('ECHO RIGHT')
+                break;
+            case DriverInput.Cool:
+                console.log('ECHO COOL')
+                break;
+            case DriverInput.Crap:
+                console.log('ECHO CRAP')
+                break;
+        }
+    }
+
+    public getNextStep(): Direction {
+        return Direction.Forward
+    }
+}
+
 export class SimpleDriver implements Driver {
     public car: Car = new Car()
 
