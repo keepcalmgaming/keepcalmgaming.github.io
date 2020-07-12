@@ -309,11 +309,13 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
                     }
                 });
             });
+            this.flags = this.physics.add.group();
             for (let flag of ls.flags) {
                 let flagSprite = this.physics.add.sprite(this.getX(flag.x), this.getY(flag.y), 'flag_ready');
                 flagSprite.setOrigin(0.5);
                 this.scaleSprite(flagSprite, this.rectSize);
                 flagSprite.setDepth(15);
+                this.flags.add(flagSprite);
             }
         }
         setupControls() {
@@ -463,16 +465,24 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             }
         }
         setupEvents() {
-            if (!this.bigCrossroads || !this.smallCrossroads || !this.carSprite)
+            if (!this.bigCrossroads || !this.smallCrossroads || !this.flags || !this.carSprite)
                 return;
             this.physics.add.collider(this.bigCrossroads, this.carSprite, this.bigCrossroadHit.bind(this));
             this.physics.add.overlap(this.smallCrossroads, this.carSprite, this.smallCrossroadHit.bind(this));
+            this.physics.add.collider(this.flags, this.carSprite, this.flagHit.bind(this));
             this.time.addEvent({
                 delay: 16,
                 loop: true,
                 callback: this.moveCar,
                 callbackScope: this
             });
+        }
+        flagHit(carSprite, flag) {
+            let flagSprite = this.physics.add.sprite(flag.x, flag.y, 'flag_empty');
+            flagSprite.setOrigin(0.5);
+            this.scaleSprite(flagSprite, this.rectSize);
+            flagSprite.setDepth(15);
+            flag.destroy();
         }
         bigCrossroadHit(carSprite, crossroad) {
             if (crossroad === this.prevBigCrossRoad)

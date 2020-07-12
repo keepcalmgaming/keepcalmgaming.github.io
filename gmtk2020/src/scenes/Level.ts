@@ -42,7 +42,7 @@ export class LevelScene extends Phaser.Scene {
 
     private bigCrossroads?: Phaser.Physics.Arcade.Group
     private smallCrossroads?: Phaser.Physics.Arcade.Group
-	
+    private flags?: Phaser.Physics.Arcade.Group
 
     constructor(
         sceneConfig: object
@@ -150,11 +150,14 @@ export class LevelScene extends Phaser.Scene {
             }
         )
 
+        this.flags = this.physics.add.group()
         for (let flag of ls.flags) {
             let flagSprite = this.physics.add.sprite(this.getX(flag.x), this.getY(flag.y), 'flag_ready')
             flagSprite.setOrigin(0.5)
             this.scaleSprite(flagSprite, this.rectSize)
             flagSprite.setDepth(15)
+
+            this.flags.add(flagSprite)
         }
     }
 
@@ -324,9 +327,10 @@ export class LevelScene extends Phaser.Scene {
     }
 
     setupEvents() {
-        if (!this.bigCrossroads || !this.smallCrossroads || !this.carSprite) return
+        if (!this.bigCrossroads || !this.smallCrossroads || !this.flags || !this.carSprite) return
         this.physics.add.collider(this.bigCrossroads, this.carSprite, this.bigCrossroadHit.bind(this))
         this.physics.add.overlap(this.smallCrossroads, this.carSprite, this.smallCrossroadHit.bind(this))
+        this.physics.add.collider(this.flags, this.carSprite, this.flagHit.bind(this))
 
         this.time.addEvent({
             delay: 16,
@@ -334,6 +338,15 @@ export class LevelScene extends Phaser.Scene {
             callback: this.moveCar,
             callbackScope: this
         })
+    }
+
+    flagHit(carSprite: Phaser.GameObjects.GameObject, flag: Phaser.GameObjects.GameObject) {
+        let flagSprite = this.physics.add.sprite(flag.x, flag.y, 'flag_empty')
+        flagSprite.setOrigin(0.5)
+        this.scaleSprite(flagSprite, this.rectSize)
+        flagSprite.setDepth(15)
+
+        flag.destroy()
     }
 
     private prevBigCrossRoad?: Phaser.GameObjects.GameObject
