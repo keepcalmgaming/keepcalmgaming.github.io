@@ -247,8 +247,8 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             this.setupCrossRoads();
             this.setupEvents();
             this.load.once('complete', () => {
-                let music = this.sound.add('music');
-                music.play();
+                // let music = this.sound.add('music')
+                // music.play()
             }, this);
             this.load.audio('music', 'sounds/NavigatorOST.mp3');
             this.load.start();
@@ -602,6 +602,7 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             if (this.stars == 0) {
                 heroInfo.text = 'You finished the level! Get at least one flag to get to know your driver better.';
             }
+            this.scene.restart();
             this.scene.switch('hero');
         }
         preload() {

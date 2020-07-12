@@ -81,8 +81,8 @@ export class LevelScene extends Phaser.Scene {
         this.setupEvents()
 
         this.load.once('complete', () => {
-            let music = this.sound.add('music')
-            music.play()
+            // let music = this.sound.add('music')
+            // music.play()
         }, this);
         this.load.audio('music', 'sounds/NavigatorOST.mp3')
         this.load.start();
@@ -496,6 +496,8 @@ export class LevelScene extends Phaser.Scene {
         if (this.stars == 0) {
             heroInfo.text = 'You finished the level! Get at least one flag to get to know your driver better.'
         }
+
+        this.scene.restart()
 
         this.scene.switch('hero')
     }
