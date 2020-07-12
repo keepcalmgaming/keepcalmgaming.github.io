@@ -20,15 +20,19 @@ export class Car {
         switch(m) {
             case Movement.Down:
                 this.verticalSpeed = this.speed;
+                this.horizontalSpeed = 0;
                 break;
             case Movement.Up:
                 this.verticalSpeed = -this.speed;
+                this.horizontalSpeed = 0;
                 break;
             case Movement.Right:
                 this.horizontalSpeed = this.speed;
+                this.verticalSpeed = 0;
                 break;
             case Movement.Left:
                 this.horizontalSpeed = -this.speed;
+                this.verticalSpeed = 0;
                 break;
         }
     }

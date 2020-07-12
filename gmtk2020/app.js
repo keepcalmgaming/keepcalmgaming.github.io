@@ -18,15 +18,19 @@ define("game/car", ["require", "exports", "game/utils"], function (require, expo
             switch (m) {
                 case utils_1.Movement.Down:
                     this.verticalSpeed = this.speed;
+                    this.horizontalSpeed = 0;
                     break;
                 case utils_1.Movement.Up:
                     this.verticalSpeed = -this.speed;
+                    this.horizontalSpeed = 0;
                     break;
                 case utils_1.Movement.Right:
                     this.horizontalSpeed = this.speed;
+                    this.verticalSpeed = 0;
                     break;
                 case utils_1.Movement.Left:
                     this.horizontalSpeed = -this.speed;
+                    this.verticalSpeed = 0;
                     break;
             }
         }
@@ -61,7 +65,7 @@ define("game/driver", ["require", "exports", "game/utils", "game/car"], function
     class EchoDriver {
         constructor() {
             this.car = new car_1.Car();
-            this.direction = utils_2.Direction.Right;
+            this.direction = utils_2.Direction.Forward;
         }
         input(di) {
             switch (di) {
@@ -540,13 +544,13 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             });
         }
         resolveCurrentNextStep() {
-            if (this.canGo(utils_4.Direction.Right)) {
+            if (this.canGo(utils_4.Direction.Forward)) {
+                return utils_4.Direction.Forward;
+            }
+            else if (this.canGo(utils_4.Direction.Right)) {
                 return utils_4.Direction.Right;
             }
-            else if (this.canGo(utils_4.Direction.Left)) {
-                return utils_4.Direction.Left;
-            }
-            return utils_4.Direction.Forward;
+            return utils_4.Direction.Left;
         }
         canGo(d) {
             switch (d) {
@@ -557,7 +561,7 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
                         case utils_4.Movement.Left:
                             return this.prevBigCrossRoad.mapPositionX > 0;
                         case utils_4.Movement.Right:
-                            return this.prevBigCrossRoad.mapPositionX > this.getCols();
+                            return this.prevBigCrossRoad.mapPositionX < this.getCols();
                         case utils_4.Movement.Up:
                             return this.prevBigCrossRoad.mapPositionY > 0;
                     }

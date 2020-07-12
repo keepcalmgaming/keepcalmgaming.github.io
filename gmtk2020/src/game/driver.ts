@@ -33,7 +33,7 @@ export class EchoDriver implements Driver {
         }
     }
 
-    private direction = Direction.Right;
+    private direction = Direction.Forward;
     public getNextStep(): Direction {
         return this.direction
     }

@@ -417,12 +417,12 @@ export class LevelScene extends Phaser.Scene {
     }
 
     private resolveCurrentNextStep(): Direction {
-        if (this.canGo(Direction.Right)) {
+        if (this.canGo(Direction.Forward)) {
+            return Direction.Forward
+        } else if (this.canGo(Direction.Right)) {
             return Direction.Right
-        } else if (this.canGo(Direction.Left)) {
-            return Direction.Left
         }
-        return Direction.Forward
+        return Direction.Left
     }
 
     private canGo(d: Direction): Boolean {
@@ -434,7 +434,7 @@ export class LevelScene extends Phaser.Scene {
                     case Movement.Left:
                         return this.prevBigCrossRoad.mapPositionX > 0
                     case Movement.Right:
-                        return this.prevBigCrossRoad.mapPositionX > this.getCols()
+                        return this.prevBigCrossRoad.mapPositionX < this.getCols()
                     case Movement.Up:
                         return this.prevBigCrossRoad.mapPositionY > 0
                 }
