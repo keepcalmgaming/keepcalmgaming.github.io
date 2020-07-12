@@ -336,8 +336,40 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
                     a = 'cool';
                     break;
             }
-            let bubble = this.physics.add.sprite(this.carSprite.x + 15, this.carSprite.y + 15, s);
-            bubble.setOrigin(0);
+            let bubble = this.physics.add.sprite(this.carSprite.x + 15, this.carSprite.y + 15 + 50, s);
+            bubble.setOrigin(0, 1);
+            bubble.setScale(0.1);
+            this.tweens.addCounter({
+                from: 0.1,
+                to: 1,
+                duration: 300,
+                onUpdate: (tween) => {
+                    let value = tween.getValue();
+                    bubble.setScale(value);
+                }
+            });
+            this.tweens.addCounter({
+                from: 1,
+                to: 0.1,
+                delay: 700,
+                duration: 200,
+                onUpdate: (tween) => {
+                    let value = tween.getValue();
+                    bubble.setScale(value);
+                }
+            });
+            this.tweens.addCounter({
+                duration: 1000,
+                onUpdate: (tween) => {
+                    bubble.x = this.carSprite.x + 15;
+                    bubble.y = this.carSprite.y + 15 + 50;
+                }
+            });
+            this.time.addEvent({
+                delay: 900,
+                loop: false,
+                callback: () => { bubble.destroy(); }
+            });
             let audio = this.sound.add(a);
             audio.play();
         }
