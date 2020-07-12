@@ -1,3 +1,5 @@
+import { LevelOrder, LevelConfig, LevelResults, HeroSceneInfo } from '../game/utils'
+
 const gameHeight = window.innerHeight
 const gameWidth = window.innerWidth
 
@@ -32,6 +34,11 @@ export class GreetingScene extends Phaser.Scene {
 
         let clicked = false
 
+        if (!window.SaveState) {
+            window.SaveState = {}
+            window.CurrentLevel = LevelOrder[0]
+        }
+
         this.input.on('pointerdown', () => {
             if (!clicked || true) {
               this.goHero()
@@ -41,6 +48,7 @@ export class GreetingScene extends Phaser.Scene {
     }
 
     goHero() {
+        window.HeroSettings = LevelConfig[window.CurrentLevel].heroIntro;
         window.heroPic = 'images/menu/profile.png'
         window.heroTxt = 'This is you. You need to get to the Finish.'
         this.scene.switch('hero')

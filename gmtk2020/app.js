@@ -1,91 +1,3 @@
-define("scenes/greeting", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    const gameHeight = window.innerHeight;
-    const gameWidth = window.innerWidth;
-    const halfHeight = gameHeight / 2;
-    const halfWidth = gameWidth / 2;
-    class GreetingScene extends Phaser.Scene {
-        constructor(sceneConfig) {
-            super({ key: 'greeting' });
-        }
-        create() {
-            var content = [
-                "Wingman",
-                "",
-                "Topic of GMTK Game Jam 2020 is “out of control”.",
-                "",
-                "We hope you’ll have as much fun as we did while developing B#.",
-                "",
-                "Enjoy!",
-                "",
-                "https://keepcalmgaming.github.io"
-            ];
-            var text = this.add.text(0, 0, content, { align: 'center' });
-            var bounds = text.getBounds();
-            text.x = halfWidth - bounds.width / 2;
-            text.y = halfHeight - bounds.height / 2;
-            let clicked = false;
-            this.input.on('pointerdown', () => {
-                if (!clicked || true) {
-                    this.goHero();
-                    clicked = true;
-                }
-            });
-        }
-        goHero() {
-            window.heroPic = 'images/menu/profile.png';
-            window.heroTxt = 'This is you. You need to get to the Finish.';
-            this.scene.switch('hero');
-        }
-    }
-    exports.GreetingScene = GreetingScene;
-});
-define("game/game", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    class Game {
-        constructor(x, y, isVertical) {
-            this.isVertical = isVertical;
-            this.X = x;
-            this.Y = y;
-            this.map = this.generateMap();
-        }
-        randomLabs() {
-            return labs[0];
-        }
-        generateMap() {
-            let result = [];
-            if (!this.isVertical && false) {
-                result = this.rotateMap(result);
-            }
-            return result;
-        }
-        rotateMap(map) {
-            let rotatedMap = [];
-            for (let y = 0; y < this.Y; y++) {
-                let row = [];
-                for (let x = 0; x < this.X; x++) {
-                    row.push(map[x][y]);
-                }
-                rotatedMap.push(row);
-            }
-            return rotatedMap;
-        }
-        active() {
-            return true;
-        }
-        randomCoords() {
-            let spawnX = this.getRandNum(this.X);
-            let spawnY = this.getRandNum(this.Y);
-            return { x: spawnX, y: spawnY };
-        }
-        getRandNum(n) {
-            return Math.floor(Math.random() * Math.floor(n));
-        }
-    }
-    exports.Game = Game;
-});
 define("game/car", ["require", "exports", "game/utils"], function (require, exports, utils_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -209,24 +121,87 @@ define("game/utils", ["require", "exports", "game/driver"], function (require, e
         Movement[Movement["Up"] = 2] = "Up";
         Movement[Movement["Down"] = 3] = "Down";
     })(Movement = exports.Movement || (exports.Movement = {}));
-    class LevelInfo {
-        constructor(driverConstructor, level) {
-            this.driverConstructor = driverConstructor;
-            this.level = level;
-        }
-    }
-    exports.LevelInfo = LevelInfo;
     let level1 = {
         start: { x: 1, y: 1 },
         finish: { x: 5, y: 5 },
         flags: [{ x: 3, y: 3 }, { x: 3, y: 3 }, { x: 3, y: 3 }]
     };
+    let defaultHero = {
+        pic: 'images/menu/profile.png',
+        text: 'Dummy Text for Hero Screen'
+    };
+    class LevelInfo {
+        constructor(driverConstructor, level, name = 'default', heroIntro = defaultHero, heroOutro = defaultHero) {
+            this.driverConstructor = driverConstructor;
+            this.level = level;
+            this.name = name;
+            this.heroIntro = heroIntro;
+            this.heroOutro = heroOutro;
+        }
+    }
+    exports.LevelInfo = LevelInfo;
+    exports.LevelOrder = ['echo', 'danny'];
+    exports.LevelConfig = {
+        echo: new LevelInfo(() => new driver_1.EchoDriver(), level1, 'echo', {
+            pic: 'images/menu/profile.png',
+            text: 'This is you. You need to get to the Finish.'
+        }),
+        danny: new LevelInfo(() => new driver_1.SimpleDriver(), level1, 'danny')
+    };
     exports.LevelsSettings = [
-        new LevelInfo(() => new driver_1.EchoDriver(), level1),
-        new LevelInfo(() => new driver_1.SimpleDriver(), level1)
+        new LevelInfo(() => new driver_1.EchoDriver(), level1, 'danny'),
+        new LevelInfo(() => new driver_1.SimpleDriver(), level1, 'echo')
     ];
 });
-define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/car", "game/driver"], function (require, exports, game_1, utils_3, car_2, driver_2) {
+define("scenes/greeting", ["require", "exports", "game/utils"], function (require, exports, utils_3) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    const gameHeight = window.innerHeight;
+    const gameWidth = window.innerWidth;
+    const halfHeight = gameHeight / 2;
+    const halfWidth = gameWidth / 2;
+    class GreetingScene extends Phaser.Scene {
+        constructor(sceneConfig) {
+            super({ key: 'greeting' });
+        }
+        create() {
+            var content = [
+                "Wingman",
+                "",
+                "Topic of GMTK Game Jam 2020 is “out of control”.",
+                "",
+                "We hope you’ll have as much fun as we did while developing B#.",
+                "",
+                "Enjoy!",
+                "",
+                "https://keepcalmgaming.github.io"
+            ];
+            var text = this.add.text(0, 0, content, { align: 'center' });
+            var bounds = text.getBounds();
+            text.x = halfWidth - bounds.width / 2;
+            text.y = halfHeight - bounds.height / 2;
+            let clicked = false;
+            if (!window.SaveState) {
+                window.SaveState = {};
+                window.CurrentLevel = utils_3.LevelOrder[0];
+            }
+            this.input.on('pointerdown', () => {
+                if (!clicked || true) {
+                    this.goHero();
+                    clicked = true;
+                }
+            });
+        }
+        goHero() {
+            window.HeroSettings = utils_3.LevelConfig[window.CurrentLevel].heroIntro;
+            window.heroPic = 'images/menu/profile.png';
+            window.heroTxt = 'This is you. You need to get to the Finish.';
+            this.scene.switch('hero');
+        }
+    }
+    exports.GreetingScene = GreetingScene;
+});
+define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/driver"], function (require, exports, utils_4, car_2, driver_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const gameHeight = window.innerHeight;
@@ -243,7 +218,7 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
             this.offsetY = 0;
             this.carX = 0;
             this.carY = 0;
-            this.levelInfo = utils_3.LevelsSettings[0];
+            this.levelInfo = utils_4.LevelsSettings[0];
             this.car = new car_2.Car();
             this.driver = new driver_2.SimpleDriver();
             // super(sceneConfig)
@@ -261,8 +236,7 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
             this.rectSize = rh < rw ? rh : rw;
             this.offsetX = (gameWidth - this.rectSize * (this.x * 3 + 1)) / 2;
             this.offsetY = (gameHeight - this.rectSize * (this.y * 3 + 1)) / 2;
-            this.towergame = new game_1.Game(this.x, this.y, this.isVertical);
-            console.log('Game Created', this.x, this.y, this.towergame);
+            console.log('Game Created', this.x, this.y);
         }
         create() {
             this.loadLevel();
@@ -270,8 +244,12 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
             this.setupHouses();
             this.setupCrossRoads();
             this.setupEvents();
-            // this.music = this.sound.add('music')
-            // this.music.play()
+            this.load.once('complete', () => {
+                let music = this.sound.add('music');
+                music.play();
+            }, this);
+            this.load.audio('music', 'sounds/NavigatorOST.mp3');
+            this.load.start();
         }
         loadLevel() {
             let li = window.LevelSetup;
@@ -280,29 +258,44 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
             this.driver = li.driverConstructor();
             this.car.setDriver(this.driver);
             this.carSprite = this.physics.add.sprite(this.offsetX + this.rectSize * 0.5, this.offsetY + this.rectSize * 0.5, 'car');
+            this.carSprite.setDepth(20);
             this.carSprite.setAngle(90);
             this.scaleSprite(this.carSprite, this.rectSize * 0.5);
             this.setupControls();
             // TODO: set start/finish/flags from here
             let ls = li.level;
+            let startSprite = this.physics.add.sprite(this.getX(ls.start.x), this.getY(ls.start.y), 'start');
+            startSprite.setOrigin(0.5);
+            startSprite.setScale(0.5);
+            startSprite.setDepth(15);
+            let finishSprite = this.physics.add.sprite(this.getX(ls.finish.x), this.getY(ls.finish.y), 'finish');
+            finishSprite.setOrigin(0.5);
+            finishSprite.setScale(0.5);
+            finishSprite.setDepth(15);
+            for (let flag of ls.flags) {
+                let flagSprite = this.physics.add.sprite(this.getX(flag.x), this.getY(flag.y), 'flag_ready');
+                flagSprite.setOrigin(0.5);
+                flagSprite.setScale(0.5);
+                flagSprite.setDepth(15);
+            }
         }
         setupControls() {
             let mapping = [
                 {
                     keys: [Phaser.Input.Keyboard.KeyCodes.UP, Phaser.Input.Keyboard.KeyCodes.W],
-                    value: utils_3.DriverInput.Cool
+                    value: utils_4.DriverInput.Cool
                 },
                 {
                     keys: [Phaser.Input.Keyboard.KeyCodes.DOWN, Phaser.Input.Keyboard.KeyCodes.S, Phaser.Input.Keyboard.KeyCodes.SPACE, Phaser.Input.Keyboard.KeyCodes.ENTER],
-                    value: utils_3.DriverInput.Crap
+                    value: utils_4.DriverInput.Crap
                 },
                 {
                     keys: [Phaser.Input.Keyboard.KeyCodes.LEFT, Phaser.Input.Keyboard.KeyCodes.A],
-                    value: utils_3.DriverInput.Left
+                    value: utils_4.DriverInput.Left
                 },
                 {
                     keys: [Phaser.Input.Keyboard.KeyCodes.RIGHT, Phaser.Input.Keyboard.KeyCodes.D],
-                    value: utils_3.DriverInput.Right
+                    value: utils_4.DriverInput.Right
                 }
             ];
             // this.input.keyboard.on('keydown-SPACE', () => console.log('hello'))
@@ -318,28 +311,32 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
                 console.log(event);
             });
             let sprite = this.physics.add.sprite(0, 0, 'arrow_right').setInteractive();
+            sprite.setDepth(100);
             sprite.x = gameWidth - 50;
             sprite.y = gameHeight - 50;
             sprite.on('pointerdown', (pointer) => {
-                this.processInput(utils_3.DriverInput.Right);
+                this.processInput(utils_4.DriverInput.Right);
             });
             sprite = this.physics.add.sprite(0, 0, 'arrow_down').setInteractive();
+            sprite.setDepth(100);
             sprite.x = gameWidth - 50 - 60;
             sprite.y = gameHeight - 50;
             sprite.on('pointerdown', (pointer) => {
-                this.processInput(utils_3.DriverInput.Crap);
+                this.processInput(utils_4.DriverInput.Crap);
             });
             sprite = this.physics.add.sprite(0, 0, 'arrow_left').setInteractive();
+            sprite.setDepth(100);
             sprite.x = gameWidth - 50 - 120;
             sprite.y = gameHeight - 50;
             sprite.on('pointerdown', (pointer) => {
-                this.processInput(utils_3.DriverInput.Left);
+                this.processInput(utils_4.DriverInput.Left);
             });
             sprite = this.physics.add.sprite(0, 0, 'arrow_up').setInteractive();
+            sprite.setDepth(100);
             sprite.x = gameWidth - 50 - 60;
             sprite.y = gameHeight - 50 - 60;
             sprite.on('pointerdown', (pointer) => {
-                this.processInput(utils_3.DriverInput.Cool);
+                this.processInput(utils_4.DriverInput.Cool);
             });
         }
         showBubble(d) {
@@ -348,25 +345,26 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
             }
             let s = '', a = '';
             switch (d) {
-                case utils_3.DriverInput.Left:
+                case utils_4.DriverInput.Left:
                     s = 'bubble_left';
                     a = 'left';
                     break;
-                case utils_3.DriverInput.Right:
+                case utils_4.DriverInput.Right:
                     s = 'bubble_right';
                     a = 'right';
                     break;
-                case utils_3.DriverInput.Crap:
+                case utils_4.DriverInput.Crap:
                     s = 'bubble_down';
                     a = 'crap';
                     break;
-                case utils_3.DriverInput.Cool:
+                case utils_4.DriverInput.Cool:
                     s = 'bubble_up';
                     a = 'cool';
                     break;
             }
             let bubble = this.physics.add.sprite(this.carSprite.x + 15, this.carSprite.y + 15 + 50, s);
             bubble.setOrigin(0, 1);
+            bubble.setDepth(30);
             bubble.setScale(0.1);
             this.tweens.addCounter({
                 from: 0.1,
@@ -446,10 +444,10 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
             this.car.speed;
             let angleChange = 0;
             switch (this.car.getNextStep()) {
-                case utils_3.Direction.Left:
+                case utils_4.Direction.Left:
                     angleChange = -90;
                     break;
-                case utils_3.Direction.Right:
+                case utils_4.Direction.Right:
                     angleChange = 90;
                     break;
             }
@@ -468,7 +466,7 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
                 return;
             this.prevSmallCrossRoad = crossroad;
             switch (this.car.getNextStep()) {
-                case utils_3.Direction.Left:
+                case utils_4.Direction.Left:
                     if (this.car.verticalSpeed > 0) {
                         this.car.verticalSpeed = 0;
                         this.car.horizontalSpeed = 1;
@@ -487,9 +485,9 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
                             this.car.horizontalSpeed = 0;
                         }
                     }
-                    this.driver.input(utils_3.DriverInput.Right);
+                    this.driver.input(utils_4.DriverInput.Right);
                     break;
-                case utils_3.Direction.Right:
+                case utils_4.Direction.Right:
                     if (this.car.verticalSpeed > 0) {
                         this.car.verticalSpeed = 0;
                         this.car.horizontalSpeed = -1;
@@ -508,7 +506,7 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
                             this.car.horizontalSpeed = 0;
                         }
                     }
-                    this.driver.input(utils_3.DriverInput.Left);
+                    this.driver.input(utils_4.DriverInput.Left);
                     break;
             }
         }
@@ -543,6 +541,12 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
                 }
             }
         }
+        getX(i) {
+            return this.offsetX + this.rectSize * (3 * i + 0.5);
+        }
+        getY(i) {
+            return this.offsetY + this.rectSize * (3 * i + 0.5);
+        }
         getScale(sprite, dim) {
             return dim / sprite.width;
         }
@@ -564,12 +568,16 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
             this.load.audio('right', 'sounds/right.mp3');
             this.load.audio('cool', 'sounds/nice.mp3');
             this.load.audio('crap', 'sounds/crap.mp3');
+            this.load.image('start', 'images/start.png');
+            this.load.image('finish', 'images/finish.png');
+            this.load.image('flag_ready', 'images/flag_ready.png');
+            this.load.image('flag_empty', 'images/flag_empty.png');
             // this.load.audio('music', 'sounds/NavigatorOST.mp3')
         }
     }
     exports.LevelScene = LevelScene;
 });
-define("scenes/level_select", ["require", "exports", "game/utils"], function (require, exports, utils_4) {
+define("scenes/level_select", ["require", "exports", "game/utils"], function (require, exports, utils_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const gameHeight = window.innerHeight;
@@ -598,7 +606,7 @@ define("scenes/level_select", ["require", "exports", "game/utils"], function (re
             sprite.x = halfWidth - 300;
             sprite.y = halfHeight;
             sprite.on('pointerdown', (pointer) => {
-                window.LevelSetup = utils_4.LevelsSettings[0];
+                window.LevelSetup = utils_5.LevelsSettings[0];
                 this.scene.switch('Level');
             });
         }
@@ -640,7 +648,7 @@ define("scenes/level_select", ["require", "exports", "game/utils"], function (re
 //         this.monsterSpawns.push(sprite)
 //     }
 // }
-define("scenes/hero_scene", ["require", "exports", "game/utils"], function (require, exports, utils_5) {
+define("scenes/hero_scene", ["require", "exports", "game/utils"], function (require, exports, utils_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const gameHeight = window.innerHeight;
@@ -652,7 +660,10 @@ define("scenes/hero_scene", ["require", "exports", "game/utils"], function (requ
             super({ key: 'hero' });
         }
         create() {
-            let imgPath = window.heroPic;
+            let heroSceneInfo = window.HeroSettings;
+            this.pic = heroSceneInfo.pic;
+            this.text = heroSceneInfo.text;
+            let imgPath = this.pic;
             this.load.once('complete', this.renderScene, this);
             this.load.image('img', imgPath);
             this.load.start();
@@ -661,7 +672,7 @@ define("scenes/hero_scene", ["require", "exports", "game/utils"], function (requ
             let sprite = this.physics.add.sprite(0, 0, 'img').setInteractive();
             sprite.x = halfWidth - 300;
             sprite.y = halfHeight;
-            let content = window.heroTxt;
+            let content = this.text;
             var text = this.add.text(0, 0, content, { align: 'left' });
             var bounds = text.getBounds();
             text.x = halfWidth - 100;
@@ -669,7 +680,7 @@ define("scenes/hero_scene", ["require", "exports", "game/utils"], function (requ
             let clicked = false;
             this.input.on('pointerdown', () => {
                 if (!clicked || true) {
-                    window.LevelSetup = utils_5.LevelsSettings[0];
+                    window.LevelSetup = utils_6.LevelsSettings[0];
                     this.scene.switch('Level');
                 }
             });
@@ -746,7 +757,7 @@ define("app", ["require", "exports", "scenes/greeting", "scenes/Level", "scenes/
     }
     exports.App = App;
 });
-define("scenes/main", ["require", "exports", "game/game"], function (require, exports, game_2) {
+define("scenes/main", ["require", "exports", "../game/game"], function (require, exports, game_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const gameHeight = window.innerHeight;
@@ -777,7 +788,7 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
             this.rectSize = rh < rw ? rh : rw;
             this.offsetX = (gameWidth - this.rectSize * this.x) / 2;
             this.offsetY = (gameHeight - this.rectSize * this.y) / 2;
-            this.towergame = new game_2.Game(this.x, this.y, this.isVertical);
+            this.towergame = new game_1.Game(this.x, this.y, this.isVertical);
             console.log('Game Created', this.x, this.y, this.towergame);
         }
         create() {
@@ -802,7 +813,7 @@ define("scenes/main", ["require", "exports", "game/game"], function (require, ex
                     if (this.music) {
                         this.music.destroy();
                     }
-                    this.towergame = new game_2.Game(this.x, this.y, this.isVertical);
+                    this.towergame = new game_1.Game(this.x, this.y, this.isVertical);
                     this.scene.restart();
                 }
             });

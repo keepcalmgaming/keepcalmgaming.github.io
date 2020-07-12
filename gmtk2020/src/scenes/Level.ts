@@ -33,8 +33,6 @@ export class LevelScene extends Phaser.Scene {
     private carX: number = 0
     private carY: number = 0
 
-    public towergame: Game
-
     private carSprite?: Phaser.GameObjects.Sprite
 
     private bigCrossroads?: Phaser.Physics.Arcade.Group
@@ -63,9 +61,7 @@ export class LevelScene extends Phaser.Scene {
         this.offsetX = (gameWidth - this.rectSize * (this.x * 3 + 1)) / 2
         this.offsetY = (gameHeight - this.rectSize * (this.y * 3 + 1)) / 2
 
-        this.towergame = new Game(this.x, this.y, this.isVertical)
-
-        console.log('Game Created', this.x, this.y, this.towergame)
+        console.log('Game Created', this.x, this.y)
     }
 
     private music?: Phaser.Sound.BaseSound
@@ -79,8 +75,12 @@ export class LevelScene extends Phaser.Scene {
 
         this.setupEvents()
 
-        // this.music = this.sound.add('music')
-        // this.music.play()
+        this.load.once('complete', () => {
+            let music = this.sound.add('music')
+            music.play()
+        }, this);
+        this.load.audio('music', 'sounds/NavigatorOST.mp3')
+        this.load.start();
     }
 
 
@@ -96,6 +96,7 @@ export class LevelScene extends Phaser.Scene {
         this.car.setDriver(this.driver)
 
         this.carSprite = this.physics.add.sprite(this.offsetX + this.rectSize * 0.5, this.offsetY + this.rectSize * 0.5, 'car')
+        this.carSprite.setDepth(20)
         this.carSprite.setAngle(90)
         this.scaleSprite(this.carSprite, this.rectSize * 0.5)
 
@@ -103,7 +104,23 @@ export class LevelScene extends Phaser.Scene {
 
         // TODO: set start/finish/flags from here
         let ls = li.level
-        
+
+        let startSprite = this.physics.add.sprite(this.getX(ls.start.x), this.getY(ls.start.y), 'start')
+        startSprite.setOrigin(0.5)
+        startSprite.setScale(0.5)
+        startSprite.setDepth(15)
+
+        let finishSprite = this.physics.add.sprite(this.getX(ls.finish.x), this.getY(ls.finish.y), 'finish')
+        finishSprite.setOrigin(0.5)
+        finishSprite.setScale(0.5)
+        finishSprite.setDepth(15)
+
+        for (let flag of ls.flags) {
+            let flagSprite = this.physics.add.sprite(this.getX(flag.x), this.getY(flag.y), 'flag_ready')
+            flagSprite.setOrigin(0.5)
+            flagSprite.setScale(0.5)
+            flagSprite.setDepth(15)
+        }
     }
 
     setupControls() {
@@ -140,6 +157,7 @@ export class LevelScene extends Phaser.Scene {
         });
 
         let sprite = this.physics.add.sprite(0, 0, 'arrow_right').setInteractive()
+        sprite.setDepth(100)
         sprite.x = gameWidth - 50
         sprite.y = gameHeight - 50
         sprite.on('pointerdown', (pointer: any) => {
@@ -147,6 +165,7 @@ export class LevelScene extends Phaser.Scene {
         })
 
         sprite = this.physics.add.sprite(0, 0, 'arrow_down').setInteractive()
+        sprite.setDepth(100)
         sprite.x = gameWidth - 50 - 60
         sprite.y = gameHeight - 50
         sprite.on('pointerdown', (pointer: any) => {
@@ -154,6 +173,7 @@ export class LevelScene extends Phaser.Scene {
         })
 
         sprite = this.physics.add.sprite(0, 0, 'arrow_left').setInteractive()
+        sprite.setDepth(100)
         sprite.x = gameWidth - 50 - 120
         sprite.y = gameHeight - 50
         sprite.on('pointerdown', (pointer: any) => {
@@ -161,6 +181,7 @@ export class LevelScene extends Phaser.Scene {
         })
 
         sprite = this.physics.add.sprite(0, 0, 'arrow_up').setInteractive()
+        sprite.setDepth(100)
         sprite.x = gameWidth - 50 - 60
         sprite.y = gameHeight - 50 - 60
         sprite.on('pointerdown', (pointer: any) => {
@@ -194,6 +215,7 @@ export class LevelScene extends Phaser.Scene {
 
         let bubble = this.physics.add.sprite(this.carSprite.x + 15, this.carSprite.y + 15 + 50, s);
         bubble.setOrigin(0, 1)
+        bubble.setDepth(30)
 
         bubble.setScale(0.1)
 
@@ -388,6 +410,14 @@ export class LevelScene extends Phaser.Scene {
 		}
     }
 
+    getX(i: number): number {
+        return this.offsetX + this.rectSize * (3 * i + 0.5)
+    }
+
+    getY(i: number): number {
+        return this.offsetY + this.rectSize * (3 * i + 0.5)
+    }
+
     getScale(sprite: Phaser.GameObjects.Sprite, dim: number) {
         return dim / sprite.width
     }
@@ -412,6 +442,12 @@ export class LevelScene extends Phaser.Scene {
         this.load.audio('right', 'sounds/right.mp3')
         this.load.audio('cool', 'sounds/nice.mp3')
         this.load.audio('crap', 'sounds/crap.mp3')
+
+        this.load.image('start', 'images/start.png')
+        this.load.image('finish', 'images/finish.png')
+        this.load.image('flag_ready', 'images/flag_ready.png')
+        this.load.image('flag_empty', 'images/flag_empty.png')
+
         // this.load.audio('music', 'sounds/NavigatorOST.mp3')
     }
 }

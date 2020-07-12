@@ -1,4 +1,4 @@
-import { LevelsSettings } from '../game/utils'
+import { LevelsSettings, HeroSceneInfo } from '../game/utils'
 
 const gameHeight = window.innerHeight
 const gameWidth = window.innerWidth
@@ -13,8 +13,15 @@ export class HeroScene extends Phaser.Scene {
         super({key: 'hero'})
     }
 
+    pic: string
+    text: string
+
     create() {
-        let imgPath = (<any>window).heroPic
+        let heroSceneInfo = window.HeroSettings
+        this.pic = heroSceneInfo.pic
+        this.text = heroSceneInfo.text
+
+        let imgPath = this.pic
         
         this.load.once('complete', this.renderScene, this);
         this.load.image('img', imgPath)
@@ -26,7 +33,7 @@ export class HeroScene extends Phaser.Scene {
         sprite.x = halfWidth - 300
         sprite.y = halfHeight
 
-        let content = (<any>window).heroTxt
+        let content = this.text
         var text = this.add.text(0, 0, content, { align: 'left' })
         var bounds = text.getBounds()
 
