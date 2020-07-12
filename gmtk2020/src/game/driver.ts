@@ -15,9 +15,11 @@ export class EchoDriver implements Driver {
     public input(di: DriverInput) {
         switch (di) {
             case DriverInput.Left:
+                this.direction = Direction.Left
                 console.log('ECHO LEFT')
                 break;
             case DriverInput.Right:
+                this.direction = Direction.Right
                 console.log('ECHO RIGHT')
                 break;
             case DriverInput.Cool:
@@ -29,8 +31,9 @@ export class EchoDriver implements Driver {
         }
     }
 
+    private direction = Direction.Right;
     public getNextStep(): Direction {
-        return Direction.Forward
+        return this.direction
     }
 }
 

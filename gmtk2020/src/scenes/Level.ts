@@ -4,7 +4,8 @@ import {
     LevelSetup, 
     LevelsSettings,
     Direction,
-    DriverInput
+    DriverInput,
+    Movement
 } from '../game/utils'
 import { Car } from '../game/car'
 import { Driver, SimpleDriver } from '../game/driver'
@@ -36,7 +37,8 @@ export class LevelScene extends Phaser.Scene {
 
     private carSprite?: Phaser.GameObjects.Sprite
 
-    private crossroads?: Phaser.Physics.Arcade.Group
+    private bigCrossroads?: Phaser.Physics.Arcade.Group
+    private smallCrossroads?: Phaser.Physics.Arcade.Group
 	
 
     constructor(
@@ -94,6 +96,7 @@ export class LevelScene extends Phaser.Scene {
         this.car.setDriver(this.driver)
 
         this.carSprite = this.physics.add.sprite(this.offsetX + this.rectSize * 0.5, this.offsetY + this.rectSize * 0.5, 'car')
+        this.carSprite.setAngle(90)
         this.scaleSprite(this.carSprite, this.rectSize * 0.5)
 
         this.setupControls()
@@ -263,8 +266,9 @@ export class LevelScene extends Phaser.Scene {
     }
 
     setupEvents() {
-        if (!this.crossroads || !this.carSprite) return
-        this.physics.add.collider(this.crossroads, this.carSprite, this.crossroadHit)
+        if (!this.bigCrossroads || !this.smallCrossroads || !this.carSprite) return
+        this.physics.add.collider(this.bigCrossroads, this.carSprite, this.bigCrossroadHit.bind(this))
+        this.physics.add.overlap(this.smallCrossroads, this.carSprite, this.smallCrossroadHit.bind(this))
 
         this.time.addEvent({
             delay: 16,
@@ -274,26 +278,112 @@ export class LevelScene extends Phaser.Scene {
         })
     }
 
-    crossroadHit(car: Phaser.GameObjects.GameObject, crossroad: Phaser.GameObjects.GameObject) {
+    private prevBigCrossRoad?: Phaser.GameObjects.GameObject
+    private prevSmallCrossRoad?: Phaser.GameObjects.GameObject
 
+    bigCrossroadHit(carSprite: Phaser.GameObjects.GameObject, crossroad: Phaser.GameObjects.GameObject) {
+        if (crossroad === this.prevBigCrossRoad) return
+
+        this.prevBigCrossRoad = crossroad;
+
+        let angle = (<any>carSprite).angle
+
+        this.car.speed
+
+        let angleChange = 0;
+        switch(this.car.getNextStep()) {
+            case Direction.Left:
+                angleChange = -90;
+                break;
+            case Direction.Right:
+                angleChange = 90;
+                break;
+        }
+        this.tweens.addCounter({
+            from: angle,
+            to: angle + angleChange,
+            duration: 500,
+            onUpdate: (tween: any) => {
+                let value = tween.getValue();
+                (<any>carSprite).setAngle(value);
+            }
+        })
+    }
+
+    smallCrossroadHit(carSprite: Phaser.GameObjects.GameObject, crossroad: Phaser.GameObjects.GameObject) {
+        if (crossroad === this.prevSmallCrossRoad) return
+
+        this.prevSmallCrossRoad = crossroad;
+        switch (this.car.getNextStep()) {
+            case Direction.Left:
+                if (this.car.verticalSpeed > 0) {
+                    this.car.verticalSpeed = 0;
+                    this.car.horizontalSpeed = 1;
+                } else if (this.car.verticalSpeed < 0) {
+                    this.car.verticalSpeed = 0;
+                    this.car.horizontalSpeed = -1;
+                } else {
+                    if (this.car.horizontalSpeed > 0) {
+                        this.car.verticalSpeed = -1;
+                        this.car.horizontalSpeed = 0;
+                    } else {
+                        this.car.verticalSpeed = 1;
+                        this.car.horizontalSpeed = 0;
+                    }
+                }
+                this.driver.input(DriverInput.Right)
+                break;
+            case Direction.Right:
+                if (this.car.verticalSpeed > 0) {
+                    this.car.verticalSpeed = 0;
+                    this.car.horizontalSpeed = -1;
+                } else if (this.car.verticalSpeed < 0) {
+                    this.car.verticalSpeed = 0;
+                    this.car.horizontalSpeed = 1;
+                } else {
+                    if (this.car.horizontalSpeed > 0) {
+                        this.car.verticalSpeed = 1;
+                        this.car.horizontalSpeed = 0;
+                    } else {
+                        this.car.verticalSpeed = -1;
+                        this.car.horizontalSpeed = 0;
+                    }
+                }
+                this.driver.input(DriverInput.Left)
+                break;
+            }
     }
 
     moveCar() {
         if (!this.car || !this.carSprite) return
 
-        // switch (this.car.getNextStep) {
-        //     case Direction.Forward
-        // }
-        this.physics.moveTo(this.carSprite, this.carSprite.x + this.car.speed, this.carSprite.y)
+        console.log('moving car')
+        this.carSprite.x = this.carSprite.x + this.car.horizontalSpeed;
+        this.carSprite.y = this.carSprite.y + this.car.verticalSpeed;
     }
 
     setupCrossRoads() {
-        this.crossroads = this.physics.add.group()
+        this.bigCrossroads = this.physics.add.group()
 		for (let i = 0; i <= maxSide; i++) {
 			for (let j = 0; j <= minSide; j++) {
-                let crossroad = this.crossroads.create(this.offsetX + this.rectSize * (3 * i + 0.5), this.offsetY + this.rectSize * (3 * j + 0.5), 'towerplace')
-                // crossroad.alpha = 0
+                let crossroad = this.bigCrossroads.create(this.offsetX + this.rectSize * (3 * i + 0.5), this.offsetY + this.rectSize * (3 * j + 0.5), 'towerplace')
+                crossroad.alpha = 0
                 this.scaleSprite(crossroad, this.rectSize * 2)
+                if (!this.prevBigCrossRoad) {
+                    this.prevBigCrossRoad = crossroad
+                }
+			}
+		}
+
+        this.smallCrossroads = this.physics.add.group()
+		for (let i = 0; i <= maxSide; i++) {
+			for (let j = 0; j <= minSide; j++) {
+                let crossroad = this.smallCrossroads.create(this.offsetX + this.rectSize * (3 * i + 0.5), this.offsetY + this.rectSize * (3 * j + 0.5), 'towerplace')
+                // crossroad.alpha = 0
+                this.scaleSprite(crossroad, this.rectSize * 0.75)
+                if (!this.prevSmallCrossRoad) {
+                    this.prevSmallCrossRoad = crossroad
+                }
 			}
 		}
     }

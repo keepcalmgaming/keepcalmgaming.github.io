@@ -92,6 +92,8 @@ define("game/car", ["require", "exports", "game/utils"], function (require, expo
     class Car {
         constructor() {
             this.speed = 0;
+            this.horizontalSpeed = 1;
+            this.verticalSpeed = 0;
         }
         setDriver(d) {
             this.driver = d;
@@ -103,6 +105,22 @@ define("game/car", ["require", "exports", "game/utils"], function (require, expo
         getNextStep() {
             return this.driver ? this.driver.getNextStep() : utils_1.Direction.Forward;
         }
+        getMovementDirection() {
+            if (this.horizontalSpeed > 0) {
+                return utils_1.Movement.Right;
+            }
+            else if (this.horizontalSpeed < 0) {
+                return utils_1.Movement.Left;
+            }
+            else {
+                if (this.verticalSpeed > 0) {
+                    return utils_1.Movement.Down;
+                }
+                else {
+                    return utils_1.Movement.Up;
+                }
+            }
+        }
     }
     exports.Car = Car;
 });
@@ -112,13 +130,16 @@ define("game/driver", ["require", "exports", "game/utils", "game/car"], function
     class EchoDriver {
         constructor() {
             this.car = new car_1.Car();
+            this.direction = utils_2.Direction.Right;
         }
         input(di) {
             switch (di) {
                 case utils_2.DriverInput.Left:
+                    this.direction = utils_2.Direction.Left;
                     console.log('ECHO LEFT');
                     break;
                 case utils_2.DriverInput.Right:
+                    this.direction = utils_2.Direction.Right;
                     console.log('ECHO RIGHT');
                     break;
                 case utils_2.DriverInput.Cool:
@@ -130,7 +151,7 @@ define("game/driver", ["require", "exports", "game/utils", "game/car"], function
             }
         }
         getNextStep() {
-            return utils_2.Direction.Forward;
+            return this.direction;
         }
     }
     exports.EchoDriver = EchoDriver;
@@ -181,6 +202,13 @@ define("game/utils", ["require", "exports", "game/driver"], function (require, e
         Direction[Direction["Right"] = 1] = "Right";
         Direction[Direction["Forward"] = 2] = "Forward";
     })(Direction = exports.Direction || (exports.Direction = {}));
+    var Movement;
+    (function (Movement) {
+        Movement[Movement["Left"] = 0] = "Left";
+        Movement[Movement["Right"] = 1] = "Right";
+        Movement[Movement["Up"] = 2] = "Up";
+        Movement[Movement["Down"] = 3] = "Down";
+    })(Movement = exports.Movement || (exports.Movement = {}));
     class LevelInfo {
         constructor(driverConstructor, level) {
             this.driverConstructor = driverConstructor;
@@ -252,6 +280,7 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
             this.driver = li.driverConstructor();
             this.car.setDriver(this.driver);
             this.carSprite = this.physics.add.sprite(this.offsetX + this.rectSize * 0.5, this.offsetY + this.rectSize * 0.5, 'car');
+            this.carSprite.setAngle(90);
             this.scaleSprite(this.carSprite, this.rectSize * 0.5);
             this.setupControls();
             // TODO: set start/finish/flags from here
@@ -398,9 +427,10 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
             }
         }
         setupEvents() {
-            if (!this.crossroads || !this.carSprite)
+            if (!this.bigCrossroads || !this.smallCrossroads || !this.carSprite)
                 return;
-            this.physics.add.collider(this.crossroads, this.carSprite, this.crossroadHit);
+            this.physics.add.collider(this.bigCrossroads, this.carSprite, this.bigCrossroadHit.bind(this));
+            this.physics.add.overlap(this.smallCrossroads, this.carSprite, this.smallCrossroadHit.bind(this));
             this.time.addEvent({
                 delay: 16,
                 loop: true,
@@ -408,23 +438,108 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
                 callbackScope: this
             });
         }
-        crossroadHit(car, crossroad) {
+        bigCrossroadHit(carSprite, crossroad) {
+            if (crossroad === this.prevBigCrossRoad)
+                return;
+            this.prevBigCrossRoad = crossroad;
+            let angle = carSprite.angle;
+            this.car.speed;
+            let angleChange = 0;
+            switch (this.car.getNextStep()) {
+                case utils_3.Direction.Left:
+                    angleChange = -90;
+                    break;
+                case utils_3.Direction.Right:
+                    angleChange = 90;
+                    break;
+            }
+            this.tweens.addCounter({
+                from: angle,
+                to: angle + angleChange,
+                duration: 500,
+                onUpdate: (tween) => {
+                    let value = tween.getValue();
+                    carSprite.setAngle(value);
+                }
+            });
+        }
+        smallCrossroadHit(carSprite, crossroad) {
+            if (crossroad === this.prevSmallCrossRoad)
+                return;
+            this.prevSmallCrossRoad = crossroad;
+            switch (this.car.getNextStep()) {
+                case utils_3.Direction.Left:
+                    if (this.car.verticalSpeed > 0) {
+                        this.car.verticalSpeed = 0;
+                        this.car.horizontalSpeed = 1;
+                    }
+                    else if (this.car.verticalSpeed < 0) {
+                        this.car.verticalSpeed = 0;
+                        this.car.horizontalSpeed = -1;
+                    }
+                    else {
+                        if (this.car.horizontalSpeed > 0) {
+                            this.car.verticalSpeed = -1;
+                            this.car.horizontalSpeed = 0;
+                        }
+                        else {
+                            this.car.verticalSpeed = 1;
+                            this.car.horizontalSpeed = 0;
+                        }
+                    }
+                    this.driver.input(utils_3.DriverInput.Right);
+                    break;
+                case utils_3.Direction.Right:
+                    if (this.car.verticalSpeed > 0) {
+                        this.car.verticalSpeed = 0;
+                        this.car.horizontalSpeed = -1;
+                    }
+                    else if (this.car.verticalSpeed < 0) {
+                        this.car.verticalSpeed = 0;
+                        this.car.horizontalSpeed = 1;
+                    }
+                    else {
+                        if (this.car.horizontalSpeed > 0) {
+                            this.car.verticalSpeed = 1;
+                            this.car.horizontalSpeed = 0;
+                        }
+                        else {
+                            this.car.verticalSpeed = -1;
+                            this.car.horizontalSpeed = 0;
+                        }
+                    }
+                    this.driver.input(utils_3.DriverInput.Left);
+                    break;
+            }
         }
         moveCar() {
             if (!this.car || !this.carSprite)
                 return;
-            // switch (this.car.getNextStep) {
-            //     case Direction.Forward
-            // }
-            this.physics.moveTo(this.carSprite, this.carSprite.x + this.car.speed, this.carSprite.y);
+            console.log('moving car');
+            this.carSprite.x = this.carSprite.x + this.car.horizontalSpeed;
+            this.carSprite.y = this.carSprite.y + this.car.verticalSpeed;
         }
         setupCrossRoads() {
-            this.crossroads = this.physics.add.group();
+            this.bigCrossroads = this.physics.add.group();
             for (let i = 0; i <= maxSide; i++) {
                 for (let j = 0; j <= minSide; j++) {
-                    let crossroad = this.crossroads.create(this.offsetX + this.rectSize * (3 * i + 0.5), this.offsetY + this.rectSize * (3 * j + 0.5), 'towerplace');
-                    // crossroad.alpha = 0
+                    let crossroad = this.bigCrossroads.create(this.offsetX + this.rectSize * (3 * i + 0.5), this.offsetY + this.rectSize * (3 * j + 0.5), 'towerplace');
+                    crossroad.alpha = 0;
                     this.scaleSprite(crossroad, this.rectSize * 2);
+                    if (!this.prevBigCrossRoad) {
+                        this.prevBigCrossRoad = crossroad;
+                    }
+                }
+            }
+            this.smallCrossroads = this.physics.add.group();
+            for (let i = 0; i <= maxSide; i++) {
+                for (let j = 0; j <= minSide; j++) {
+                    let crossroad = this.smallCrossroads.create(this.offsetX + this.rectSize * (3 * i + 0.5), this.offsetY + this.rectSize * (3 * j + 0.5), 'towerplace');
+                    // crossroad.alpha = 0
+                    this.scaleSprite(crossroad, this.rectSize * 0.75);
+                    if (!this.prevSmallCrossRoad) {
+                        this.prevSmallCrossRoad = crossroad;
+                    }
                 }
             }
         }

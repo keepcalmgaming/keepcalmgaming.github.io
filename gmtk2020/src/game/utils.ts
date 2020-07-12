@@ -2,6 +2,7 @@ import { Driver, SimpleDriver, EchoDriver } from 'driver'
 
 export enum DriverInput { Left, Right, Cool, Crap}
 export enum Direction { Left, Right, Forward }
+export enum Movement { Left, Right, Up, Down }
 
 export type Coords = {
     x: number,
