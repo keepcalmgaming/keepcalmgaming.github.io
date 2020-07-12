@@ -397,7 +397,6 @@ export class LevelScene extends Phaser.Scene {
     }
 
     private canGo(d: Direction): Boolean {
-        debugger
         switch(d) {
             case Direction.Forward:
                 switch (this.car.getMovementDirection()) {

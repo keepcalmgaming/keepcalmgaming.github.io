@@ -537,7 +537,6 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             return utils_4.Direction.Forward;
         }
         canGo(d) {
-            debugger;
             switch (d) {
                 case utils_4.Direction.Forward:
                     switch (this.car.getMovementDirection()) {
