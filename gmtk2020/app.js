@@ -188,6 +188,8 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
             super({ key: 'Level' });
             this.offsetX = 0;
             this.offsetY = 0;
+            this.carX = 0;
+            this.carY = 0;
             this.levelInfo = utils_3.LevelsSettings[0];
             this.car = new car_2.Car();
             this.driver = new driver_2.SimpleDriver();
@@ -213,6 +215,7 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
             this.loadLevel();
             this.cameras.main.setBackgroundColor('#FFFFFF');
             this.setupHouses();
+            this.setupCrossRoads();
             this.setupEvents();
             this.music = this.sound.add('music');
             this.music.play();
@@ -229,6 +232,7 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
             let ls = li.level;
         }
         update() {
+            console.log('update()');
             this.input.on('pointerup', () => {
                 if (!this.towergame.active()) {
                     if (this.music) {
@@ -240,16 +244,17 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
             });
         }
         setupHouses() {
-            let rows = 9;
-            let cols = 8;
             let field = this.add.graphics({ lineStyle: { width: 2, color: 0x000000 }, fillStyle: { color: 0x000000 } });
-            for (let i = 0; i < rows; i++) {
-                for (let j = 0; j < cols; j++) {
+            for (let i = 0; i < maxSide; i++) {
+                for (let j = 0; j < minSide; j++) {
                     field.fillRect(this.offsetX + this.rectSize * (3 * i + 1), this.offsetY + this.rectSize * (3 * j + 1), this.rectSize * 2, this.rectSize * 2);
                 }
             }
         }
         setupEvents() {
+            if (!this.crossroads || !this.carSprite)
+                return;
+            this.physics.add.collider(this.crossroads, this.carSprite, this.crossroadHit);
             this.time.addEvent({
                 delay: 16,
                 loop: true,
@@ -257,10 +262,25 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
                 callbackScope: this
             });
         }
+        crossroadHit(car, crossroad) {
+        }
         moveCar() {
             if (!this.car || !this.carSprite)
                 return;
+            // switch (this.car.getNextStep) {
+            //     case Direction.Forward
+            // }
             this.physics.moveTo(this.carSprite, this.carSprite.x + this.car.speed, this.carSprite.y);
+        }
+        setupCrossRoads() {
+            this.crossroads = this.physics.add.group();
+            for (let i = 0; i <= maxSide; i++) {
+                for (let j = 0; j <= minSide; j++) {
+                    let crossroad = this.crossroads.create(this.offsetX + this.rectSize * (3 * i + 0.5), this.offsetY + this.rectSize * (3 * j + 0.5), 'towerplace');
+                    // crossroad.alpha = 0
+                    this.scaleSprite(crossroad, this.rectSize * 2);
+                }
+            }
         }
         getScale(sprite, dim) {
             return dim / sprite.width;
