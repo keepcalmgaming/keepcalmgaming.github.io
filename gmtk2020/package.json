@@ -1,7 +1,7 @@
 {
-  "name": "kcg-gmtk-2019",
+  "name": "kcg-gmtk-2020",
   "version": "0.0.1",
-  "description": "Spaceteam-like shooter",
+  "description": "Co-driver simulator",
   "main": "app.js",
   "scripts": {
     "test": "we are live!",

@@ -1,3 +1,5 @@
+import { LevelsSettings } from '../game/utils'
+
 const gameHeight = window.innerHeight
 const gameWidth = window.innerWidth
 
@@ -35,7 +37,7 @@ export class HeroScene extends Phaser.Scene {
 
         this.input.on('pointerdown', () => {
             if (!clicked || true) {
-                window.a = 2
+                (<any>window).LevelSetup = LevelsSettings[0]
                 this.scene.switch('Level')
             }
         })

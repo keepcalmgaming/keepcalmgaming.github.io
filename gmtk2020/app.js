@@ -86,7 +86,91 @@ define("game/game", ["require", "exports"], function (require, exports) {
     }
     exports.Game = Game;
 });
-define("scenes/Level", ["require", "exports", "game/game"], function (require, exports, game_1) {
+define("game/car", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    class Car {
+        constructor() {
+            this.speed = 0;
+        }
+        setDriver(d) {
+            this.driver = d;
+            d.car = this;
+        }
+        setSpeed(speed) {
+            this.speed = speed;
+        }
+    }
+    exports.Car = Car;
+});
+define("game/driver", ["require", "exports", "game/utils", "game/car"], function (require, exports, utils_1, car_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    class SimpleDriver {
+        constructor() {
+            this.car = new car_1.Car();
+            this.nextDirection = utils_1.Direction.Forward;
+        }
+        input(di) {
+            switch (di) {
+                case utils_1.DriverInput.Left:
+                    this.nextDirection = utils_1.Direction.Left;
+                    break;
+                case utils_1.DriverInput.Right:
+                    this.nextDirection = utils_1.Direction.Right;
+                    break;
+                case utils_1.DriverInput.Cool:
+                    this.car.setSpeed(this.car.speed + 1);
+                    break;
+                case utils_1.DriverInput.Crap:
+                    let newSpeed = this.car.speed - 1;
+                    if (newSpeed >= 0)
+                        this.car.setSpeed(this.car.speed - 1);
+                    break;
+            }
+        }
+        getNextStep() {
+            let result = this.nextDirection;
+            this.nextDirection = utils_1.Direction.Forward;
+            return result;
+        }
+    }
+    exports.SimpleDriver = SimpleDriver;
+});
+define("game/utils", ["require", "exports", "game/driver"], function (require, exports, driver_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var DriverInput;
+    (function (DriverInput) {
+        DriverInput[DriverInput["Left"] = 0] = "Left";
+        DriverInput[DriverInput["Right"] = 1] = "Right";
+        DriverInput[DriverInput["Cool"] = 2] = "Cool";
+        DriverInput[DriverInput["Crap"] = 3] = "Crap";
+    })(DriverInput = exports.DriverInput || (exports.DriverInput = {}));
+    var Direction;
+    (function (Direction) {
+        Direction[Direction["Left"] = 0] = "Left";
+        Direction[Direction["Right"] = 1] = "Right";
+        Direction[Direction["Forward"] = 2] = "Forward";
+    })(Direction = exports.Direction || (exports.Direction = {}));
+    class LevelInfo {
+        constructor(driverConstructor, level) {
+            this.driverConstructor = driverConstructor;
+            this.level = level;
+        }
+    }
+    exports.LevelInfo = LevelInfo;
+    let level1 = {
+        start: { x: 1, y: 1 },
+        finish: { x: 5, y: 5 },
+        flags: [{ x: 3, y: 3 }, { x: 3, y: 3 }, { x: 3, y: 3 }]
+    };
+    exports.LevelsSettings = [
+        new LevelInfo(() => new driver_1.SimpleDriver(), level1),
+        new LevelInfo(() => new driver_1.SimpleDriver(), level1)
+    ];
+});
+define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/car", "game/driver"], function (require, exports, game_1, utils_2, car_2, driver_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const gameHeight = window.innerHeight;
@@ -101,6 +185,9 @@ define("scenes/Level", ["require", "exports", "game/game"], function (require, e
             super({ key: 'Level' });
             this.offsetX = 0;
             this.offsetY = 0;
+            this.levelInfo = utils_2.LevelsSettings[0];
+            this.car = new car_2.Car();
+            this.driver = new driver_2.SimpleDriver();
             // super(sceneConfig)
             this.isVertical = gameHeight > gameWidth;
             if (this.isVertical) {
@@ -120,6 +207,7 @@ define("scenes/Level", ["require", "exports", "game/game"], function (require, e
             console.log('Game Created', this.x, this.y, this.towergame);
         }
         create() {
+            this.loadLevel();
             console.log('Create()', window.a);
             this.cameras.main.setBackgroundColor('#FFFFFF');
             this.setupHouses();
@@ -127,6 +215,15 @@ define("scenes/Level", ["require", "exports", "game/game"], function (require, e
             this.setupEvents();
             this.music = this.sound.add('music');
             this.music.play();
+        }
+        loadLevel() {
+            let li = window.LevelSetup;
+            this.levelInfo = li;
+            this.car = new car_2.Car();
+            this.driver = li.driverConstructor();
+            this.car.setDriver(this.driver);
+            // TODO: set start/finish/flags from here
+            let ls = li.level;
         }
         update() {
             this.input.on('pointerup', () => {
@@ -188,7 +285,7 @@ define("scenes/Level", ["require", "exports", "game/game"], function (require, e
     }
     exports.LevelScene = LevelScene;
 });
-define("scenes/level_select", ["require", "exports"], function (require, exports) {
+define("scenes/level_select", ["require", "exports", "game/utils"], function (require, exports, utils_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const gameHeight = window.innerHeight;
@@ -217,9 +314,8 @@ define("scenes/level_select", ["require", "exports"], function (require, exports
             sprite.x = halfWidth - 300;
             sprite.y = halfHeight;
             sprite.on('pointerdown', (pointer) => {
-                console.log('profile clicked');
-                window.a = 2;
-                this.scene.switch('greeting');
+                window.LevelSetup = utils_3.LevelsSettings[0];
+                this.scene.switch('Level');
             });
         }
         preload() {
@@ -260,7 +356,7 @@ define("scenes/level_select", ["require", "exports"], function (require, exports
 //         this.monsterSpawns.push(sprite)
 //     }
 // }
-define("scenes/hero_scene", ["require", "exports"], function (require, exports) {
+define("scenes/hero_scene", ["require", "exports", "game/utils"], function (require, exports, utils_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const gameHeight = window.innerHeight;
@@ -289,7 +385,7 @@ define("scenes/hero_scene", ["require", "exports"], function (require, exports) 
             let clicked = false;
             this.input.on('pointerdown', () => {
                 if (!clicked || true) {
-                    window.a = 2;
+                    window.LevelSetup = utils_4.LevelsSettings[0];
                     this.scene.switch('Level');
                 }
             });

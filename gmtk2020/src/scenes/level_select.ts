@@ -1,3 +1,5 @@
+import { LevelsSettings } from '../game/utils'
+
 const gameHeight = window.innerHeight
 const gameWidth = window.innerWidth
 
@@ -33,9 +35,8 @@ export class LevelSelectScene extends Phaser.Scene {
         sprite.x = halfWidth - 300
         sprite.y = halfHeight
         sprite.on('pointerdown', (pointer: any) => {
-            console.log('profile clicked')
-            window.a = 2;
-            this.scene.switch('greeting')
+            (<any>window).LevelSetup = LevelsSettings[0]
+            this.scene.switch('Level')
         })
     }
 

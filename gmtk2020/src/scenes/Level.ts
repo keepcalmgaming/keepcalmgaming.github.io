@@ -1,4 +1,13 @@
 import { Game } from '../game/game'
+import { 
+    LevelInfo, 
+    LevelSetup, 
+    LevelsSettings,
+    Direction,
+    DriverInput
+} from '../game/utils'
+import { Car } from '../game/car'
+import { Driver, SimpleDriver } from '../game/driver'
 
 const gameHeight = window.innerHeight
 const gameWidth = window.innerWidth
@@ -67,6 +76,7 @@ export class LevelScene extends Phaser.Scene {
     private music?: Phaser.Sound.BaseSound
 
     create() {
+        this.loadLevel()
         console.log('Create()', window.a)
         this.cameras.main.setBackgroundColor('#FFFFFF');
 
@@ -78,6 +88,22 @@ export class LevelScene extends Phaser.Scene {
 
         this.music = this.sound.add('music')
         this.music.play()
+    }
+
+
+    levelInfo: LevelInfo = LevelsSettings[0]
+    car: Car = new Car()
+    driver: Driver = new SimpleDriver()
+
+    loadLevel(): void {
+        let li: LevelInfo = (<any>window).LevelSetup
+        this.levelInfo = li
+        this.car = new Car()
+        this.driver = li.driverConstructor()
+        this.car.setDriver(this.driver)
+
+        // TODO: set start/finish/flags from here
+        let ls = li.level
     }
 
     update() {
