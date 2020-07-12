@@ -185,7 +185,7 @@ export class Jessica implements Driver {
 
 export class Lloyd implements Driver {
     public car: Car = new Car()
-    directions = [Direction.Forward, Direction.Left, Direction.Right]
+    private directions = [Direction.Forward, Direction.Left, Direction.Right]
     private direction: Direction = directions[Math.floor(Math.random() * directions.length)]
     private previous: Direction = direction;
 
@@ -209,4 +209,11 @@ export class Lloyd implements Driver {
         }
     }
 
+    public getNextStep(): Direction {
+      return this.direction
+    }
+
+    public flushDirection(): void {
+        this.direction = this.directions[Math.floor(Math.random() * directions.length)]
+    }
 }
