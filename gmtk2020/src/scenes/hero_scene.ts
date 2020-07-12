@@ -42,12 +42,14 @@ export class HeroScene extends Phaser.Scene {
 
         let clicked = false
 
-        this.input.on('pointerup', () => {
-            if (window.Result) {
-                this.scene.start('level_select')
-            } else {
-                (<any>window).LevelSetup = LevelsSettings[0]
-                this.scene.start('Level')
+        this.input.on('pointerdown', () => {
+            if (!clicked) {
+                if (window.Result) {
+                    this.scene.start('level_select')
+                } else {
+                    (<any>window).LevelSetup = LevelsSettings[0]
+                    this.scene.start('Level')
+                }
             }
         })
     }

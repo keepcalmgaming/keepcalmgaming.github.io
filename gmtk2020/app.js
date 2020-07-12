@@ -144,7 +144,7 @@ define("game/utils", ["require", "exports", "game/driver"], function (require, e
     exports.LevelConfig = {
         echo: new LevelInfo(() => new driver_1.EchoDriver(), level1, 'echo', {
             pic: 'images/menu/profile.png',
-            text: 'This is you. You need to get to the Finish.'
+            text: "But you are not the driver. Your driver was Danny, he is a nice guy and always listens. Other won't."
         }, {
             pic: 'images/menu/profile.png',
             text: 'This is you. You need to get to the Finish.'
@@ -653,6 +653,7 @@ define("scenes/level_select", ["require", "exports", "game/utils"], function (re
         }
         create() {
             console.log('create called');
+            window.Result = null;
             let sprite = this.physics.add.sprite(0, 0, 'profile').setInteractive();
             sprite.x = halfWidth - 300;
             sprite.y = halfHeight;
@@ -729,13 +730,15 @@ define("scenes/hero_scene", ["require", "exports", "game/utils"], function (requ
             text.x = halfWidth - 100;
             text.y = halfHeight - bounds.height / 2;
             let clicked = false;
-            this.input.on('pointerup', () => {
-                if (window.Result) {
-                    this.scene.start('level_select');
-                }
-                else {
-                    window.LevelSetup = utils_6.LevelsSettings[0];
-                    this.scene.start('Level');
+            this.input.on('pointerdown', () => {
+                if (!clicked) {
+                    if (window.Result) {
+                        this.scene.start('level_select');
+                    }
+                    else {
+                        window.LevelSetup = utils_6.LevelsSettings[0];
+                        this.scene.start('Level');
+                    }
                 }
             });
         }

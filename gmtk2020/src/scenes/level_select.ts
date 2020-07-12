@@ -31,6 +31,8 @@ export class LevelSelectScene extends Phaser.Scene {
     create() {
         console.log('create called')
 
+        window.Result = null
+
         let sprite = this.physics.add.sprite(0, 0, 'profile').setInteractive()
         sprite.x = halfWidth - 300
         sprite.y = halfHeight
