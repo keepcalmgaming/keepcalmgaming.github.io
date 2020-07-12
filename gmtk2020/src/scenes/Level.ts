@@ -77,8 +77,8 @@ export class LevelScene extends Phaser.Scene {
 
         this.setupEvents()
 
-        this.music = this.sound.add('music')
-        this.music.play()
+        // this.music = this.sound.add('music')
+        // this.music.play()
     }
 
 
@@ -103,62 +103,17 @@ export class LevelScene extends Phaser.Scene {
         
     }
 
-    cursors: any
     setupControls() {
-        this.cursors = this.input.keyboard.createCursorKeys()
-        // let mapping = [
-        //     {
-        //         keys: [ Phaser.Input.Keyboard.KeyCodes.UP, Phaser.Input.Keyboard.KeyCodes.W ],
-        //         value: DriverInput.Cool
-        //     },
-        //     {
-        //         keys: [ Phaser.Input.Keyboard.KeyCodes.DOWN, Phaser.Input.Keyboard.KeyCodes.S, Phaser.Input.Keyboard.KeyCodes.SPACE, Phaser.Input.Keyboard.KeyCodes.ENTER ],
-        //         value: DriverInput.Crap
-        //     },
-        //     {
-        //         keys: [ Phaser.Input.Keyboard.KeyCodes.LEFT, Phaser.Input.Keyboard.KeyCodes.A ],
-        //         value: DriverInput.Left
-        //     },
-        //     {
-        //         keys: [ Phaser.Input.Keyboard.KeyCodes.RIGHT, Phaser.Input.Keyboard.KeyCodes.D ],
-        //         value: DriverInput.Right
-        //     }
-        // ]
-
-        // this.input.keyboard.on('keydown-SPACE', () => console.log('hello'))
-        // this.input.keyboard.on('keydown', function (event) {
-
-        //         console.dir(event);
-
-        //     });
-
-        // for (let data of mapping) {
-        //     for (let key of data.keys) {
-        //         // console.log('setting event for ', key, data.value)
-        //         // this.input.keyboard.on('keydown', (event: any) => {
-        //         //     console.log('key handler', event, data)
-        //         //     if (event.keyCode === key)
-        //         //     {
-        //         //         event.stopPropagation()
-        //         //         this.processInput(data.value)
-        //         //     }
-        //         // });
-
-        //         let button = this.input.keyboard.addKey(key)
-        //         debugger
-        //         button.on('down', () => {
-        //             console.log('button on')
-        //             this.processInput(data.value)
-        //         })
-        //         button.onDown(() => {
-        //             console.log('button onDown')
-        //             this.processInput(data.value)
-        //         })
-        //     }
-        // }
+        let sprite = this.physics.add.sprite(0, 0, 'arrow_right').setInteractive()
+        sprite.x = gameWidth - 50
+        sprite.y = gameHeight - 50
+        sprite.on('pointerdown', (pointer: any) => {
+            this.processInput(DriverInput.Right)
+        })
     }
 
     processInput(d: DriverInput) {
+        console.log('LEVEL SCENE, PROCESS INPUT', d)
         // TODO: Draw bubbles here
         this.driver.input(d)
     }
@@ -241,6 +196,6 @@ export class LevelScene extends Phaser.Scene {
         this.load.image('bubble_down', 'images/bubble_down.png')
         this.load.image('towerplace', 'images/towerplace.png')
 
-        this.load.audio('music', 'sounds/GameOST.mp3')
+        // this.load.audio('music', 'sounds/NavigatorOST.mp3')
     }
 }
