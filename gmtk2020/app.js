@@ -93,6 +93,169 @@ define("game/driver", ["require", "exports", "game/utils", "game/car"], function
         }
     }
     exports.EchoDriver = EchoDriver;
+    class SimpleDriver {
+        constructor() {
+            this.car = new car_1.Car();
+            this.nextDirection = utils_2.Direction.Forward;
+        }
+        input(di) {
+            switch (di) {
+                case utils_2.DriverInput.Left:
+                    this.nextDirection = utils_2.Direction.Left;
+                    break;
+                case utils_2.DriverInput.Right:
+                    this.nextDirection = utils_2.Direction.Right;
+                    break;
+                case utils_2.DriverInput.Cool:
+                    this.car.setSpeed(this.car.speed + 1);
+                    break;
+                case utils_2.DriverInput.Crap:
+                    let newSpeed = this.car.speed - 1;
+                    if (newSpeed >= 0)
+                        this.car.setSpeed(this.car.speed - 1);
+                    break;
+            }
+        }
+        getNextStep() {
+            let result = this.nextDirection;
+            this.flushDirection();
+            return result;
+        }
+        flushDirection() {
+            this.nextDirection = utils_2.Direction.Forward;
+        }
+    }
+    exports.SimpleDriver = SimpleDriver;
+    class Misha {
+        constructor() {
+            this.car = new car_1.Car();
+            this.direction = utils_2.Direction.Forward;
+        }
+        input(di) {
+            switch (di) {
+                case utils_2.DriverInput.Left:
+                    this.direction = utils_2.Direction.Right;
+                    console.log('RIGHT');
+                    break;
+                case utils_2.DriverInput.Right:
+                    this.direction = utils_2.Direction.Left;
+                    console.log('LEFT');
+                    break;
+                case utils_2.DriverInput.Cool:
+                    console.log('Misha says: well, technically its not cool, but i got your point, thank you.');
+                    break;
+                case utils_2.DriverInput.Crap:
+                    console.log('Misha says: indeed');
+                    break;
+            }
+        }
+        getNextStep() {
+            return this.direction;
+        }
+        flushDirection() {
+            this.direction = utils_2.Direction.Forward;
+        }
+    }
+    exports.Misha = Misha;
+    class Ahmed {
+        constructor() {
+            this.car = new car_1.Car();
+            this.isTriggered = false;
+            this.direction = utils_2.Direction.Forward;
+        }
+        input(di) {
+            switch (di) {
+                case utils_2.DriverInput.Left:
+                    this.direction = isTriggered ? utils_2.Direction.Left : utils_2.Direction.Right;
+                    break;
+                case utils_2.DriverInput.Right:
+                    this.direction = isTriggerd ? utils_2.Direction.Left : utils_2.Direction.Right;
+                    break;
+                case utils_2.DriverInput.Cool:
+                    isTriggered = !isTriggered;
+                    break;
+                case utils_2.DriverInput.Crap:
+                    isTriggered = !isTriggered;
+                    break;
+            }
+        }
+        getNextStep() {
+            return this.direction;
+        }
+        flushDirection() {
+            this.direction = utils_2.Direction.Forward;
+            this.isTriggered = false;
+        }
+    }
+    exports.Ahmed = Ahmed;
+    // 1. Your driver Danny listens carefully to all your commands and executes them. He is a reliable driver. Others are not.
+    // 2. Your driver Misha always performs reversed commands. He had a tough childhood.
+    // 2.5. Your driver Ahmed always performs reversed commands. If you swear or compliment, he performs commands normally. If you swear or compliment once more, he performs commands reversely. 
+    // 3. Your driver Jessica always turns left if he doesn't hear any command. Command "right" makes he move forward. Command "left" makes him turn right. Classic Jessica.
+    // 4. Your driver Lloyd always performs your penultimate command. His first move is random.
+    // 5. Your driver Elon always goes with perfect route ignoring all your commands. He's out of control.
+    class Jessica {
+        constructor() {
+            this.car = new car_1.Car();
+            this.direction = utils_2.Direction.Left;
+        }
+        input(di) {
+            switch (di) {
+                case utils_2.DriverInput.Left:
+                    this.direction = utils_2.Direction.Forward;
+                    break;
+                case utils_2.DriverInput.Right:
+                    this.direction = utils_2.Direction.Forward;
+                    break;
+                case utils_2.DriverInput.Cool:
+                    console.log('Thank you!');
+                    break;
+                case utils_2.DriverInput.Crap:
+                    console.log('Well that wasn\'t so nice.');
+                    break;
+            }
+        }
+        getNextStep() {
+            return this.direction;
+        }
+        flushDirection() {
+            this.direction = utils_2.Direction.Left;
+        }
+    }
+    exports.Jessica = Jessica;
+    class Lloyd {
+        constructor() {
+            this.car = new car_1.Car();
+            this.directions = [utils_2.Direction.Forward, utils_2.Direction.Left, utils_2.Direction.Right];
+            this.direction = directions[Math.floor(Math.random() * directions.length)];
+            this.previous = direction;
+        }
+        input(di) {
+            switch (di) {
+                case utils_2.DriverInput.Left:
+                    this.direction = this.previous;
+                    this.previous = utils_2.Direction.Left;
+                    break;
+                case utils_2.DriverInput.Right:
+                    this.direction = this.previous;
+                    this.previous = utils_2.Direction.Left;
+                    break;
+                case utils_2.DriverInput.Cool:
+                    console.log('Thank you!');
+                    break;
+                case utils_2.DriverInput.Crap:
+                    console.log('Well that wasn\'t so nice.');
+                    break;
+            }
+        }
+        getNextStep() {
+            return this.direction;
+        }
+        flushDirection() {
+            this.direction = this.directions[Math.floor(Math.random() * directions.length)];
+        }
+    }
+    exports.Lloyd = Lloyd;
 });
 define("game/utils", ["require", "exports", "game/driver"], function (require, exports, driver_1) {
     "use strict";
@@ -118,27 +281,56 @@ define("game/utils", ["require", "exports", "game/driver"], function (require, e
         Movement[Movement["Down"] = 3] = "Down";
     })(Movement = exports.Movement || (exports.Movement = {}));
     let level1 = {
-        start: { x: 2, y: 2 },
-        finish: { x: 5, y: 5 },
-        flags: [{ x: 3, y: 3 }, { x: 2, y: 5 }, { x: 5, y: 1 }],
-        direction: Movement.Right
-    };
+        start: { x: 4, y: 0 },
+        finish: { x: 0, y: 7 },
+        flags: [{ x: 4, y: 1 }, { x: 1, y: 3 }, { x: 7, y: 1 }],
+        direction: Movement.Up
+    }; //Danny
+    let level2 = {
+        start: { x: 0, y: 0 },
+        finish: { x: 8, y: 7 },
+        flags: [{ x: 3, y: 3 }, { x: 5, y: 5 }, { x: 8, y: 1 }],
+        direction: Movement.Up
+    }; //Misha
+    let level3 = {
+        start: { x: 7, y: 0 },
+        finish: { x: 0, y: 8 },
+        flags: [{ x: 5, y: 3 }, { x: 8, y: 5 }, { x: 0, y: 1 }],
+        direction: Movement.Up
+    }; //Ahmed
+    let level4 = {
+        start: { x: 3, y: 3 },
+        finish: { x: 6, y: 6 },
+        flags: [{ x: 0, y: 0 }, { x: 2, y: 5 }, { x: 8, y: 7 }],
+        direction: Movement.Up
+    }; //Jessica
+    let level5 = {
+        start: { x: 4, y: 0 },
+        finish: { x: 7, y: 0 },
+        flags: [{ x: 1, y: 6 }, { x: 6, y: 3 }, { x: 3, y: 7 }],
+        direction: Movement.Up
+    }; //Floyd
+    let level6 = {
+        start: { x: 1, y: 1 },
+        finish: { x: 0, y: 0 },
+        flags: [{ x: 3, y: 3 }, { x: 4, y: 5 }, { x: 7, y: 7 }],
+        direction: Movement.Up
+    }; //Elon
     let defaultHero = {
         pic: 'images/menu/profile.png',
         text: 'Dummy Text for Hero Screen'
     };
     class LevelInfo {
-        constructor(driverConstructor, level, name = 'default', heroOutro = defaultHero, heroIntro = defaultHero, direction) {
+        constructor(driverConstructor, level, name = 'default', heroOutro = defaultHero, heroIntro = defaultHero) {
             this.driverConstructor = driverConstructor;
             this.level = level;
             this.name = name;
             this.heroOutro = heroOutro;
             this.heroIntro = heroIntro;
-            this.direction = direction;
         }
     }
     exports.LevelInfo = LevelInfo;
-    exports.LevelOrder = ['danny', 'alex', 'yappie', 'misha', 'elon'];
+    exports.LevelOrder = ['danny', 'misha', 'alex', 'yappie', 'elon'];
     exports.LevelConfig = {
         danny: new LevelInfo(() => new driver_1.EchoDriver(), level1, 'danny', {
             pic: 'images/profile_danny.png',
@@ -149,27 +341,27 @@ define("game/utils", ["require", "exports", "game/driver"], function (require, e
             text: 'This is you.\n\nYou need to get to the Finish.',
             name: 'beginning'
         }),
-        alex: new LevelInfo(() => new driver_1.EchoDriver(), level1, 'alex', {
+        alex: new LevelInfo(() => new driver_1.EchoDriver(), level3, 'alex', {
             pic: 'images/profile_alex.png',
             text: 'Your driver Ahmed always performs reversed commands. If you swear or compliment, he performs commands normally. If you swear or compliment once more, he performs commands reversely.',
             name: 'alex'
         }),
-        yappie: new LevelInfo(() => new driver_1.EchoDriver(), level1, 'yappie', {
+        yappie: new LevelInfo(() => new driver_1.EchoDriver(), level4, 'yappie', {
             pic: 'images/profile_yappie.png',
             text: `Your driver Jessica always turns left if he doesn't hear any command. Command "right" makes he move forward. Command "left" makes him turn right. Classic Jessica.`,
             name: 'yappie'
         }),
-        misha: new LevelInfo(() => new driver_1.EchoDriver(), level1, 'misha', {
+        misha: new LevelInfo(() => new driver_1.EchoDriver(), level2, 'misha', {
             pic: 'images/profile_misha.png',
             text: 'Your driver Misha always performs reversed commands. He had a tough childhood.',
             name: 'misha'
         }),
-        elon: new LevelInfo(() => new driver_1.EchoDriver(), level1, 'elon', {
+        elon: new LevelInfo(() => new driver_1.EchoDriver(), level6, 'elon', {
             pic: 'images/profile_elon.png',
             text: "Your driver Floyd always performs your penultimate command. His first move is random.",
             name: 'elon'
         }),
-        lloyd: new LevelInfo(() => new driver_1.EchoDriver(), level1, 'lloyd', {
+        lloyd: new LevelInfo(() => new driver_1.EchoDriver(), level5, 'lloyd', {
             pic: 'images/profile_elon.png',
             text: "Your driver Elon always goes with perfect route ignoring all your commands. He's out of control.",
             name: 'elon'
