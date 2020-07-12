@@ -147,21 +147,23 @@ define("game/utils", ["require", "exports", "game/driver"], function (require, e
         Movement[Movement["Down"] = 3] = "Down";
     })(Movement = exports.Movement || (exports.Movement = {}));
     let level1 = {
-        start: { x: 1, y: 1 },
+        start: { x: 2, y: 2 },
         finish: { x: 5, y: 5 },
-        flags: [{ x: 3, y: 3 }, { x: 2, y: 5 }, { x: 5, y: 1 }]
+        flags: [{ x: 3, y: 3 }, { x: 2, y: 5 }, { x: 5, y: 1 }],
+        direction: Movement.Right
     };
     let defaultHero = {
         pic: 'images/menu/profile.png',
         text: 'Dummy Text for Hero Screen'
     };
     class LevelInfo {
-        constructor(driverConstructor, level, name = 'default', heroOutro = defaultHero, heroIntro = defaultHero) {
+        constructor(driverConstructor, level, name = 'default', heroOutro = defaultHero, heroIntro = defaultHero, direction) {
             this.driverConstructor = driverConstructor;
             this.level = level;
             this.name = name;
             this.heroOutro = heroOutro;
             this.heroIntro = heroIntro;
+            this.direction = direction;
         }
     }
     exports.LevelInfo = LevelInfo;
@@ -313,10 +315,12 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             this.car.setDriver(this.driver);
             this.defaultSpeed = this.rectSize / 11;
             this.car.setSpeed(this.defaultSpeed);
-            let initialDirection;
-            initialDirection = utils_4.Movement.Down;
+            let initialDirection = li.direction;
+            //TODO fix
+            initialDirection = utils_4.Movement.Right;
             this.car.setMovementDirection(initialDirection);
-            this.carSprite = this.physics.add.sprite(this.offsetX + this.rectSize * 0.5, this.offsetY + this.rectSize * 0.5, 'car');
+            let ls = li.level;
+            this.carSprite = this.physics.add.sprite(this.offsetX + this.rectSize * (3 * ls.start.x + 0.5), this.offsetY + this.rectSize * (3 * ls.start.y + 0.5), 'car');
             this.carSprite.setDepth(20);
             switch (initialDirection) {
                 case utils_4.Movement.Right:
@@ -332,7 +336,6 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
             this.scaleSprite(this.carSprite, this.rectSize * 0.5);
             this.setupControls();
             // TODO: set start/finish/flags from here
-            let ls = li.level;
             let startSprite = this.physics.add.sprite(this.getX(ls.start.x), this.getY(ls.start.y), 'start');
             startSprite.setOrigin(0.5);
             this.scaleSprite(startSprite, this.rectSize);
@@ -694,7 +697,7 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
                     crossroad.mapPositionX = i;
                     crossroad.mapPositionY = j;
                     this.scaleSprite(crossroad, this.rectSize * 2);
-                    if (!this.prevBigCrossRoad) {
+                    if (!this.prevBigCrossRoad && i == this.levelInfo.level.start.x && j == this.levelInfo.level.start.y) {
                         this.prevBigCrossRoad = crossroad;
                     }
                 }
@@ -705,7 +708,7 @@ define("scenes/Level", ["require", "exports", "game/utils", "game/car", "game/dr
                     let crossroad = this.smallCrossroads.create(this.offsetX + this.rectSize * (3 * i + 0.5), this.offsetY + this.rectSize * (3 * j + 0.5), 'towerplace');
                     crossroad.alpha = 0;
                     this.scaleSprite(crossroad, this.rectSize * 0.75);
-                    if (!this.prevSmallCrossRoad) {
+                    if (!this.prevSmallCrossRoad && i == this.levelInfo.level.start.x && j == this.levelInfo.level.start.y) {
                         this.prevSmallCrossRoad = crossroad;
                     }
                 }

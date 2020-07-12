@@ -12,14 +12,16 @@ export type Coords = {
 export type LevelSetup = {
     start: Coords,
     finish: Coords,
-    flags: Coords[]
+    flags: Coords[],
+    direction: Movement
 }
 
 
 let level1: LevelSetup = {
-    start: { x: 1, y: 1 },
+    start: { x: 2, y: 2 },
     finish: { x: 5, y: 5},
-    flags: [{ x: 3, y: 3}, { x: 2, y: 5}, { x: 5, y: 1}]
+    flags: [{ x: 3, y: 3}, { x: 2, y: 5}, { x: 5, y: 1}],
+    direction: Movement.Right
 }
 
 
@@ -40,7 +42,8 @@ export class LevelInfo {
         public level: LevelSetup,
         public name: string = 'default',
         public heroOutro: HeroSceneInfo = defaultHero,
-        public heroIntro: HeroSceneInfo = defaultHero
+        public heroIntro: HeroSceneInfo = defaultHero,
+        public direction: Movement
     ) { }
 }
 

@@ -117,12 +117,14 @@ export class LevelScene extends Phaser.Scene {
         this.defaultSpeed = this.rectSize / 11;
         this.car.setSpeed(this.defaultSpeed)
 
-        let initialDirection: Movement;
-        initialDirection = Movement.Down;
+        let initialDirection: Movement = li.direction;
+        //TODO fix
+        initialDirection = Movement.Right;
 
         this.car.setMovementDirection(initialDirection)
 
-        this.carSprite = this.physics.add.sprite(this.offsetX + this.rectSize * 0.5, this.offsetY + this.rectSize * 0.5, 'car')
+        let ls = li.level
+        this.carSprite = this.physics.add.sprite(this.offsetX + this.rectSize * (3 * ls.start.x + 0.5), this.offsetY + this.rectSize * (3 * ls.start.y + 0.5), 'car')
         this.carSprite.setDepth(20)
         switch (initialDirection) {
             case Movement.Right:
@@ -140,7 +142,6 @@ export class LevelScene extends Phaser.Scene {
         this.setupControls()
 
         // TODO: set start/finish/flags from here
-        let ls = li.level
 
         let startSprite = this.physics.add.sprite(this.getX(ls.start.x), this.getY(ls.start.y), 'start')
         startSprite.setOrigin(0.5)
@@ -552,7 +553,7 @@ export class LevelScene extends Phaser.Scene {
                 crossroad.mapPositionY = j
                 
                 this.scaleSprite(crossroad, this.rectSize * 2)
-                if (!this.prevBigCrossRoad) {
+                if (!this.prevBigCrossRoad && i == this.levelInfo.level.start.x && j == this.levelInfo.level.start.y) {
                     this.prevBigCrossRoad = crossroad
                 }
 			}
@@ -564,7 +565,7 @@ export class LevelScene extends Phaser.Scene {
                 let crossroad = this.smallCrossroads.create(this.offsetX + this.rectSize * (3 * i + 0.5), this.offsetY + this.rectSize * (3 * j + 0.5), 'towerplace')
                 crossroad.alpha = 0
                 this.scaleSprite(crossroad, this.rectSize * 0.75)
-                if (!this.prevSmallCrossRoad) {
+                if (!this.prevSmallCrossRoad && i == this.levelInfo.level.start.x && j == this.levelInfo.level.start.y) {
                     this.prevSmallCrossRoad = crossroad
                 }
 			}
