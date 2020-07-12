@@ -223,6 +223,8 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
             this.car = new car_2.Car();
             this.driver = li.driverConstructor();
             this.car.setDriver(this.driver);
+            this.carSprite = this.physics.add.sprite(this.offsetX + this.rectSize * 0.5, this.offsetY + this.rectSize * 0.5, 'car');
+            this.scaleSprite(this.carSprite, this.rectSize * 0.5);
             // TODO: set start/finish/flags from here
             let ls = li.level;
         }
@@ -248,6 +250,17 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
             }
         }
         setupEvents() {
+            this.time.addEvent({
+                delay: 16,
+                loop: true,
+                callback: this.moveCar,
+                callbackScope: this
+            });
+        }
+        moveCar() {
+            if (!this.car || !this.carSprite)
+                return;
+            this.physics.moveTo(this.carSprite, this.carSprite.x + this.car.speed, this.carSprite.y);
         }
         getScale(sprite, dim) {
             return dim / sprite.width;
@@ -256,6 +269,7 @@ define("scenes/Level", ["require", "exports", "game/game", "game/utils", "game/c
             sprite.setScale(this.getScale(sprite, dim));
         }
         preload() {
+            this.load.image('car', 'images/monster.png');
             this.load.image('bullet', 'images/bullet2.png');
             this.load.image('mainframe', 'images/mainframe.png');
             this.load.image('monster', 'images/monster.png');
