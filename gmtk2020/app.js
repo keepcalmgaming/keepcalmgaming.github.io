@@ -341,17 +341,17 @@ define("game/utils", ["require", "exports", "game/driver"], function (require, e
             text: 'This is you.\n\nYou need to get to the Finish.',
             name: 'beginning'
         }),
-        alex: new LevelInfo(() => new driver_1.EchoDriver(), level3, 'alex', {
+        alex: new LevelInfo(() => new driver_1.Ahmed(), level3, 'alex', {
             pic: 'images/profile_alex.png',
             text: 'Your driver Ahmed always performs reversed commands. If you swear or compliment, he performs commands normally. If you swear or compliment once more, he performs commands reversely.',
             name: 'alex'
         }),
-        yappie: new LevelInfo(() => new driver_1.EchoDriver(), level4, 'yappie', {
+        yappie: new LevelInfo(() => new driver_1.Jessica(), level4, 'yappie', {
             pic: 'images/profile_yappie.png',
             text: `Your driver Jessica always turns left if he doesn't hear any command. Command "right" makes he move forward. Command "left" makes him turn right. Classic Jessica.`,
             name: 'yappie'
         }),
-        misha: new LevelInfo(() => new driver_1.EchoDriver(), level2, 'misha', {
+        misha: new LevelInfo(() => new driver_1.Misha(), level2, 'misha', {
             pic: 'images/profile_misha.png',
             text: 'Your driver Misha always performs reversed commands. He had a tough childhood.',
             name: 'misha'
@@ -361,7 +361,7 @@ define("game/utils", ["require", "exports", "game/driver"], function (require, e
             text: "Your driver Floyd always performs your penultimate command. His first move is random.",
             name: 'elon'
         }),
-        lloyd: new LevelInfo(() => new driver_1.EchoDriver(), level5, 'lloyd', {
+        lloyd: new LevelInfo(() => new driver_1.Lloyd(), level5, 'lloyd', {
             pic: 'images/profile_elon.png',
             text: "Your driver Elon always goes with perfect route ignoring all your commands. He's out of control.",
             name: 'elon'
@@ -381,9 +381,10 @@ define("scenes/greeting", ["require", "exports", "game/utils"], function (requir
         }
         create() {
             var content = [
-                "Wingman",
+                "Left! Right! Cool! Crap!",
                 "",
-                "Topic of GMTK Game Jam 2020 is “out of control”.",
+                "Topic of GMTK Game Jam 2020 is “Out of Control”.",
+                "Here's our small",
                 "",
                 "Enjoy!",
                 "",

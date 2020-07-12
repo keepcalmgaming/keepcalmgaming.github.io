@@ -1,4 +1,4 @@
-import { Driver, EchoDriver } from 'driver'
+import { Driver, EchoDriver, Misha, Ahmed, Jessica, Lloyd } from 'driver'
 
 export enum DriverInput { Left, Right, Cool, Crap }
 export enum Direction { Left, Right, Forward }
@@ -98,19 +98,19 @@ export let LevelConfig = {
             name: 'beginning'
         }
     ),
-    alex: new LevelInfo(() => new EchoDriver(), level3, 'alex',
+    alex: new LevelInfo(() => new Ahmed(), level3, 'alex',
         {
             pic: 'images/profile_alex.png',
             text: 'Your driver Ahmed always performs reversed commands. If you swear or compliment, he performs commands normally. If you swear or compliment once more, he performs commands reversely.',
             name: 'alex'
         }),
-    yappie: new LevelInfo(() => new EchoDriver(), level4, 'yappie',
+    yappie: new LevelInfo(() => new Jessica(), level4, 'yappie',
         {
             pic: 'images/profile_yappie.png',
             text: `Your driver Jessica always turns left if he doesn't hear any command. Command "right" makes he move forward. Command "left" makes him turn right. Classic Jessica.`,
             name: 'yappie'
         }),
-    misha: new LevelInfo(() => new EchoDriver(), level2, 'misha',
+    misha: new LevelInfo(() => new Misha(), level2, 'misha',
         {
             pic: 'images/profile_misha.png',
             text: 'Your driver Misha always performs reversed commands. He had a tough childhood.',
@@ -122,7 +122,7 @@ export let LevelConfig = {
             text: "Your driver Floyd always performs your penultimate command. His first move is random.",
             name: 'elon'
         }),
-    lloyd: new LevelInfo(() => new EchoDriver(), level5, 'lloyd',
+    lloyd: new LevelInfo(() => new Lloyd(), level5, 'lloyd',
         {
             pic: 'images/profile_elon.png',
             text: "Your driver Elon always goes with perfect route ignoring all your commands. He's out of control.",

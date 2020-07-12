@@ -15,9 +15,10 @@ export class GreetingScene extends Phaser.Scene {
 
     create() {
         var content = [
-            "Wingman",
+            "Left! Right! Cool! Crap!",
             "",
-            "Topic of GMTK Game Jam 2020 is “out of control”.",
+            "Topic of GMTK Game Jam 2020 is “Out of Control”.",
+            "Here's our small"
             "",
             "Enjoy!",
             "",
