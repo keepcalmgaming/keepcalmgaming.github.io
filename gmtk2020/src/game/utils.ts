@@ -1,6 +1,6 @@
 import { Driver, EchoDriver } from 'driver'
 
-export enum DriverInput { Left, Right, Cool, Crap}
+export enum DriverInput { Left, Right, Cool, Crap }
 export enum Direction { Left, Right, Forward }
 export enum Movement { Left, Right, Up, Down }
 
