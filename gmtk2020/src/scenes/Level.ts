@@ -104,11 +104,64 @@ export class LevelScene extends Phaser.Scene {
     }
 
     setupControls() {
+        let mapping = [
+            {
+                keys: [ Phaser.Input.Keyboard.KeyCodes.UP, Phaser.Input.Keyboard.KeyCodes.W ],
+                value: DriverInput.Cool
+            },
+            {
+                keys: [ Phaser.Input.Keyboard.KeyCodes.DOWN, Phaser.Input.Keyboard.KeyCodes.S, Phaser.Input.Keyboard.KeyCodes.SPACE, Phaser.Input.Keyboard.KeyCodes.ENTER ],
+                value: DriverInput.Crap
+            },
+            {
+                keys: [ Phaser.Input.Keyboard.KeyCodes.LEFT, Phaser.Input.Keyboard.KeyCodes.A ],
+                value: DriverInput.Left
+            },
+            {
+                keys: [ Phaser.Input.Keyboard.KeyCodes.RIGHT, Phaser.Input.Keyboard.KeyCodes.D ],
+                value: DriverInput.Right
+            }
+        ]
+
+        // this.input.keyboard.on('keydown-SPACE', () => console.log('hello'))
+        this.input.keyboard.on('keydown', (event: any) => {
+            for (let data of mapping) {
+                for (let key of data.keys) {
+                    if (event.keyCode === key) {
+                        event.stopPropagation()
+                        this.processInput(data.value);
+                    }
+                }
+            }
+            console.log(event)
+        });
+
         let sprite = this.physics.add.sprite(0, 0, 'arrow_right').setInteractive()
         sprite.x = gameWidth - 50
         sprite.y = gameHeight - 50
         sprite.on('pointerdown', (pointer: any) => {
             this.processInput(DriverInput.Right)
+        })
+
+        sprite = this.physics.add.sprite(0, 0, 'arrow_down').setInteractive()
+        sprite.x = gameWidth - 50 - 60
+        sprite.y = gameHeight - 50
+        sprite.on('pointerdown', (pointer: any) => {
+            this.processInput(DriverInput.Crap)
+        })
+
+        sprite = this.physics.add.sprite(0, 0, 'arrow_left').setInteractive()
+        sprite.x = gameWidth - 50 - 120
+        sprite.y = gameHeight - 50
+        sprite.on('pointerdown', (pointer: any) => {
+            this.processInput(DriverInput.Left)
+        })
+
+        sprite = this.physics.add.sprite(0, 0, 'arrow_up').setInteractive()
+        sprite.x = gameWidth - 50 - 60
+        sprite.y = gameHeight - 50 - 60
+        sprite.on('pointerdown', (pointer: any) => {
+            this.processInput(DriverInput.Cool)
         })
     }
 
@@ -119,15 +172,15 @@ export class LevelScene extends Phaser.Scene {
     }
 
     update() {
-        console.log('update()')
-        this.input.on('pointerup', () => {
-            if (!this.towergame.active()) {
-                if (this.music) { this.music.destroy() }
+        // console.log('update()')
+        // this.input.on('pointerup', () => {
+        //     if (!this.towergame.active()) {
+        //         if (this.music) { this.music.destroy() }
 
-              this.towergame = new Game(this.x, this.y, this.isVertical)
-              this.scene.restart();
-            }
-        });
+        //       this.towergame = new Game(this.x, this.y, this.isVertical)
+        //       this.scene.restart();
+        //     }
+        // });
     }
 
     setupHouses() {
