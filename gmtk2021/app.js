@@ -103,6 +103,12 @@ define("game/base_game", ["require", "exports"], function (require, exports) {
 define("game/tetris", ["require", "exports", "game/base_game"], function (require, exports, base_game_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    const TETRAMINOS = [
+        [[0, 0], [0, 1], [0, 2], [0, 3]],
+        [[0, 0], [1, 0], [2, 0], [1, 1]],
+        [[0, 0], [0, 1], [1, 1], [1, 2]],
+        [[1, 0], [1, 1], [0, 1], [0, 2]] //J
+    ];
     class Tetris extends base_game_1.BaseGame {
         constructor(config) {
             super(config);
@@ -116,11 +122,15 @@ define("game/tetris", ["require", "exports", "game/base_game"], function (requir
                 this.blocks.add(block);
             }
             this.movingBlocks.clear();
-            let point = this.getCellCenter({ x: Math.floor(Math.random() * this.x), y: 0 });
-            let block = this.physics.add.image(point.x, point.y, 'block');
-            block.setOrigin(0.5);
-            this.scaleSprite(block, this.cellSize * 0.9);
-            this.movingBlocks.add(block);
+            let tetramino = TETRAMINOS[Math.floor(Math.random() * TETRAMINOS.length)];
+            let startX = Math.floor(Math.random() * (this.x - 2));
+            for (let point of tetramino) {
+                let coords = this.getCellCenter({ x: startX + point[0], y: point[1] });
+                let block = this.physics.add.image(coords.x, coords.y, 'block');
+                block.setOrigin(0.5);
+                this.scaleSprite(block, this.cellSize * 0.9);
+                this.movingBlocks.add(block);
+            }
         }
         moveLeft() {
             for (let block of this.movingBlocks.getChildren()) {
@@ -290,7 +300,7 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                 callback: this.tetris.moveDown,
                 callbackScope: this.tetris
             });
-            this.time.timeScale = 15.5;
+            this.time.timeScale = 1;
             console.log('Game Created', this.x, this.y);
             // this.input.keyboard.on('keydown-SPACE', () => console.log('hello'))
             this.input.keyboard.on('keydown', (event) => {

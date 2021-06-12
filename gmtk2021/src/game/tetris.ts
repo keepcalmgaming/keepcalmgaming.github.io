@@ -1,5 +1,12 @@
 import { BaseGame } from './base_game'
 
+const TETRAMINOS = [
+	[[0, 0], [0, 1], [0, 2], [0, 3]], // palka
+	[[0, 0], [1, 0], [2, 0], [1, 1]], //T
+	[[0, 0], [0, 1], [1, 1], [1, 2]], //Z
+	[[1, 0], [1, 1], [0, 1], [0, 2]] //J
+]
+
 export class Tetris extends BaseGame {
 	private blocks?: Phaser.Physics.Arcade.Group
 
@@ -10,6 +17,7 @@ export class Tetris extends BaseGame {
 		console.log('Tetris', this.config)
 
 		this.spawnFigure()
+
 	}
 
 	private spawnFigure() {
@@ -18,18 +26,22 @@ export class Tetris extends BaseGame {
 		}
 		this.movingBlocks.clear()
 
-		let point = this.getCellCenter({x: Math.floor(Math.random() * this.x), y: 0})
+		let tetramino = TETRAMINOS[Math.floor(Math.random() * TETRAMINOS.length)]
+		let startX = Math.floor(Math.random() * (this.x - 2))
 
-		let block = this.physics.add.image(point.x, point.y, 'block')
-		block.setOrigin(0.5)
-		this.scaleSprite(block, this.cellSize * 0.9)
+		for (let point of tetramino) {
+			let coords = this.getCellCenter({x: startX + point[0], y: point[1]})
 
-		this.movingBlocks.add(block)
+			let block = this.physics.add.image(coords.x, coords.y, 'block')
+			block.setOrigin(0.5)
+			this.scaleSprite(block, this.cellSize * 0.9)
+			this.movingBlocks.add(block)
+		}
 	}
 
 	public moveLeft() {
 		for (let block of this.movingBlocks.getChildren()) {
-			if this.getSpritePosition(block).x <= 0 {
+			if (this.getSpritePosition(block).x <= 0) {
 				return
 			}
 		}
@@ -43,7 +55,7 @@ export class Tetris extends BaseGame {
 
 	public moveRight() {
 		for (let block of this.movingBlocks.getChildren()) {
-			if this.getSpritePosition(block).x >= this.x - 1 {
+			if (this.getSpritePosition(block).x >= this.x - 1) {
 				return
 			}
 		}

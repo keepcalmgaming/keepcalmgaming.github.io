@@ -107,7 +107,7 @@ export class MainScene extends Phaser.Scene {
             callbackScope: this.tetris
         })
 
-        this.time.timeScale = 15.5;
+        this.time.timeScale = 1;
 
         console.log('Game Created', this.x, this.y)
 
