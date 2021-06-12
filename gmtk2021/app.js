@@ -86,9 +86,9 @@ define("game/base_game", ["require", "exports"], function (require, exports) {
             sprite.setScale(this.getScale(sprite, dim));
         }
         getCellCenter(position) {
-            let x = this.offsetX + this.cellSize / 2 + startOffset + this.cellSize * position.x;
-            let y = this.offsetY + this.cellSize / 2 + startOffset + this.cellSize * position.y;
-            return Point(x, x, y, y);
+            let x = this.offsetX + this.cellSize / 2 + this.cellSize * position.x;
+            let y = this.offsetY + this.cellSize / 2 + this.cellSize * position.y;
+            return { x: x, y: y };
         }
         getSpritePosition(sprite) {
             //TODO:
@@ -102,7 +102,15 @@ define("game/tetris", ["require", "exports", "game/base_game"], function (requir
     class Tetris extends base_game_1.BaseGame {
         constructor(config) {
             super(config);
+            this.blocks = this.physics.add.group();
             console.log('Tetris', this.config);
+            this.spawnFigure();
+        }
+        spawnFigure() {
+            let point = this.getCellCenter({ x: Math.floor(Math.random() * this.x), y: 0 });
+            let block = this.physics.add.image(point.x, point.y, 'block');
+            block.setOrigin(0.5);
+            this.scaleSprite(block, this.cellSize * 0.9);
         }
         update() {
             super.update();

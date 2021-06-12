@@ -58,9 +58,9 @@ export class BaseGame {
 	}
 
 	public getCellCenter(position: Position) {
-		let x = this.offsetX + this.cellSize / 2 + startOffset + this.cellSize * position.x
-		let y = this.offsetY + this.cellSize / 2 + startOffset + this.cellSize * position.y
-		return Point(x: x, y: y)
+		let x = this.offsetX + this.cellSize / 2 + this.cellSize * position.x
+		let y = this.offsetY + this.cellSize / 2 + this.cellSize * position.y
+		return {x: x, y: y}
 	}
 
 	public getSpritePosition(sprite: Sprite) {
