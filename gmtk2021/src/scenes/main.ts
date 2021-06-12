@@ -100,6 +100,12 @@ export class MainScene extends Phaser.Scene {
             rectangle: rectangle
         })
 
+        this.time.addEvent({
+            delay: 1000,
+            loop: true,
+            callback: this.tetris.moveDown,
+            callbackScope: this.tetris
+        })
 
         console.log('Game Created', this.x, this.y)
 
