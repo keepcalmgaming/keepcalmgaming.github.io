@@ -8,22 +8,15 @@ export class Arcanoid extends BaseGame {
 
 		console.log(this)
 
-		let ball = this.physics.add.image(this.offsetX, this.offsetY, 'ball');
+		this.setupBall();
+		this.setupWalls();
 
 		// start of most left block 
 		let platformOffsetX = this.offsetX + ((this.cellSize / 2) * 9);
 		let platformOffsetY = (this.offsetY + (this.cellSize * 18) - (this.cellSize / 2));
 
 		let platform = this.physics.add.image(platformOffsetX, platformOffsetY, 'block');
-    ball.setScale(0.3);
-    ball.setCircle(120);
-    ball.setCollideWorldBounds(false);
-    ball.setBounce(0.1);
-    ball.body.stopVelocityOnCollide = false;
-    ball.setMass(2);
-
-    this.ball = ball
-    this.platform = platform
+	    this.platform = platform
 
 		console.log('Arcanoid', this.config)
 	}
@@ -50,4 +43,47 @@ export class Arcanoid extends BaseGame {
 
 	public stopPlatform() {
 	}
+
+	public setupBall() {
+		this.ball = this.physics.add.image(this.offsetX + 100, this.offsetY + 100, 'ball');
+		this.ball.setScale(1);
+		this.ball.setCollideWorldBounds(false);
+		this.ball.setBounce(1);
+		this.ball.body.stopVelocityOnCollide = false;
+		this.ball.setVelocity(-200, -200)
+	}
+
+	public setupWalls() {
+		let cellPosition = this.getCellCenter({x: -1, y: -1})
+		let cell = this.physics.add.image(cellPosition.x, cellPosition.y, 'block').setAlpha(0).setImmovable()
+		this.physics.add.collider(cell, this.ball, this.wallHit)
+		for (let i = 0; i < 12; i++) {
+			let cell2 = this.physics.add.image(cell.x + i * cell.height, cellPosition.y, 'block').setAlpha(0).setImmovable()
+			this.physics.add.collider(cell2, this.ball, this.wallHit)	
+		}
+
+		for (let i = 0; i < 22; i++) {
+			let cell2 = this.physics.add.image(cell.x, cellPosition.y + i * cell.height, 'block').setAlpha(0).setImmovable()
+			this.physics.add.collider(cell2, this.ball, this.wallHit)
+		}
+
+		cellPosition = this.getCellCenter({x: 10, y: -1})
+		cell = this.physics.add.image(cellPosition.x, cellPosition.y, 'block').setAlpha(0).setImmovable()
+		this.physics.add.collider(cell, this.ball, this.wallHit)
+		for (let i = 0; i < 22; i++) {
+			let cell2 = this.physics.add.image(cell.x, cellPosition.y + i * cell.height, 'block').setAlpha(0).setImmovable()
+			this.physics.add.collider(cell2, this.ball, this.wallHit)
+		}
+
+		cellPosition = this.getCellCenter({x: -1, y: 18})
+		cell = this.physics.add.image(cellPosition.x, cellPosition.y, 'block').setAlpha(0).setImmovable()
+		this.physics.add.collider(cell, this.ball, this.wallHit)
+		for (let i = 0; i < 12; i++) {
+			let cell2 = this.physics.add.image(cell.x + i * cell.height, cellPosition.y, 'block').setAlpha(0).setImmovable()
+			this.physics.add.collider(cell2, this.ball, this.wallHit)	
+		}
+	}
+
+	wallHit(cell: Phaser.GameObjects.GameObject, ball: Phaser.GameObjects.GameObject) {
+    }
 }
