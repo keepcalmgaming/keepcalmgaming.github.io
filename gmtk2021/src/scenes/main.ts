@@ -54,10 +54,16 @@ export class MainScene extends Phaser.Scene {
         this.x = minSide
         this.y = maxSide
 
-        let rw = gameWidth / this.x, rh = gameHeight / this.y
-        this.cellSize = 43//rh < rw ? rh : rw
-        this.offsetX = (gameWidth - this.cellSize * this.x) / 2
-        this.offsetY = (gameHeight - this.cellSize * this.y) / 2
+        this.isVertical = gameWidth < gameHeight;
+        if (this.isVertical) {
+            this.cellSize = gameWidth / (this.x*2 + 8)
+            this.offsetX = this.cellSize * 2
+            this.offsetY = this.cellSize * 2
+        } else {
+            this.cellSize = gameHeight / (this.y+4)
+            this.offsetX = halfWidth - this.cellSize * (this.x + 2)
+            this.offsetY = this.cellSize * 2
+        }
     }
 
     private music?: Phaser.Sound.BaseSound
@@ -78,8 +84,8 @@ export class MainScene extends Phaser.Scene {
             cellSize: this.cellSize,
             x: this.x,
             y: this.y,
-            offsetX: 100,
-            offsetY: 100,
+            offsetX: this.offsetX,
+            offsetY: this.offsetY,
             physics: this.physics
         })
 
@@ -87,8 +93,8 @@ export class MainScene extends Phaser.Scene {
             cellSize: this.cellSize,
             x: this.x,
             y: this.y,
-            offsetX: 600,
-            offsetY: 100,
+            offsetX: this.offsetX + this.cellSize * (this.x + 4),
+            offsetY: this.offsetY,
             physics: this.physics
         })
 
