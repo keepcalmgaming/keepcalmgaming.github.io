@@ -65,12 +65,12 @@ define("game/base_game", ["require", "exports"], function (require, exports) {
         update() {
         }
         setupBackgroundCells() {
-            let startOffset = this.cellSize;
+            let startOffset = 0;
             for (let i = 0; i < this.x; i++) {
                 for (let j = 0; j < this.y; j++) {
                     let cell = this.physics.add.image(0, 0, 'cell');
-                    cell.x = this.offsetX + startOffset + this.cellSize * i;
-                    cell.y = this.offsetY + startOffset + this.cellSize * j;
+                    cell.x = this.offsetX + this.cellSize / 2 + startOffset + this.cellSize * i;
+                    cell.y = this.offsetY + this.cellSize / 2 + startOffset + this.cellSize * j;
                     cell.setOrigin(0.5);
                     this.scaleSprite(cell, this.cellSize * 0.9);
                 }
@@ -83,7 +83,7 @@ define("game/base_game", ["require", "exports"], function (require, exports) {
             //         this.rectangle.strokeRect(i*10, j*10, this.cellSize, this.cellSize)
             //     }
             // }
-            this.rectangle.strokeRect(this.offsetX + this.cellSize / 4, this.offsetY + this.cellSize / 4, this.cellSize * (this.x + 1) - this.cellSize / 2, this.cellSize * (this.y + 1) - this.cellSize / 2);
+            this.rectangle.strokeRect(this.offsetX - this.cellSize / 4, this.offsetY - this.cellSize / 4, this.cellSize * (this.x + 1) - this.cellSize / 2, this.cellSize * (this.y + 1) - this.cellSize / 2);
         }
         getScale(sprite, dim) {
             return dim / sprite.width;
