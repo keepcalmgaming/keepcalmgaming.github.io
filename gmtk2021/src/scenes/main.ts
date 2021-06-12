@@ -1,3 +1,6 @@
+import { Tetris } from '../game/tetris'
+import { Arcanoid } from '../game/arcanoid'
+
 const gameHeight = window.innerHeight
 const gameWidth = window.innerWidth
 
@@ -27,6 +30,9 @@ export class MainScene extends Phaser.Scene {
     private x: number
     private y: number
 
+    private tetris: Tetris
+    private arcanoid: Arcanoid
+
     // private mfGroup?: Phaser.Physics.Arcade.StaticGroup
     // private mainframe?: Phaser.GameObjects.Sprite
     // private tower?: Phaser.GameObjects.Sprite
@@ -45,24 +51,23 @@ export class MainScene extends Phaser.Scene {
         super({key: 'main'})
         // super(sceneConfig)
 
-        this.isVertical = gameHeight > gameWidth
-
-        if (this.isVertical) {
-            this.x = minSide
-            this.y = maxSide
-        } else {
-            this.x = maxSide
-            this.y = minSide
-        }
+        this.x = minSide
+        this.y = maxSide
 
         let rw = gameWidth / this.x, rh = gameHeight / this.y
         this.rectSize = rh < rw ? rh : rw
         this.offsetX = (gameWidth - this.rectSize * this.x) / 2
         this.offsetY = (gameHeight - this.rectSize * this.y) / 2
 
-        // this.towergame = new Game(this.x, this.y, this.isVertical)
+        this.tetris = new Tetris({
+            // blocks: []
+        })
 
-        console.log('Game Created', this.x, this.y, this.towergame)
+        this.arcanoid = new Arcanoid({
+            // blocks: []
+        })
+
+        console.log('Game Created', this.x, this.y)
     }
 
     private music?: Phaser.Sound.BaseSound
@@ -85,6 +90,8 @@ export class MainScene extends Phaser.Scene {
     }
 
     update() {
+        this.arcanoid.update()
+        this.tetris.update()
         // this.input.on('pointerup', () => {
         //     if (!this.towergame.active()) {
         //         if (this.music) { this.music.destroy() }
