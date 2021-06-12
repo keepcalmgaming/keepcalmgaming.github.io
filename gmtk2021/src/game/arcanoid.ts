@@ -14,7 +14,7 @@ export class Arcanoid extends BaseGame {
 		let platformOffsetX = this.offsetX + ((this.cellSize / 2) * 9);
 		let platformOffsetY = (this.offsetY + (this.cellSize * 18) - (this.cellSize / 2));
 
-		let platform = this.physics.add.image(platformOffsetX, platformOffsetY, 'cell_full');
+		let platform = this.physics.add.image(platformOffsetX, platformOffsetY, 'block');
     ball.setScale(0.3);
     ball.setCircle(120);
     ball.setCollideWorldBounds(false);

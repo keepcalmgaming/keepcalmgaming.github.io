@@ -150,7 +150,7 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             // start of most left block 
             let platformOffsetX = this.offsetX + ((this.cellSize / 2) * 9);
             let platformOffsetY = (this.offsetY + (this.cellSize * 18) - (this.cellSize / 2));
-            let platform = this.physics.add.image(platformOffsetX, platformOffsetY, 'cell_full');
+            let platform = this.physics.add.image(platformOffsetX, platformOffsetY, 'block');
             ball.setScale(0.3);
             ball.setCircle(120);
             ball.setCollideWorldBounds(false);
@@ -269,16 +269,6 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
         update() {
             this.arcanoid.update();
             this.tetris.update();
-            this.input.keyboard.on('keydown', (event) => {
-                if ([Phaser.Input.Keyboard.KeyCodes.LEFT, Phaser.Input.Keyboard.KeyCodes.A].includes(event.keyCode)) {
-                    event.stopPropagation();
-                    this.tetris.moveLeft();
-                }
-                if ([Phaser.Input.Keyboard.KeyCodes.RIGHT, Phaser.Input.Keyboard.KeyCodes.D].includes(event.keyCode)) {
-                    event.stopPropagation();
-                    this.tetris.moveRight();
-                }
-            });
         }
         setupEvents() {
             // if (!this.mainframe || !this.mfGroup) return

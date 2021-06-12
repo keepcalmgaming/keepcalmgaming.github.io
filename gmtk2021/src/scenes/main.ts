@@ -132,18 +132,6 @@ export class MainScene extends Phaser.Scene {
     update() {
         this.arcanoid.update()
         this.tetris.update()
-
-
-        this.input.keyboard.on('keydown', (event: any) => {
-            if ([ Phaser.Input.Keyboard.KeyCodes.LEFT, Phaser.Input.Keyboard.KeyCodes.A ].includes(event.keyCode)) {
-                event.stopPropagation()
-                this.tetris.moveLeft()
-            }
-            if ([ Phaser.Input.Keyboard.KeyCodes.RIGHT, Phaser.Input.Keyboard.KeyCodes.D ].includes(event.keyCode)) {
-                event.stopPropagation()
-                this.tetris.moveRight()
-            }
-        });
     }
 
     setupEvents() {
