@@ -143,6 +143,8 @@ define("game/tetris", ["require", "exports", "game/base_game"], function (requir
             // TODO: Check if can move. If not - stop, check, spawn next
             for (let block of this.movingBlocks.getChildren()) {
                 if (this.getSpritePosition(block).y >= this.y - 1) {
+                    this.movingBlocks.clear();
+                    this.spawnFigure();
                     return;
                 }
             }
@@ -154,7 +156,7 @@ define("game/tetris", ["require", "exports", "game/base_game"], function (requir
         checkCollisions() {
             console.log();
             for (let block of this.movingBlocks.getChildren()) {
-                console.log(this.getSpritePosition(block));
+                // console.log(this.getSpritePosition(block))
             }
         }
         update() {

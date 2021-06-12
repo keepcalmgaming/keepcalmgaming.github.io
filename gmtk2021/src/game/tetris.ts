@@ -51,6 +51,8 @@ export class Tetris extends BaseGame {
 		// TODO: Check if can move. If not - stop, check, spawn next
 		for (let block of this.movingBlocks.getChildren()) {
 			if this.getSpritePosition(block).y >= this.y - 1 {
+				this.movingBlocks.clear()
+				this.spawnFigure()
 				return
 			}
 		}
@@ -65,7 +67,7 @@ export class Tetris extends BaseGame {
 	private checkCollisions() {
 		console.log()
 		for (let block of this.movingBlocks.getChildren()) {
-			console.log(this.getSpritePosition(block))
+			// console.log(this.getSpritePosition(block))
 		}
 	}
 
