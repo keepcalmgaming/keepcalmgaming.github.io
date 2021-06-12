@@ -51,8 +51,20 @@ define("game/base_game", ["require", "exports"], function (require, exports) {
     class BaseGame {
         constructor(config) {
             this.config = config;
+            this.x = this.config.x;
+            this.y = this.config.y;
+            this.cellSize = this.config.cellSize;
+            this.offsetX = this.config.offsetX;
+            this.offsetY = this.config.offsetY;
+            this.physics = this.config.physics;
         }
         update() {
+        }
+        getScale(sprite, dim) {
+            return dim / sprite.width;
+        }
+        scaleSprite(sprite, dim) {
+            sprite.setScale(this.getScale(sprite, dim));
         }
     }
     exports.BaseGame = BaseGame;
@@ -77,6 +89,15 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
     class Arcanoid extends base_game_2.BaseGame {
         constructor(config) {
             super(config);
+            console.log(this);
+            let ball = this.physics.add.image(this.offsetX, this.offsetY, 'ball');
+            ball.setScale(0.3);
+            ball.setCircle(120);
+            ball.setCollideWorldBounds(false);
+            ball.setBounce(0.1);
+            ball.body.stopVelocityOnCollide = false;
+            ball.setMass(2);
+            this.ball = ball;
             console.log('Arcanoid', this.config);
         }
         update() {
@@ -92,7 +113,7 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
     const gameWidth = window.innerWidth;
     const halfWidth = gameWidth / 2;
     const halfHeight = gameHeight / 2;
-    const debug = true;
+    const debug = false;
     const minSide = 10;
     const maxSide = 16;
     class MainScene extends Phaser.Scene {
@@ -116,21 +137,6 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             this.rectSize = rh < rw ? rh : rw;
             this.offsetX = (gameWidth - this.rectSize * this.x) / 2;
             this.offsetY = (gameHeight - this.rectSize * this.y) / 2;
-            this.tetris = new tetris_1.Tetris({
-                rectSize: this.rectSize,
-                x: this.x,
-                y: this.y,
-                xStart: 100,
-                yStart: 100
-            });
-            this.arcanoid = new arcanoid_1.Arcanoid({
-                rectSize: this.rectSize,
-                x: this.x,
-                y: this.y,
-                xStart: 300,
-                yStart: 100
-            });
-            console.log('Game Created', this.x, this.y);
         }
         create() {
             this.cameras.main.setBackgroundColor('#959F7D');
@@ -139,6 +145,23 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             this.setupEvents();
             // this.music = this.sound.add('music')
             // this.music.play()
+            this.tetris = new tetris_1.Tetris({
+                rectSize: this.rectSize,
+                x: this.x,
+                y: this.y,
+                offsetX: 100,
+                offsetY: 100,
+                physics: this.physics
+            });
+            this.arcanoid = new arcanoid_1.Arcanoid({
+                rectSize: this.rectSize,
+                x: this.x,
+                y: this.y,
+                offsetX: 100,
+                offsetY: 200,
+                physics: this.physics
+            });
+            console.log('Game Created', this.x, this.y);
             if (debug) {
                 this.debugDrawGrid();
             }
@@ -190,6 +213,8 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
         preload() {
             this.load.image('cell', 'images/cell_empty.png');
             this.load.image('block', 'images/cell_empty.png');
+            this.load.image('ball', 'images/ball.png');
+            this.load.image('bullet', 'images/bullet.png');
             // this.load.image('bullet', 'images/bullet2.png')
             // this.load.image('mainframe', 'images/mainframe.png')
             // this.load.image('monster', 'images/monster.png')
@@ -210,7 +235,7 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
     }
     exports.MainScene = MainScene;
 });
-define("app", ["require", "exports", "scenes/greeting", "scenes/main"], function (require, exports, greeting_1, main_1) {
+define("app", ["require", "exports", "scenes/main"], function (require, exports, main_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const gameHeight = window.innerHeight;
@@ -225,7 +250,7 @@ define("app", ["require", "exports", "scenes/greeting", "scenes/main"], function
                 debug: false
             }
         },
-        scene: [greeting_1.GreetingScene, main_1.MainScene]
+        scene: [main_1.MainScene]
     };
     class App {
         constructor() {

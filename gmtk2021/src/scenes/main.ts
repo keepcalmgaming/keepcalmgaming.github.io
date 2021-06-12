@@ -7,7 +7,7 @@ const gameWidth = window.innerWidth
 const halfWidth = gameWidth / 2
 const halfHeight = gameHeight / 2
 
-const debug = true
+const debug = false
 const minSide = 10
 const maxSide = 16
 
@@ -58,24 +58,6 @@ export class MainScene extends Phaser.Scene {
         this.rectSize = rh < rw ? rh : rw
         this.offsetX = (gameWidth - this.rectSize * this.x) / 2
         this.offsetY = (gameHeight - this.rectSize * this.y) / 2
-
-        this.tetris = new Tetris({
-            rectSize: this.rectSize,
-            x: this.x,
-            y: this.y,
-            xStart: 100,
-            yStart: 100
-        })
-
-        this.arcanoid = new Arcanoid({
-            rectSize: this.rectSize,
-            x: this.x,
-            y: this.y,
-            xStart: 300,
-            yStart: 100
-        })
-
-        console.log('Game Created', this.x, this.y)
     }
 
     private music?: Phaser.Sound.BaseSound
@@ -91,6 +73,26 @@ export class MainScene extends Phaser.Scene {
 
         // this.music = this.sound.add('music')
         // this.music.play()
+
+        this.tetris = new Tetris({
+            rectSize: this.rectSize,
+            x: this.x,
+            y: this.y,
+            offsetX: 100,
+            offsetY: 100,
+            physics: this.physics
+        })
+
+        this.arcanoid = new Arcanoid({
+            rectSize: this.rectSize,
+            x: this.x,
+            y: this.y,
+            offsetX: 100,
+            offsetY: 200,
+            physics: this.physics
+        })
+
+        console.log('Game Created', this.x, this.y)
 
         if (debug) {
             this.debugDrawGrid()
@@ -154,6 +156,8 @@ export class MainScene extends Phaser.Scene {
     preload() {
         this.load.image('cell', 'images/cell_empty.png')
         this.load.image('block', 'images/cell_empty.png')
+        this.load.image('ball', 'images/ball.png')
+        this.load.image('bullet', 'images/bullet.png')
         // this.load.image('bullet', 'images/bullet2.png')
         // this.load.image('mainframe', 'images/mainframe.png')
         // this.load.image('monster', 'images/monster.png')

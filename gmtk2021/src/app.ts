@@ -14,7 +14,7 @@ let config: GameConfig = {
             debug: false
         }
     },
-    scene: [ GreetingScene, MainScene ]
+    scene: [ MainScene ]
 }
 
 export class App {
