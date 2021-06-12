@@ -137,6 +137,38 @@ export class MainScene extends Phaser.Scene {
             }
         })
 
+        if (this.isVertical) {
+            console.log(this.isVertical)
+            let sprite = this.physics.add.sprite(0, 0, 'cell').setInteractive()
+            sprite.setDepth(100)
+            sprite.x = 50
+            sprite.y = gameHeight - 100
+            sprite.on('pointerdown', (pointer: any) => {
+                this.tetris.moveLeft()
+                this.arcanoid.moveLeft()
+            })
+
+            sprite = this.physics.add.sprite(0, 0, 'cell').setInteractive()
+            sprite.setDepth(100)
+            sprite.x = 150
+            sprite.y = gameHeight - 100
+            sprite.on('pointerdown', (pointer: any) => {
+                this.tetris.moveRight()
+                this.arcanoid.moveRight()
+            })
+
+            sprite = this.physics.add.sprite(0, 0, 'cell').setInteractive()
+            sprite.setDepth(100)
+            sprite.x = 100
+            sprite.y = gameHeight - 50
+            sprite.on('pointerdown', (pointer: any) => {
+                this.time.timeScale = 15.5
+            })
+            sprite.on('pointerup', (pointer: any) => {
+                this.time.timeScale = 1
+            })
+        }
+
         if (debug) {
             this.debugDrawGrid()
         }
