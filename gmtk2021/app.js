@@ -193,90 +193,81 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                 offsetX: this.offsetX + this.cellSize * (this.x + 4),
                 offsetY: this.offsetY,
                 physics: this.physics,
-                offsetX: 600,
-                offsetY: 100,
-                physics: this.physics,
                 rectangle: rectangle
             });
+            console.log('Game Created', this.x, this.y);
+            if (debug) {
+                this.debugDrawGrid();
+            }
         }
-        if(debug) {
-            this.debugDrawGrid();
+        update() {
+            this.arcanoid.update();
+            this.tetris.update();
+            // this.input.on('pointerup', () => {
+            //     if (!this.towergame.active()) {
+            //         if (this.music) { this.music.destroy() }
+            //       this.towergame = new Game(this.x, this.y, this.isVertical)
+            //       this.scene.restart();
+            //     }
+            // });
         }
-    }
-    exports.MainScene = MainScene;
-    update();
-    {
-        this.arcanoid.update();
-        this.tetris.update();
-        // this.input.on('pointerup', () => {
-        //     if (!this.towergame.active()) {
-        //         if (this.music) { this.music.destroy() }
-        //       this.towergame = new Game(this.x, this.y, this.isVertical)
-        //       this.scene.restart();
-        //     }
-        // });
-    }
-    setupEvents();
-    {
-        // if (!this.mainframe || !this.mfGroup) return
-        // this.monsters = this.physics.add.group()
-        // this.physics.add.collider(this.monsters, this.mfGroup, this.mainframeHit)
-        // this.bullets = this.physics.add.group()
-        // this.physics.add.collider(this.monsters, this.bullets, this.bulletHit)
-        // // MONSTER SPAWNS
-        // for (let monsterSpawn of this.monsterSpawns) {
-        //     this.time.addEvent({
-        //         delay: 3000,
-        //         loop: true,
-        //         callback: this.createMonster,
-        //         callbackScope: this,
-        //         args: [ monsterSpawn ]
-        //     })
-        // }
-        // this.time.addEvent({
-        //     delay: 1000,
-        //     loop: true,
-        //     callback: this.towerShoot,
-        //     callbackScope: this
-        // })
-    }
-    setupText();
-    {
-        // this.textLives = this.add.text(20, 20, `LIVES: ${this.towergame.lives}`, { fontFamily: 'Verdana', fontSize: 20, color: '#4C191B', align: 'center' })
-        // this.textScore = this.add.text(gameWidth - 120, 20, `SCORE: ${this.towergame.score}`, { fontFamily: 'Verdana', fontSize: 20, color: '#4C191B', align: 'center' })
-    }
-    getScale(sprite, Phaser.GameObjects.Sprite, dim, number);
-    {
-        return dim / sprite.width;
-    }
-    scaleSprite(sprite, Phaser.GameObjects.Sprite, dim, number);
-    {
-        sprite.setScale(this.getScale(sprite, dim));
-    }
-    preload();
-    {
-        this.load.image('cell', 'images/cell_empty.png');
-        this.load.image('block', 'images/cell_full.png');
-        this.load.image('ball', 'images/ball.png');
-        this.load.image('bullet', 'images/bullet.png');
-        // this.load.image('bullet', 'images/bullet2.png')
-        // this.load.image('mainframe', 'images/mainframe.png')
-        // this.load.image('monster', 'images/monster.png')
-        // this.load.image('monsterplace', 'images/monsterplace.png')
-        // this.load.image('tower', 'images/tower.png')
-        // this.load.image('towerplace', 'images/towerplace.png')
-        // this.load.image('wallbrick', 'images/wallbrick.png')
-        // this.load.audio('music', 'sounds/GameOST.mp3')
-    }
-    debugDrawGrid();
-    {
-        let field = this.add.graphics({ lineStyle: { width: 2, color: 0x000000 }, fillStyle: { color: 0x000000 } });
-        for (let i = 0; i < this.x; i++) {
-            for (let j = 0; j < this.y; j++) {
-                field.strokeRect(i * 10, j * 10, this.cellSize, this.cellSize);
+        setupEvents() {
+            // if (!this.mainframe || !this.mfGroup) return
+            // this.monsters = this.physics.add.group()
+            // this.physics.add.collider(this.monsters, this.mfGroup, this.mainframeHit)
+            // this.bullets = this.physics.add.group()
+            // this.physics.add.collider(this.monsters, this.bullets, this.bulletHit)
+            // // MONSTER SPAWNS
+            // for (let monsterSpawn of this.monsterSpawns) {
+            //     this.time.addEvent({
+            //         delay: 3000,
+            //         loop: true,
+            //         callback: this.createMonster,
+            //         callbackScope: this,
+            //         args: [ monsterSpawn ]
+            //     })
+            // }
+            // this.time.addEvent({
+            //     delay: 1000,
+            //     loop: true,
+            //     callback: this.towerShoot,
+            //     callbackScope: this
+            // })
+        }
+        setupText() {
+            // this.textLives = this.add.text(20, 20, `LIVES: ${this.towergame.lives}`, { fontFamily: 'Verdana', fontSize: 20, color: '#4C191B', align: 'center' })
+            // this.textScore = this.add.text(gameWidth - 120, 20, `SCORE: ${this.towergame.score}`, { fontFamily: 'Verdana', fontSize: 20, color: '#4C191B', align: 'center' })
+        }
+        getScale(sprite, dim) {
+            return dim / sprite.width;
+        }
+        scaleSprite(sprite, dim) {
+            sprite.setScale(this.getScale(sprite, dim));
+        }
+        preload() {
+            this.load.image('cell', 'images/cell_empty.png');
+            this.load.image('block', 'images/cell_full.png');
+            this.load.image('ball', 'images/ball.png');
+            this.load.image('bullet', 'images/bullet.png');
+            // this.load.image('bullet', 'images/bullet2.png')
+            // this.load.image('mainframe', 'images/mainframe.png')
+            // this.load.image('monster', 'images/monster.png')
+            // this.load.image('monsterplace', 'images/monsterplace.png')
+            // this.load.image('tower', 'images/tower.png')
+            // this.load.image('towerplace', 'images/towerplace.png')
+            // this.load.image('wallbrick', 'images/wallbrick.png')
+            // this.load.audio('music', 'sounds/GameOST.mp3')
+        }
+        debugDrawGrid() {
+            let field = this.add.graphics({ lineStyle: { width: 2, color: 0x000000 }, fillStyle: { color: 0x000000 } });
+            for (let i = 0; i < this.x; i++) {
+                for (let j = 0; j < this.y; j++) {
+                    field.strokeRect(i * 10, j * 10, this.cellSize, this.cellSize);
+                }
             }
         }
     }
+    exports.MainScene = MainScene;
 });
 define("app", ["require", "exports", "scenes/main"], function (require, exports, main_1) {
     "use strict";

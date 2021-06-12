@@ -86,7 +86,7 @@ export class MainScene extends Phaser.Scene {
             y: this.y,
             offsetX: this.offsetX,
             offsetY: this.offsetY,
-            physics: this.physics
+            physics: this.physics,
             rectangle: rectangle
         })
 
@@ -96,11 +96,8 @@ export class MainScene extends Phaser.Scene {
             y: this.y,
             offsetX: this.offsetX + this.cellSize * (this.x + 4),
             offsetY: this.offsetY,
-            physics: this.physics
-            offsetX: 600,
-            offsetY: 100,
             physics: this.physics,
-            rectangle: rectangle)
+            rectangle: rectangle
         })
 
 
