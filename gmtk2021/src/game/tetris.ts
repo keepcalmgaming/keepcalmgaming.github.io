@@ -1,11 +1,12 @@
-export class Tetris {
-	constructor(
-		tetrisConfig: object
-	) {
+import { BaseGame } from './base_game'
 
+export class Tetris extends BaseGame {
+	constructor(config) {
+		super(config)
+		console.log('Tetris', this.config)
 	}
 
-	update() {
-
+	public update() {
+		super.update()
 	}
 }

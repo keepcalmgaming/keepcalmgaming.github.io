@@ -60,11 +60,19 @@ export class MainScene extends Phaser.Scene {
         this.offsetY = (gameHeight - this.rectSize * this.y) / 2
 
         this.tetris = new Tetris({
-            // blocks: []
+            rectSize: this.rectSize,
+            x: this.x,
+            y: this.y,
+            xStart: 100,
+            yStart: 100
         })
 
         this.arcanoid = new Arcanoid({
-            // blocks: []
+            rectSize: this.rectSize,
+            x: this.x,
+            y: this.y,
+            xStart: 300,
+            yStart: 100
         })
 
         console.log('Game Created', this.x, this.y)

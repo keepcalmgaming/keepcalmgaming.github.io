@@ -45,24 +45,42 @@ define("scenes/greeting", ["require", "exports"], function (require, exports) {
     }
     exports.GreetingScene = GreetingScene;
 });
-define("game/tetris", ["require", "exports"], function (require, exports) {
+define("game/base_game", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    class Tetris {
-        constructor(tetrisConfig) {
+    class BaseGame {
+        constructor(config) {
+            this.config = config;
         }
         update() {
         }
     }
-    exports.Tetris = Tetris;
+    exports.BaseGame = BaseGame;
 });
-define("game/arcanoid", ["require", "exports"], function (require, exports) {
+define("game/tetris", ["require", "exports", "game/base_game"], function (require, exports, base_game_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    class Arcanoid {
-        constructor(arcanoidConfig) {
+    class Tetris extends base_game_1.BaseGame {
+        constructor(config) {
+            super(config);
+            console.log('Tetris', this.config);
         }
         update() {
+            super.update();
+        }
+    }
+    exports.Tetris = Tetris;
+});
+define("game/arcanoid", ["require", "exports", "game/base_game"], function (require, exports, base_game_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    class Arcanoid extends base_game_2.BaseGame {
+        constructor(config) {
+            super(config);
+            console.log('Arcanoid', this.config);
+        }
+        update() {
+            super.update();
         }
     }
     exports.Arcanoid = Arcanoid;
@@ -99,10 +117,18 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             this.offsetX = (gameWidth - this.rectSize * this.x) / 2;
             this.offsetY = (gameHeight - this.rectSize * this.y) / 2;
             this.tetris = new tetris_1.Tetris({
-            // blocks: []
+                rectSize: this.rectSize,
+                x: this.x,
+                y: this.y,
+                xStart: 100,
+                yStart: 100
             });
             this.arcanoid = new arcanoid_1.Arcanoid({
-            // blocks: []
+                rectSize: this.rectSize,
+                x: this.x,
+                y: this.y,
+                xStart: 300,
+                yStart: 100
             });
             console.log('Game Created', this.x, this.y);
         }

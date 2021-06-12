@@ -1,11 +1,12 @@
-export class Arcanoid {
-	constructor(
-		arcanoidConfig: object
-	) {
+import { BaseGame } from './base_game'
 
+export class Arcanoid extends BaseGame {
+	constructor(config) {
+		super(config)
+		console.log('Arcanoid', this.config)
 	}
 
-	update() {
-
+	public update() {
+		super.update()
 	}
 }
