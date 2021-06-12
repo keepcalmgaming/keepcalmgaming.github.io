@@ -33,16 +33,21 @@ export class Arcanoid extends BaseGame {
 	}
 
 	public moveLeft() {
+		if this.getSpritePosition(this.platform).x <= 0 {
+			return
+		}
+
 		this.platform.x -= this.cellSize;
-		console.log('left')
 	}
 
 	public moveRight() {
+		if this.getSpritePosition(this.platform).x > this.x - 2 {
+			return
+		}
+
 		this.platform.x += this.cellSize;
-		console.log('right');
 	}
 
 	public stopPlatform() {
-		console.log('stop');
 	}
 }
