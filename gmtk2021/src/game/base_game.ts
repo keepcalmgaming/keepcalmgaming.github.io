@@ -44,15 +44,7 @@ export class BaseGame {
     }
 
     private setupRectangle() {
-    	console.log('create rectangle')
-    	
-        // for (let i=0; i<this.x; i++) {
-        //     for (let j=0; j<this.y; j++) {
-        //         this.rectangle.strokeRect(i*10, j*10, this.cellSize, this.cellSize)
-        //     }
-        // }
-
-        this.rectangle.strokeRect(this.offsetX - this.cellSize / 4, this.offsetY - this.cellSize / 4, 
+    	this.rectangle.strokeRect(this.offsetX - this.cellSize / 4, this.offsetY - this.cellSize / 4, 
         	this.cellSize * (this.x + 1) - this.cellSize / 2, this.cellSize * (this.y + 1) - this.cellSize / 2)
 
     }
@@ -63,5 +55,15 @@ export class BaseGame {
 
 	private scaleSprite(sprite: Phaser.GameObjects.Sprite, dim: number) {
 		sprite.setScale(this.getScale(sprite, dim))
+	}
+
+	public getCellCenter(position: Position) {
+		let x = this.offsetX + this.cellSize / 2 + startOffset + this.cellSize * position.x
+		let y = this.offsetY + this.cellSize / 2 + startOffset + this.cellSize * position.y
+		return Point(x: x, y: y)
+	}
+
+	public getSpritePosition(sprite: Sprite) {
+		//TODO:
 	}
 }

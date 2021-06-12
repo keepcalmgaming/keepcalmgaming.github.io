@@ -77,12 +77,6 @@ define("game/base_game", ["require", "exports"], function (require, exports) {
             }
         }
         setupRectangle() {
-            console.log('create rectangle');
-            // for (let i=0; i<this.x; i++) {
-            //     for (let j=0; j<this.y; j++) {
-            //         this.rectangle.strokeRect(i*10, j*10, this.cellSize, this.cellSize)
-            //     }
-            // }
             this.rectangle.strokeRect(this.offsetX - this.cellSize / 4, this.offsetY - this.cellSize / 4, this.cellSize * (this.x + 1) - this.cellSize / 2, this.cellSize * (this.y + 1) - this.cellSize / 2);
         }
         getScale(sprite, dim) {
@@ -90,6 +84,14 @@ define("game/base_game", ["require", "exports"], function (require, exports) {
         }
         scaleSprite(sprite, dim) {
             sprite.setScale(this.getScale(sprite, dim));
+        }
+        getCellCenter(position) {
+            let x = this.offsetX + this.cellSize / 2 + startOffset + this.cellSize * position.x;
+            let y = this.offsetY + this.cellSize / 2 + startOffset + this.cellSize * position.y;
+            return Point(x, x, y, y);
+        }
+        getSpritePosition(sprite) {
+            //TODO:
         }
     }
     exports.BaseGame = BaseGame;
