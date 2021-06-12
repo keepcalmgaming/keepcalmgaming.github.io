@@ -175,12 +175,26 @@ define("game/tetris", ["require", "exports", "game/base_game"], function (requir
             }
             this.checkFullLines();
         }
-        checkCollisions() {
-            for (let block of this.movingBlocks.getChildren()) {
-                // console.log(this.getSpritePosition(block))
-            }
-        }
         checkFullLines() {
+            var shouldFallDown = false;
+            for (let i = 0; i < this.y; i++) {
+                let line = this.blocks.getChildren().filter(block => this.getSpritePosition(block).y == i);
+                if (line.length == this.x) {
+                    shouldFallDown = true;
+                    for (let block of line) {
+                        // this.blocks.remove(block)
+                        block.destroy();
+                    }
+                }
+            }
+            if (shouldFallDown) {
+                for (let block of this.blocks.getChildren()) {
+                    let blockY = this.getSpritePosition(block).y;
+                    if (blockY < this.y - 1) {
+                        block.y = block.y + this.cellSize;
+                    }
+                }
+            }
         }
         update() {
             super.update();
