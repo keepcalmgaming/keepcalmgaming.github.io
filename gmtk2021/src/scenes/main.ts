@@ -107,6 +107,8 @@ export class MainScene extends Phaser.Scene {
             callbackScope: this.tetris
         })
 
+        this.time.timeScale = 15.5;
+
         console.log('Game Created', this.x, this.y)
 
         // this.input.keyboard.on('keydown-SPACE', () => console.log('hello'))

@@ -112,11 +112,14 @@ define("game/tetris", ["require", "exports", "game/base_game"], function (requir
             this.spawnFigure();
         }
         spawnFigure() {
+            for (let block of this.movingBlocks.getChildren()) {
+                this.blocks.add(block);
+            }
+            this.movingBlocks.clear();
             let point = this.getCellCenter({ x: Math.floor(Math.random() * this.x), y: 0 });
             let block = this.physics.add.image(point.x, point.y, 'block');
             block.setOrigin(0.5);
             this.scaleSprite(block, this.cellSize * 0.9);
-            this.blocks.add(block);
             this.movingBlocks.add(block);
         }
         moveLeft() {
@@ -128,6 +131,7 @@ define("game/tetris", ["require", "exports", "game/base_game"], function (requir
             for (let block of this.movingBlocks.getChildren()) {
                 block.x = block.x - this.cellSize;
             }
+            this.checkFullLines();
         }
         moveRight() {
             for (let block of this.movingBlocks.getChildren()) {
@@ -138,26 +142,35 @@ define("game/tetris", ["require", "exports", "game/base_game"], function (requir
             for (let block of this.movingBlocks.getChildren()) {
                 block.x = block.x + this.cellSize;
             }
+            this.checkFullLines();
         }
         moveDown() {
             // TODO: Check if can move. If not - stop, check, spawn next
             for (let block of this.movingBlocks.getChildren()) {
-                if (this.getSpritePosition(block).y >= this.y - 1) {
-                    this.movingBlocks.clear();
+                let blockX = this.getSpritePosition(block).x;
+                let blockY = this.getSpritePosition(block).y;
+                if (blockY >= this.y - 1) {
                     this.spawnFigure();
                     return;
+                }
+                for (let staticBlock of this.blocks.getChildren()) {
+                    if (blockY >= this.getSpritePosition(staticBlock).y - 1 && blockX == this.getSpritePosition(staticBlock).x) {
+                        this.spawnFigure();
+                        return;
+                    }
                 }
             }
             for (let block of this.movingBlocks.getChildren()) {
                 block.y = block.y + this.cellSize;
             }
-            this.checkCollisions();
+            this.checkFullLines();
         }
         checkCollisions() {
-            console.log();
             for (let block of this.movingBlocks.getChildren()) {
                 // console.log(this.getSpritePosition(block))
             }
+        }
+        checkFullLines() {
         }
         update() {
             super.update();
@@ -277,6 +290,7 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                 callback: this.tetris.moveDown,
                 callbackScope: this.tetris
             });
+            this.time.timeScale = 15.5;
             console.log('Game Created', this.x, this.y);
             // this.input.keyboard.on('keydown-SPACE', () => console.log('hello'))
             this.input.keyboard.on('keydown', (event) => {
