@@ -24,7 +24,7 @@ type Position = {
 export class MainScene extends Phaser.Scene {
     private isVertical: boolean
 
-    private rectSize: number
+    private cellSize: number
     private offsetX: number = 0
     private offsetY: number = 0
     private x: number
@@ -55,9 +55,9 @@ export class MainScene extends Phaser.Scene {
         this.y = maxSide
 
         let rw = gameWidth / this.x, rh = gameHeight / this.y
-        this.rectSize = rh < rw ? rh : rw
-        this.offsetX = (gameWidth - this.rectSize * this.x) / 2
-        this.offsetY = (gameHeight - this.rectSize * this.y) / 2
+        this.cellSize = rh < rw ? rh : rw
+        this.offsetX = (gameWidth - this.cellSize * this.x) / 2
+        this.offsetY = (gameHeight - this.cellSize * this.y) / 2
     }
 
     private music?: Phaser.Sound.BaseSound
@@ -75,7 +75,7 @@ export class MainScene extends Phaser.Scene {
         // this.music.play()
 
         this.tetris = new Tetris({
-            rectSize: this.rectSize,
+            cellSize: this.cellSize,
             x: this.x,
             y: this.y,
             offsetX: 100,
@@ -84,7 +84,7 @@ export class MainScene extends Phaser.Scene {
         })
 
         this.arcanoid = new Arcanoid({
-            rectSize: this.rectSize,
+            cellSize: this.cellSize,
             x: this.x,
             y: this.y,
             offsetX: 100,
@@ -174,7 +174,7 @@ export class MainScene extends Phaser.Scene {
 
         for (let i=0; i<this.x; i++) {
             for (let j=0; j<this.y; j++) {
-                field.strokeRect(i*10, j*10, this.rectSize, this.rectSize)
+                field.strokeRect(i*10, j*10, this.cellSize, this.cellSize)
             }
         }
     }

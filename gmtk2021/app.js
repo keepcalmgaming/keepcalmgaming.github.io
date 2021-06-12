@@ -134,9 +134,9 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             this.x = minSide;
             this.y = maxSide;
             let rw = gameWidth / this.x, rh = gameHeight / this.y;
-            this.rectSize = rh < rw ? rh : rw;
-            this.offsetX = (gameWidth - this.rectSize * this.x) / 2;
-            this.offsetY = (gameHeight - this.rectSize * this.y) / 2;
+            this.cellSize = rh < rw ? rh : rw;
+            this.offsetX = (gameWidth - this.cellSize * this.x) / 2;
+            this.offsetY = (gameHeight - this.cellSize * this.y) / 2;
         }
         create() {
             this.cameras.main.setBackgroundColor('#959F7D');
@@ -146,7 +146,7 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             // this.music = this.sound.add('music')
             // this.music.play()
             this.tetris = new tetris_1.Tetris({
-                rectSize: this.rectSize,
+                cellSize: this.cellSize,
                 x: this.x,
                 y: this.y,
                 offsetX: 100,
@@ -154,7 +154,7 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                 physics: this.physics
             });
             this.arcanoid = new arcanoid_1.Arcanoid({
-                rectSize: this.rectSize,
+                cellSize: this.cellSize,
                 x: this.x,
                 y: this.y,
                 offsetX: 100,
@@ -228,7 +228,7 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             let field = this.add.graphics({ lineStyle: { width: 2, color: 0x000000 }, fillStyle: { color: 0x000000 } });
             for (let i = 0; i < this.x; i++) {
                 for (let j = 0; j < this.y; j++) {
-                    field.strokeRect(i * 10, j * 10, this.rectSize, this.rectSize);
+                    field.strokeRect(i * 10, j * 10, this.cellSize, this.cellSize);
                 }
             }
         }
