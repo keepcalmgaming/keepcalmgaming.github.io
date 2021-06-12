@@ -107,7 +107,7 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             console.log('Game Created', this.x, this.y);
         }
         create() {
-            this.cameras.main.setBackgroundColor('#E8745A');
+            this.cameras.main.setBackgroundColor('#959F7D');
             let field = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0x000000 } });
             this.setupText();
             this.setupEvents();
@@ -162,6 +162,8 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             sprite.setScale(this.getScale(sprite, dim));
         }
         preload() {
+            this.load.image('cell', 'images/cell_empty.png');
+            this.load.image('block', 'images/cell_empty.png');
             // this.load.image('bullet', 'images/bullet2.png')
             // this.load.image('mainframe', 'images/mainframe.png')
             // this.load.image('monster', 'images/monster.png')
