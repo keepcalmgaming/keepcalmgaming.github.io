@@ -24,14 +24,24 @@ export class Tetris extends BaseGame {
 	}
 
 	public moveLeft() {
-		// TODO: Check if can move left
+		for (let block of this.movingBlocks.getChildren()) {
+			if this.getSpritePosition(block).x <= 0 {
+				return
+			}
+		}
+
 		for (let block of this.movingBlocks.getChildren()) {
 			block.x = block.x - this.cellSize
 		}
 	}
 
 	public moveRight() {
-		// TODO: Check if can move right
+		for (let block of this.movingBlocks.getChildren()) {
+			if this.getSpritePosition(block).x >= this.x - 1 {
+				return
+			}
+		}
+
 		for (let block of this.movingBlocks.getChildren()) {
 			block.x = block.x + this.cellSize
 		}
@@ -39,9 +49,25 @@ export class Tetris extends BaseGame {
 
 	public moveDown() {
 		// TODO: Check if can move. If not - stop, check, spawn next
+		for (let block of this.movingBlocks.getChildren()) {
+			if this.getSpritePosition(block).y >= this.y - 1 {
+				this.movingBlocks.clear()
+				this.spawnFigure()
+				return
+			}
+		}
 
 		for (let block of this.movingBlocks.getChildren()) {
 			block.y = block.y + this.cellSize
+		}
+
+		this.checkCollisions()
+	}
+
+	private checkCollisions() {
+		console.log()
+		for (let block of this.movingBlocks.getChildren()) {
+			// console.log(this.getSpritePosition(block))
 		}
 	}
 

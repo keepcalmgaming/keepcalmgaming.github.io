@@ -64,6 +64,11 @@ export class BaseGame {
 	}
 
 	public getSpritePosition(sprite: Sprite) {
-		//TODO:
+		let positionX = (sprite.x - this.offsetX - this.cellSize / 2) / this.cellSize
+		let positionY = (sprite.y - this.offsetY - this.cellSize / 2) / this.cellSize
+		let x = positionX.toFixed()
+		let y = positionY.toFixed()
+		return {x: x, y: y}
+
 	}
 }
