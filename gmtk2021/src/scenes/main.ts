@@ -71,7 +71,7 @@ export class MainScene extends Phaser.Scene {
     create() {
         this.cameras.main.setBackgroundColor('#959F7D');
 
-        let field: Phaser.GameObjects.Graphics = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0x000000 }})
+        let rectangle: Phaser.GameObjects.Graphics = this.add.graphics({ lineStyle: { width: this.cellSize / 4, color: 0x0F110D }})
 
         this.setupText()
 
@@ -87,6 +87,7 @@ export class MainScene extends Phaser.Scene {
             offsetX: this.offsetX,
             offsetY: this.offsetY,
             physics: this.physics
+            rectangle: rectangle
         })
 
         this.arcanoid = new Arcanoid({
@@ -96,6 +97,10 @@ export class MainScene extends Phaser.Scene {
             offsetX: this.offsetX + this.cellSize * (this.x + 4),
             offsetY: this.offsetY,
             physics: this.physics
+            offsetX: 600,
+            offsetY: 100,
+            physics: this.physics,
+            rectangle: rectangle)
         })
 
 

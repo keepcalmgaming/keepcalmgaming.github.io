@@ -57,22 +57,33 @@ define("game/base_game", ["require", "exports"], function (require, exports) {
             this.offsetX = this.config.offsetX;
             this.offsetY = this.config.offsetY;
             this.physics = this.config.physics;
+            this.rectangle = this.config.rectangle;
+            console.log(this.config);
             this.setupBackgroundCells();
+            this.setupRectangle();
         }
         update() {
         }
         setupBackgroundCells() {
-            console.log('create background cells', this.x, this.y, this.cellSize);
-            let startOffset = this.cellSize * 2;
+            let startOffset = this.cellSize;
             for (let i = 0; i < this.x; i++) {
                 for (let j = 0; j < this.y; j++) {
                     let cell = this.physics.add.image(0, 0, 'cell');
                     cell.x = this.offsetX + startOffset + this.cellSize * i;
-                    cell.y = startOffset + this.cellSize * j;
+                    cell.y = this.offsetY + startOffset + this.cellSize * j;
                     cell.setOrigin(0.5);
                     this.scaleSprite(cell, this.cellSize * 0.9);
                 }
             }
+        }
+        setupRectangle() {
+            console.log('create rectangle');
+            // for (let i=0; i<this.x; i++) {
+            //     for (let j=0; j<this.y; j++) {
+            //         this.rectangle.strokeRect(i*10, j*10, this.cellSize, this.cellSize)
+            //     }
+            // }
+            this.rectangle.strokeRect(this.offsetX + this.cellSize / 4, this.offsetY + this.cellSize / 4, this.cellSize * (this.x + 1) - this.cellSize / 2, this.cellSize * (this.y + 1) - this.cellSize / 2);
         }
         getScale(sprite, dim) {
             return dim / sprite.width;
@@ -161,7 +172,7 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
         }
         create() {
             this.cameras.main.setBackgroundColor('#959F7D');
-            let field = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0x000000 } });
+            let rectangle = this.add.graphics({ lineStyle: { width: this.cellSize / 4, color: 0x0F110D } });
             this.setupText();
             this.setupEvents();
             // this.music = this.sound.add('music')
@@ -172,7 +183,8 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                 y: this.y,
                 offsetX: this.offsetX,
                 offsetY: this.offsetY,
-                physics: this.physics
+                physics: this.physics,
+                rectangle: rectangle
             });
             this.arcanoid = new arcanoid_1.Arcanoid({
                 cellSize: this.cellSize,
@@ -180,81 +192,91 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                 y: this.y,
                 offsetX: this.offsetX + this.cellSize * (this.x + 4),
                 offsetY: this.offsetY,
-                physics: this.physics
+                physics: this.physics,
+                offsetX: 600,
+                offsetY: 100,
+                physics: this.physics,
+                rectangle: rectangle
             });
-            console.log('Game Created', this.x, this.y);
-            if (debug) {
-                this.debugDrawGrid();
-            }
         }
-        update() {
-            this.arcanoid.update();
-            this.tetris.update();
-            // this.input.on('pointerup', () => {
-            //     if (!this.towergame.active()) {
-            //         if (this.music) { this.music.destroy() }
-            //       this.towergame = new Game(this.x, this.y, this.isVertical)
-            //       this.scene.restart();
-            //     }
-            // });
-        }
-        setupEvents() {
-            // if (!this.mainframe || !this.mfGroup) return
-            // this.monsters = this.physics.add.group()
-            // this.physics.add.collider(this.monsters, this.mfGroup, this.mainframeHit)
-            // this.bullets = this.physics.add.group()
-            // this.physics.add.collider(this.monsters, this.bullets, this.bulletHit)
-            // // MONSTER SPAWNS
-            // for (let monsterSpawn of this.monsterSpawns) {
-            //     this.time.addEvent({
-            //         delay: 3000,
-            //         loop: true,
-            //         callback: this.createMonster,
-            //         callbackScope: this,
-            //         args: [ monsterSpawn ]
-            //     })
-            // }
-            // this.time.addEvent({
-            //     delay: 1000,
-            //     loop: true,
-            //     callback: this.towerShoot,
-            //     callbackScope: this
-            // })
-        }
-        setupText() {
-            // this.textLives = this.add.text(20, 20, `LIVES: ${this.towergame.lives}`, { fontFamily: 'Verdana', fontSize: 20, color: '#4C191B', align: 'center' })
-            // this.textScore = this.add.text(gameWidth - 120, 20, `SCORE: ${this.towergame.score}`, { fontFamily: 'Verdana', fontSize: 20, color: '#4C191B', align: 'center' })
-        }
-        getScale(sprite, dim) {
-            return dim / sprite.width;
-        }
-        scaleSprite(sprite, dim) {
-            sprite.setScale(this.getScale(sprite, dim));
-        }
-        preload() {
-            this.load.image('cell', 'images/cell_empty.png');
-            this.load.image('block', 'images/cell_full.png');
-            this.load.image('ball', 'images/ball.png');
-            this.load.image('bullet', 'images/bullet.png');
-            // this.load.image('bullet', 'images/bullet2.png')
-            // this.load.image('mainframe', 'images/mainframe.png')
-            // this.load.image('monster', 'images/monster.png')
-            // this.load.image('monsterplace', 'images/monsterplace.png')
-            // this.load.image('tower', 'images/tower.png')
-            // this.load.image('towerplace', 'images/towerplace.png')
-            // this.load.image('wallbrick', 'images/wallbrick.png')
-            // this.load.audio('music', 'sounds/GameOST.mp3')
-        }
-        debugDrawGrid() {
-            let field = this.add.graphics({ lineStyle: { width: 2, color: 0x000000 }, fillStyle: { color: 0x000000 } });
-            for (let i = 0; i < this.x; i++) {
-                for (let j = 0; j < this.y; j++) {
-                    field.strokeRect(i * 10, j * 10, this.cellSize, this.cellSize);
-                }
-            }
+        if(debug) {
+            this.debugDrawGrid();
         }
     }
     exports.MainScene = MainScene;
+    update();
+    {
+        this.arcanoid.update();
+        this.tetris.update();
+        // this.input.on('pointerup', () => {
+        //     if (!this.towergame.active()) {
+        //         if (this.music) { this.music.destroy() }
+        //       this.towergame = new Game(this.x, this.y, this.isVertical)
+        //       this.scene.restart();
+        //     }
+        // });
+    }
+    setupEvents();
+    {
+        // if (!this.mainframe || !this.mfGroup) return
+        // this.monsters = this.physics.add.group()
+        // this.physics.add.collider(this.monsters, this.mfGroup, this.mainframeHit)
+        // this.bullets = this.physics.add.group()
+        // this.physics.add.collider(this.monsters, this.bullets, this.bulletHit)
+        // // MONSTER SPAWNS
+        // for (let monsterSpawn of this.monsterSpawns) {
+        //     this.time.addEvent({
+        //         delay: 3000,
+        //         loop: true,
+        //         callback: this.createMonster,
+        //         callbackScope: this,
+        //         args: [ monsterSpawn ]
+        //     })
+        // }
+        // this.time.addEvent({
+        //     delay: 1000,
+        //     loop: true,
+        //     callback: this.towerShoot,
+        //     callbackScope: this
+        // })
+    }
+    setupText();
+    {
+        // this.textLives = this.add.text(20, 20, `LIVES: ${this.towergame.lives}`, { fontFamily: 'Verdana', fontSize: 20, color: '#4C191B', align: 'center' })
+        // this.textScore = this.add.text(gameWidth - 120, 20, `SCORE: ${this.towergame.score}`, { fontFamily: 'Verdana', fontSize: 20, color: '#4C191B', align: 'center' })
+    }
+    getScale(sprite, Phaser.GameObjects.Sprite, dim, number);
+    {
+        return dim / sprite.width;
+    }
+    scaleSprite(sprite, Phaser.GameObjects.Sprite, dim, number);
+    {
+        sprite.setScale(this.getScale(sprite, dim));
+    }
+    preload();
+    {
+        this.load.image('cell', 'images/cell_empty.png');
+        this.load.image('block', 'images/cell_full.png');
+        this.load.image('ball', 'images/ball.png');
+        this.load.image('bullet', 'images/bullet.png');
+        // this.load.image('bullet', 'images/bullet2.png')
+        // this.load.image('mainframe', 'images/mainframe.png')
+        // this.load.image('monster', 'images/monster.png')
+        // this.load.image('monsterplace', 'images/monsterplace.png')
+        // this.load.image('tower', 'images/tower.png')
+        // this.load.image('towerplace', 'images/towerplace.png')
+        // this.load.image('wallbrick', 'images/wallbrick.png')
+        // this.load.audio('music', 'sounds/GameOST.mp3')
+    }
+    debugDrawGrid();
+    {
+        let field = this.add.graphics({ lineStyle: { width: 2, color: 0x000000 }, fillStyle: { color: 0x000000 } });
+        for (let i = 0; i < this.x; i++) {
+            for (let j = 0; j < this.y; j++) {
+                field.strokeRect(i * 10, j * 10, this.cellSize, this.cellSize);
+            }
+        }
+    }
 });
 define("app", ["require", "exports", "scenes/main"], function (require, exports, main_1) {
     "use strict";
