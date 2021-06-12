@@ -114,10 +114,12 @@ export class MainScene extends Phaser.Scene {
             if ([ Phaser.Input.Keyboard.KeyCodes.LEFT, Phaser.Input.Keyboard.KeyCodes.A ].includes(event.keyCode)) {
                 event.stopPropagation()
                 this.tetris.moveLeft()
+                this.arcanoid.moveLeft()
             }
             if ([ Phaser.Input.Keyboard.KeyCodes.RIGHT, Phaser.Input.Keyboard.KeyCodes.D ].includes(event.keyCode)) {
                 event.stopPropagation()
                 this.tetris.moveRight()
+                this.arcanoid.moveRight()
             }
         });
 
@@ -130,14 +132,6 @@ export class MainScene extends Phaser.Scene {
     update() {
         this.arcanoid.update()
         this.tetris.update()
-        // this.input.on('pointerup', () => {
-        //     if (!this.towergame.active()) {
-        //         if (this.music) { this.music.destroy() }
-
-        //       this.towergame = new Game(this.x, this.y, this.isVertical)
-        //       this.scene.restart();
-        //     }
-        // });
     }
 
     setupEvents() {

@@ -173,6 +173,10 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             super(config);
             console.log(this);
             let ball = this.physics.add.image(this.offsetX, this.offsetY, 'ball');
+            // start of most left block 
+            let platformOffsetX = this.offsetX + ((this.cellSize / 2) * 9);
+            let platformOffsetY = (this.offsetY + (this.cellSize * 18) - (this.cellSize / 2));
+            let platform = this.physics.add.image(platformOffsetX, platformOffsetY, 'block');
             ball.setScale(0.3);
             ball.setCircle(120);
             ball.setCollideWorldBounds(false);
@@ -180,10 +184,22 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             ball.body.stopVelocityOnCollide = false;
             ball.setMass(2);
             this.ball = ball;
+            this.platform = platform;
             console.log('Arcanoid', this.config);
         }
         update() {
             super.update();
+        }
+        moveLeft() {
+            this.platform.x -= this.cellSize;
+            console.log('left');
+        }
+        moveRight() {
+            this.platform.x += this.cellSize;
+            console.log('right');
+        }
+        stopPlatform() {
+            console.log('stop');
         }
     }
     exports.Arcanoid = Arcanoid;
@@ -264,10 +280,12 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                 if ([Phaser.Input.Keyboard.KeyCodes.LEFT, Phaser.Input.Keyboard.KeyCodes.A].includes(event.keyCode)) {
                     event.stopPropagation();
                     this.tetris.moveLeft();
+                    this.arcanoid.moveLeft();
                 }
                 if ([Phaser.Input.Keyboard.KeyCodes.RIGHT, Phaser.Input.Keyboard.KeyCodes.D].includes(event.keyCode)) {
                     event.stopPropagation();
                     this.tetris.moveRight();
+                    this.arcanoid.moveRight();
                 }
             });
             if (debug) {
@@ -277,13 +295,6 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
         update() {
             this.arcanoid.update();
             this.tetris.update();
-            // this.input.on('pointerup', () => {
-            //     if (!this.towergame.active()) {
-            //         if (this.music) { this.music.destroy() }
-            //       this.towergame = new Game(this.x, this.y, this.isVertical)
-            //       this.scene.restart();
-            //     }
-            // });
         }
         setupEvents() {
             // if (!this.mainframe || !this.mfGroup) return
