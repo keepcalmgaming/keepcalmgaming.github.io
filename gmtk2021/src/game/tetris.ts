@@ -23,8 +23,22 @@ export class Tetris extends BaseGame {
 		this.movingBlocks.add(block)
 	}
 
-	private moveDown() {
-		// Check if can move. If not - stop, check, spawn next
+	public moveLeft() {
+		// TODO: Check if can move left
+		for (let block of this.movingBlocks.getChildren()) {
+			block.x = block.x - this.cellSize
+		}
+	}
+
+	public moveRight() {
+		// TODO: Check if can move right
+		for (let block of this.movingBlocks.getChildren()) {
+			block.x = block.x + this.cellSize
+		}
+	}
+
+	public moveDown() {
+		// TODO: Check if can move. If not - stop, check, spawn next
 
 		for (let block of this.movingBlocks.getChildren()) {
 			block.y = block.y + this.cellSize

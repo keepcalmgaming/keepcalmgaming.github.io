@@ -115,8 +115,20 @@ define("game/tetris", ["require", "exports", "game/base_game"], function (requir
             this.blocks.add(block);
             this.movingBlocks.add(block);
         }
+        moveLeft() {
+            // TODO: Check if can move left
+            for (let block of this.movingBlocks.getChildren()) {
+                block.x = block.x - this.cellSize;
+            }
+        }
+        moveRight() {
+            // TODO: Check if can move right
+            for (let block of this.movingBlocks.getChildren()) {
+                block.x = block.x + this.cellSize;
+            }
+        }
         moveDown() {
-            // Check if can move. If not - stop, check, spawn next
+            // TODO: Check if can move. If not - stop, check, spawn next
             for (let block of this.movingBlocks.getChildren()) {
                 block.y = block.y + this.cellSize;
             }
@@ -157,7 +169,7 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
     const gameWidth = window.innerWidth;
     const halfWidth = gameWidth / 2;
     const halfHeight = gameHeight / 2;
-    const debug = true;
+    const debug = false;
     const minSide = 10;
     const maxSide = 18;
     class MainScene extends Phaser.Scene {
@@ -221,6 +233,17 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                 callbackScope: this.tetris
             });
             console.log('Game Created', this.x, this.y);
+            // this.input.keyboard.on('keydown-SPACE', () => console.log('hello'))
+            this.input.keyboard.on('keydown', (event) => {
+                if ([Phaser.Input.Keyboard.KeyCodes.LEFT, Phaser.Input.Keyboard.KeyCodes.A].includes(event.keyCode)) {
+                    event.stopPropagation();
+                    this.tetris.moveLeft();
+                }
+                if ([Phaser.Input.Keyboard.KeyCodes.RIGHT, Phaser.Input.Keyboard.KeyCodes.D].includes(event.keyCode)) {
+                    event.stopPropagation();
+                    this.tetris.moveRight();
+                }
+            });
             if (debug) {
                 this.debugDrawGrid();
             }

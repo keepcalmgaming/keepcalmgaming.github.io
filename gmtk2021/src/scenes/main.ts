@@ -7,7 +7,7 @@ const gameWidth = window.innerWidth
 const halfWidth = gameWidth / 2
 const halfHeight = gameHeight / 2
 
-const debug = true
+const debug = false
 const minSide = 10
 const maxSide = 18
 
@@ -108,6 +108,18 @@ export class MainScene extends Phaser.Scene {
         })
 
         console.log('Game Created', this.x, this.y)
+
+        // this.input.keyboard.on('keydown-SPACE', () => console.log('hello'))
+        this.input.keyboard.on('keydown', (event: any) => {
+            if ([ Phaser.Input.Keyboard.KeyCodes.LEFT, Phaser.Input.Keyboard.KeyCodes.A ].includes(event.keyCode)) {
+                event.stopPropagation()
+                this.tetris.moveLeft()
+            }
+            if ([ Phaser.Input.Keyboard.KeyCodes.RIGHT, Phaser.Input.Keyboard.KeyCodes.D ].includes(event.keyCode)) {
+                event.stopPropagation()
+                this.tetris.moveRight()
+            }
+        });
 
         if (debug) {
             this.debugDrawGrid()
