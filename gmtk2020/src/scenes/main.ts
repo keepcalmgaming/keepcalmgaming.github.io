@@ -67,6 +67,8 @@ export class MainScene extends Phaser.Scene {
         this.towergame = new Game(this.x, this.y, this.isVertical)
 
         console.log('Game Created', this.x, this.y, this.towergame)
+
+        console.log('I amd sinij senoir')
     }
 
     private music?: Phaser.Sound.BaseSound

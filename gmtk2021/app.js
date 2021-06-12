@@ -57,8 +57,22 @@ define("game/base_game", ["require", "exports"], function (require, exports) {
             this.offsetX = this.config.offsetX;
             this.offsetY = this.config.offsetY;
             this.physics = this.config.physics;
+            this.setupBackgroundCells();
         }
         update() {
+        }
+        setupBackgroundCells() {
+            console.log('create background cells', this.x, this.y, this.cellSize);
+            let startOffset = this.cellSize * 2;
+            for (let i = 0; i < this.x; i++) {
+                for (let j = 0; j < this.y; j++) {
+                    let cell = this.physics.add.image(0, 0, 'cell');
+                    cell.x = this.offsetX + startOffset + this.cellSize * i;
+                    cell.y = startOffset + this.cellSize * j;
+                    cell.setOrigin(0.5);
+                    this.scaleSprite(cell, this.cellSize * 0.9);
+                }
+            }
         }
         getScale(sprite, dim) {
             return dim / sprite.width;
@@ -115,7 +129,7 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
     const halfHeight = gameHeight / 2;
     const debug = false;
     const minSide = 10;
-    const maxSide = 16;
+    const maxSide = 18;
     class MainScene extends Phaser.Scene {
         // private mfGroup?: Phaser.Physics.Arcade.StaticGroup
         // private mainframe?: Phaser.GameObjects.Sprite
@@ -134,7 +148,7 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             this.x = minSide;
             this.y = maxSide;
             let rw = gameWidth / this.x, rh = gameHeight / this.y;
-            this.cellSize = rh < rw ? rh : rw;
+            this.cellSize = 43; //rh < rw ? rh : rw
             this.offsetX = (gameWidth - this.cellSize * this.x) / 2;
             this.offsetY = (gameHeight - this.cellSize * this.y) / 2;
         }
@@ -157,8 +171,8 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                 cellSize: this.cellSize,
                 x: this.x,
                 y: this.y,
-                offsetX: 100,
-                offsetY: 200,
+                offsetX: 600,
+                offsetY: 100,
                 physics: this.physics
             });
             console.log('Game Created', this.x, this.y);
@@ -212,7 +226,7 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
         }
         preload() {
             this.load.image('cell', 'images/cell_empty.png');
-            this.load.image('block', 'images/cell_empty.png');
+            this.load.image('block', 'images/cell_full.png');
             this.load.image('ball', 'images/ball.png');
             this.load.image('bullet', 'images/bullet.png');
             // this.load.image('bullet', 'images/bullet2.png')
