@@ -253,7 +253,7 @@ define("game/tetris", ["require", "exports", "game/base_game", "game/tetraminos"
         }
         canSpawn(blocks, a) {
             // for (let block of blocks) {
-            // 	if (this.isPositionFull({x: this.tx + block[0] + a.shiftX, y: this.ty + block[1] + y.shiftY})) {
+            // 	if (this.isPositionFull({x: this.tx + block[0] + a.shiftX, y: this.ty + block[1] + a.shiftY})) {
             // 		return false
             // 	}
             // }
@@ -277,6 +277,9 @@ define("game/tetris", ["require", "exports", "game/base_game", "game/tetraminos"
                     let block = this.spawnBlock(pos);
                     this.movingBlocks.add(block);
                 }
+            }
+            else {
+                console.log('cannot rotate');
             }
         }
         moveLeft() {
@@ -376,16 +379,26 @@ define("game/tetris", ["require", "exports", "game/base_game", "game/tetraminos"
 define("game/arcanoid", ["require", "exports", "game/base_game"], function (require, exports, base_game_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    const START_BLOCKS = [
+        { x: 0, y: 1 },
+        { x: 0, y: 5 },
+        { x: 3, y: 1 },
+        { x: 2, y: 2 },
+        { x: 8, y: 2 },
+    ];
     class Arcanoid extends base_game_2.BaseGame {
         constructor(config) {
             super(config);
             console.log(this);
             this.setupBall();
             this.setupWalls();
+            this.setupBlocks();
             // start of most left block 
             let platformOffsetX = this.offsetX + ((this.cellSize / 2) * 9);
             let platformOffsetY = (this.offsetY + (this.cellSize * 18) - (this.cellSize / 2));
-            let platform = this.physics.add.image(platformOffsetX, platformOffsetY, 'block');
+            let platform = this.physics.add.image(platformOffsetX, platformOffsetY, 'block').setImmovable();
+            this.scaleSprite(platform, this.cellSize * 0.9);
+            this.physics.add.collider(platform, this.ball, this.platformHit);
             this.platform = platform;
             console.log('Arcanoid', this.config);
         }
@@ -407,39 +420,52 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
         stopPlatform() {
         }
         setupBall() {
-            this.ball = this.physics.add.image(this.offsetX + 100, this.offsetY + 100, 'ball');
-            this.ball.setScale(1);
+            let cellPosition = this.getCellCenter({ x: 4, y: 16 });
+            this.ball = this.physics.add.image(cellPosition.x, cellPosition.y, 'ball');
+            this.scaleSprite(this.ball, this.cellSize / 2);
             this.ball.setCollideWorldBounds(false);
             this.ball.setBounce(1);
             this.ball.body.stopVelocityOnCollide = false;
-            this.ball.setVelocity(-200, -200);
+            this.ball.setVelocity(200, -200);
+        }
+        setupBlocks() {
+            this.blocks = this.physics.add.group();
+            this.physics.add.collider(this.ball, this.blocks, this.onBallBlock);
+            for (let pos of START_BLOCKS) {
+                let block = this.spawnBlock(pos);
+                this.blocks.add(block);
+            }
+        }
+        onBallBlock(ball, block) {
+            console.log('ball hit');
+            block.destroy();
         }
         setupWalls() {
-            let cellPosition = this.getCellCenter({ x: -1, y: -1 });
-            let cell = this.physics.add.image(cellPosition.x, cellPosition.y, 'block').setAlpha(0).setImmovable();
-            this.physics.add.collider(cell, this.ball, this.wallHit);
-            for (let i = 0; i < 12; i++) {
-                let cell2 = this.physics.add.image(cell.x + i * cell.height, cellPosition.y, 'block').setAlpha(0).setImmovable();
-                this.physics.add.collider(cell2, this.ball, this.wallHit);
-            }
-            for (let i = 0; i < 22; i++) {
-                let cell2 = this.physics.add.image(cell.x, cellPosition.y + i * cell.height, 'block').setAlpha(0).setImmovable();
-                this.physics.add.collider(cell2, this.ball, this.wallHit);
-            }
-            cellPosition = this.getCellCenter({ x: 10, y: -1 });
-            cell = this.physics.add.image(cellPosition.x, cellPosition.y, 'block').setAlpha(0).setImmovable();
-            this.physics.add.collider(cell, this.ball, this.wallHit);
-            for (let i = 0; i < 22; i++) {
-                let cell2 = this.physics.add.image(cell.x, cellPosition.y + i * cell.height, 'block').setAlpha(0).setImmovable();
-                this.physics.add.collider(cell2, this.ball, this.wallHit);
-            }
-            cellPosition = this.getCellCenter({ x: -1, y: 18 });
-            cell = this.physics.add.image(cellPosition.x, cellPosition.y, 'block').setAlpha(0).setImmovable();
-            this.physics.add.collider(cell, this.ball, this.wallHit);
-            for (let i = 0; i < 12; i++) {
-                let cell2 = this.physics.add.image(cell.x + i * cell.height, cellPosition.y, 'block').setAlpha(0).setImmovable();
-                this.physics.add.collider(cell2, this.ball, this.wallHit);
-            }
+            let alpha = 0;
+            this.setupHorizontalWalls(alpha);
+            this.setupVerticalWalls(alpha);
+        }
+        setupHorizontalWalls(alpha) {
+            let cellPosition = this.getCellCenter({ x: 5, y: -1 });
+            let wall = this.physics.add.image(cellPosition.x, cellPosition.y, 'horizontal_wall').setAlpha(alpha).setImmovable();
+            this.scaleSprite(wall, this.cellSize * 12);
+            this.physics.add.collider(wall, this.ball, this.wallHit);
+            cellPosition = this.getCellCenter({ x: 5, y: 18 });
+            wall = this.physics.add.image(cellPosition.x, cellPosition.y, 'horizontal_wall').setAlpha(alpha).setImmovable();
+            this.scaleSprite(wall, this.cellSize * 12);
+            this.physics.add.collider(wall, this.ball, this.wallHit);
+        }
+        setupVerticalWalls(alpha) {
+            let cellPosition = this.getCellCenter({ x: -1, y: 9 });
+            let wall = this.physics.add.image(cellPosition.x, cellPosition.y, 'vertical_wall').setAlpha(alpha).setImmovable();
+            this.scaleSprite(wall, this.cellSize);
+            this.physics.add.collider(wall, this.ball, this.wallHit);
+            cellPosition = this.getCellCenter({ x: 10, y: 9 });
+            wall = this.physics.add.image(cellPosition.x, cellPosition.y, 'vertical_wall').setAlpha(alpha).setImmovable();
+            this.scaleSprite(wall, this.cellSize);
+            this.physics.add.collider(wall, this.ball, this.wallHit);
+        }
+        platformHit(cell, ball) {
         }
         wallHit(cell, ball) {
         }
@@ -635,6 +661,8 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             this.load.image('block', 'images/cell_full.png');
             this.load.image('ball', 'images/ball.png');
             this.load.image('bullet', 'images/bullet.png');
+            this.load.image('vertical_wall', 'images/vertical_wall.png');
+            this.load.image('horizontal_wall', 'images/horizontal_wall.png');
             // this.load.image('bullet', 'images/bullet2.png')
             // this.load.image('mainframe', 'images/mainframe.png')
             // this.load.image('monster', 'images/monster.png')

@@ -60,7 +60,7 @@ export class Tetris extends BaseGame {
 
 	private canSpawn(blocks, a: Adjustment): boolean {
 		// for (let block of blocks) {
-		// 	if (this.isPositionFull({x: this.tx + block[0] + a.shiftX, y: this.ty + block[1] + y.shiftY})) {
+		// 	if (this.isPositionFull({x: this.tx + block[0] + a.shiftX, y: this.ty + block[1] + a.shiftY})) {
 		// 		return false
 		// 	}
 		// }
@@ -87,6 +87,8 @@ export class Tetris extends BaseGame {
 				let block = this.spawnBlock(pos)
 				this.movingBlocks.add(block)
 			}
+		} else {
+			console.log('cannot rotate')
 		}
 	}
 

@@ -1,7 +1,17 @@
 import { BaseGame } from './base_game'
 
+const START_BLOCKS = [
+	{x: 0, y: 1},
+	{x: 0, y: 5},
+	{x: 3, y: 1},
+	{x: 2, y: 2},
+	{x: 8, y: 2},
+]
+
+
 export class Arcanoid extends BaseGame {
 	private ball: any
+	private blocks?: Phaser.Physics.Arcade.Group
 
 	constructor(config: any) {
 		super(config)
@@ -10,6 +20,7 @@ export class Arcanoid extends BaseGame {
 
 		this.setupBall();
 		this.setupWalls();
+		this.setupBlocks();
 
 		// start of most left block 
 		let platformOffsetX = this.offsetX + ((this.cellSize / 2) * 9);
@@ -54,6 +65,26 @@ export class Arcanoid extends BaseGame {
 		this.ball.setBounce(1);
 		this.ball.body.stopVelocityOnCollide = false;
 		this.ball.setVelocity(200, -200)
+	}
+
+	private setupBlocks() {
+		this.blocks = this.physics.add.group()
+
+		this.physics.add.collider(
+			this.ball, 
+			this.blocks, 
+			this.onBallBlock
+		);
+
+		for (let pos of START_BLOCKS) {
+			let block = this.spawnBlock(pos)
+			this.blocks.add(block)
+		}
+	}
+
+	private onBallBlock(ball, block) {
+		console.log('ball hit')
+		block.destroy()
 	}
 
 	public setupWalls() {
