@@ -44,6 +44,13 @@ export class Tetris extends BaseGame {
 			if (this.getSpritePosition(block).x <= 0) {
 				return
 			}
+
+			for (let staticBlock of this.blocks.getChildren()) {
+				if (this.isBlocksAreOnTheSameLine(block, staticBlock) &&
+					this.getSpritePosition(block).x - 1 == this.getSpritePosition(staticBlock).x) {
+					return
+				}				
+			}
 		}
 
 		for (let block of this.movingBlocks.getChildren()) {
@@ -57,6 +64,13 @@ export class Tetris extends BaseGame {
 		for (let block of this.movingBlocks.getChildren()) {
 			if (this.getSpritePosition(block).x >= this.x - 1) {
 				return
+			}
+
+			for (let staticBlock of this.blocks.getChildren()) {
+				if (this.isBlocksAreOnTheSameLine(block, staticBlock) && 
+					this.getSpritePosition(block).x == this.getSpritePosition(staticBlock).x - 1) {
+					return
+				}				
 			}
 		}
 
@@ -114,6 +128,10 @@ export class Tetris extends BaseGame {
 				}
 			}
 		}
+	}
+
+	private isBlocksAreOnTheSameLine(block1: any, block2: any) {
+		return this.getSpritePosition(block1).y == this.getSpritePosition(block2).y
 	}
 
 	public update() {
