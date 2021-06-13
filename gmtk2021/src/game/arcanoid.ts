@@ -102,6 +102,9 @@ export class Arcanoid extends BaseGame {
 	public spawnLine() {
 		for (let block of this.blocks) {
 			block.y = block.y + this.cellSize
+			if (block.y >= (this.offsetY + (this.y-1)*this.cellSize) {
+				this.addScore(-42)
+			}
 		}
 
 		for (let x = 0; x < this.x; x++) {

@@ -464,6 +464,9 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
         spawnLine() {
             for (let block of this.blocks) {
                 block.y = block.y + this.cellSize;
+                if (block.y >= (this.offsetY + (this.y - 1) * this.cellSize)) {
+                    this.addScore(-42);
+                }
             }
             for (let x = 0; x < this.x; x++) {
                 this.createBlock({ x: x, y: 0 });
@@ -587,6 +590,12 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                 loop: true,
                 callback: this.tetris.moveDown,
                 callbackScope: this.tetris
+            });
+            this.time.addEvent({
+                delay: 40000,
+                loop: true,
+                callback: this.arcanoid.spawnLine,
+                callbackScope: this.arcanoid
             });
             this.time.timeScale = 1;
             console.log('Game Created', this.x, this.y);

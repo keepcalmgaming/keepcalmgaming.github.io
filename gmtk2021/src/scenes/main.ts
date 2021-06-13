@@ -121,6 +121,13 @@ export class MainScene extends Phaser.Scene {
             callbackScope: this.tetris
         })
 
+        this.time.addEvent({
+            delay: 40000,
+            loop: true,
+            callback: this.arcanoid.spawnLine,
+            callbackScope: this.arcanoid
+        })
+
         this.time.timeScale = 1;
 
         console.log('Game Created', this.x, this.y)
