@@ -1,11 +1,5 @@
 import { BaseGame } from './base_game'
-
-const TETRAMINOS = [
-	[[0, 0], [0, 1], [0, 2], [0, 3]], // palka
-	[[0, 0], [1, 0], [2, 0], [1, 1]], //T
-	[[0, 0], [0, 1], [1, 1], [1, 2]], //Z
-	[[1, 0], [1, 1], [0, 1], [0, 2]] //J
-]
+import { Tetramino, TGenerator } from './tetraminos'
 
 export class Tetris extends BaseGame {
 	private blocks?: Phaser.Physics.Arcade.Group
@@ -26,10 +20,13 @@ export class Tetris extends BaseGame {
 		}
 		this.movingBlocks.clear()
 
-		let tetramino = TETRAMINOS[Math.floor(Math.random() * TETRAMINOS.length)]
+		let tname = TGenerator.random()
+		let tetramino: Tetramino = TGenerator.get(tname)
+		let blocks = tetramino.b
+
 		let startX = Math.floor(Math.random() * (this.x - 2))
 
-		for (let point of tetramino) {
+		for (let point of blocks) {
 			let coords = this.getCellCenter({x: startX + point[0], y: point[1]})
 
 			let block = this.physics.add.image(coords.x, coords.y, 'block')

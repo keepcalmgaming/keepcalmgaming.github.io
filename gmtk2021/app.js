@@ -100,15 +100,51 @@ define("game/base_game", ["require", "exports"], function (require, exports) {
     }
     exports.BaseGame = BaseGame;
 });
-define("game/tetris", ["require", "exports", "game/base_game"], function (require, exports, base_game_1) {
+define("game/tetraminos", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const TETRAMINOS = [
-        [[0, 0], [0, 1], [0, 2], [0, 3]],
-        [[0, 0], [1, 0], [2, 0], [1, 1]],
-        [[0, 0], [0, 1], [1, 1], [1, 2]],
-        [[1, 0], [1, 1], [0, 1], [0, 2]] //J
-    ];
+    const TETRAMINOS = {
+        palka: {
+            b: [[0, 0], [0, 1], [0, 2], [0, 3]],
+            next: 'horpalka',
+            moveLeft: 2
+        },
+        // 'horpalka': {next: 'palka'},
+        t: {
+            b: [[0, 0], [1, 0], [2, 0], [1, 1]],
+            next: 't-r'
+        },
+        // 't-r': {next: 't-u'},
+        // 't-u': {next: 't-r'},
+        z: {
+            b: [[0, 0], [0, 1], [1, 1], [1, 2]],
+            next: 'horz'
+        },
+        // horz: { next: 'z'}
+        n: {
+            b: [[1, 0], [1, 1], [0, 1], [0, 2]],
+            next: 'horn'
+        },
+        // horn: { next: 'n' },
+        square: {
+            b: [[0, 0], [0, 1], [1, 0], [1, 1]],
+            next: 'square'
+        },
+    };
+    class TGenerator {
+        static get(name) {
+            return TETRAMINOS[name];
+        }
+        static random() {
+            let keys = Object.keys(TETRAMINOS);
+            return keys[keys.length * Math.random() << 0];
+        }
+    }
+    exports.TGenerator = TGenerator;
+});
+define("game/tetris", ["require", "exports", "game/base_game", "game/tetraminos"], function (require, exports, base_game_1, tetraminos_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     class Tetris extends base_game_1.BaseGame {
         constructor(config) {
             super(config);
@@ -122,9 +158,11 @@ define("game/tetris", ["require", "exports", "game/base_game"], function (requir
                 this.blocks.add(block);
             }
             this.movingBlocks.clear();
-            let tetramino = TETRAMINOS[Math.floor(Math.random() * TETRAMINOS.length)];
+            let tname = tetraminos_1.TGenerator.random();
+            let tetramino = tetraminos_1.TGenerator.get(tname);
+            let blocks = tetramino.b;
             let startX = Math.floor(Math.random() * (this.x - 2));
-            for (let point of tetramino) {
+            for (let point of blocks) {
                 let coords = this.getCellCenter({ x: startX + point[0], y: point[1] });
                 let block = this.physics.add.image(coords.x, coords.y, 'block');
                 block.setOrigin(0.5);
