@@ -249,6 +249,8 @@ export class MainScene extends Phaser.Scene {
         this.load.image('block', 'images/cell_full.png')
         this.load.image('ball', 'images/ball.png')
         this.load.image('bullet', 'images/bullet.png')
+        this.load.image('vertical_wall', 'images/vertical_wall.png')
+        this.load.image('horizontal_wall', 'images/horizontal_wall.png')
         // this.load.image('bullet', 'images/bullet2.png')
         // this.load.image('mainframe', 'images/mainframe.png')
         // this.load.image('monster', 'images/monster.png')

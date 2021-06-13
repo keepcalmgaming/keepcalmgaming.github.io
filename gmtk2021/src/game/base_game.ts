@@ -62,7 +62,7 @@ export class BaseGame {
 		return dim / sprite.width
 	}
 
-	private scaleSprite(sprite: Phaser.GameObjects.Sprite, dim: number) {
+	protected scaleSprite(sprite: Phaser.GameObjects.Sprite, dim: number) {
 		sprite.setScale(this.getScale(sprite, dim))
 	}
 

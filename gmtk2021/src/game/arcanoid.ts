@@ -15,7 +15,9 @@ export class Arcanoid extends BaseGame {
 		let platformOffsetX = this.offsetX + ((this.cellSize / 2) * 9);
 		let platformOffsetY = (this.offsetY + (this.cellSize * 18) - (this.cellSize / 2));
 
-		let platform = this.physics.add.image(platformOffsetX, platformOffsetY, 'block');
+		let platform = this.physics.add.image(platformOffsetX, platformOffsetY, 'block').setImmovable();
+		this.scaleSprite(platform, this.cellSize * 0.9)
+		this.physics.add.collider(platform, this.ball, this.platformHit)
 	    this.platform = platform
 
 		console.log('Arcanoid', this.config)
@@ -45,44 +47,49 @@ export class Arcanoid extends BaseGame {
 	}
 
 	public setupBall() {
-		this.ball = this.physics.add.image(this.offsetX + 100, this.offsetY + 100, 'ball');
-		this.ball.setScale(1);
+		let cellPosition = this.getCellCenter({x: 4, y: 16})
+		this.ball = this.physics.add.image(cellPosition.x, cellPosition.y, 'ball');
+		this.scaleSprite(this.ball, this.cellSize / 2);
 		this.ball.setCollideWorldBounds(false);
 		this.ball.setBounce(1);
 		this.ball.body.stopVelocityOnCollide = false;
-		this.ball.setVelocity(-200, -200)
+		this.ball.setVelocity(200, -200)
 	}
 
 	public setupWalls() {
-		let cellPosition = this.getCellCenter({x: -1, y: -1})
-		let cell = this.physics.add.image(cellPosition.x, cellPosition.y, 'block').setAlpha(0).setImmovable()
-		this.physics.add.collider(cell, this.ball, this.wallHit)
-		for (let i = 0; i < 12; i++) {
-			let cell2 = this.physics.add.image(cell.x + i * cell.height, cellPosition.y, 'block').setAlpha(0).setImmovable()
-			this.physics.add.collider(cell2, this.ball, this.wallHit)	
-		}
+		let alpha = 0
 
-		for (let i = 0; i < 22; i++) {
-			let cell2 = this.physics.add.image(cell.x, cellPosition.y + i * cell.height, 'block').setAlpha(0).setImmovable()
-			this.physics.add.collider(cell2, this.ball, this.wallHit)
-		}
-
-		cellPosition = this.getCellCenter({x: 10, y: -1})
-		cell = this.physics.add.image(cellPosition.x, cellPosition.y, 'block').setAlpha(0).setImmovable()
-		this.physics.add.collider(cell, this.ball, this.wallHit)
-		for (let i = 0; i < 22; i++) {
-			let cell2 = this.physics.add.image(cell.x, cellPosition.y + i * cell.height, 'block').setAlpha(0).setImmovable()
-			this.physics.add.collider(cell2, this.ball, this.wallHit)
-		}
-
-		cellPosition = this.getCellCenter({x: -1, y: 18})
-		cell = this.physics.add.image(cellPosition.x, cellPosition.y, 'block').setAlpha(0).setImmovable()
-		this.physics.add.collider(cell, this.ball, this.wallHit)
-		for (let i = 0; i < 12; i++) {
-			let cell2 = this.physics.add.image(cell.x + i * cell.height, cellPosition.y, 'block').setAlpha(0).setImmovable()
-			this.physics.add.collider(cell2, this.ball, this.wallHit)	
-		}
+		this.setupHorizontalWalls(alpha)
+		this.setupVerticalWalls(alpha)
 	}
+
+	public setupHorizontalWalls(alpha: number) {
+		let cellPosition = this.getCellCenter({x: 5, y: -1})
+		let wall = this.physics.add.image(cellPosition.x, cellPosition.y, 'horizontal_wall').setAlpha(alpha).setImmovable()
+		this.scaleSprite(wall, this.cellSize * 12)
+		this.physics.add.collider(wall, this.ball, this.wallHit)	
+
+		cellPosition = this.getCellCenter({x: 5, y: 18})
+		wall = this.physics.add.image(cellPosition.x, cellPosition.y, 'horizontal_wall').setAlpha(alpha).setImmovable()
+		this.scaleSprite(wall, this.cellSize * 12)
+		this.physics.add.collider(wall, this.ball, this.wallHit)	
+	}
+	
+	public setupVerticalWalls(alpha: number) {
+		let cellPosition = this.getCellCenter({x: -1, y: 9})
+		let wall = this.physics.add.image(cellPosition.x, cellPosition.y, 'vertical_wall').setAlpha(alpha).setImmovable()
+		this.scaleSprite(wall, this.cellSize)
+		this.physics.add.collider(wall, this.ball, this.wallHit)	
+
+		cellPosition = this.getCellCenter({x: 10, y: 9})
+		wall = this.physics.add.image(cellPosition.x, cellPosition.y, 'vertical_wall').setAlpha(alpha).setImmovable()
+		this.scaleSprite(wall, this.cellSize)
+		this.physics.add.collider(wall, this.ball, this.wallHit)	
+
+	}
+
+	platformHit(cell: Phaser.GameObjects.GameObject, ball: Phaser.GameObjects.GameObject) {
+   }
 
 	wallHit(cell: Phaser.GameObjects.GameObject, ball: Phaser.GameObjects.GameObject) {
     }
