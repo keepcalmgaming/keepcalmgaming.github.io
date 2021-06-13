@@ -681,47 +681,47 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                 }
             });
             let buttonScale = this.isVertical ? gameWidth / 10 : gameHeight / 20;
-            let sprite = this.physics.add.sprite(0, 0, 'button_left').setInteractive();
-            this.scaleSprite(sprite, buttonScale * 1.3);
-            sprite.setDepth(100);
-            sprite.x = buttonScale * 2;
-            sprite.y = this.isVertical ? gameHeight - buttonScale * 3 : halfHeight + buttonScale;
-            sprite.on('pointerdown', (pointer) => {
-                this.tetris.moveLeft();
-                this.arcanoid.moveLeft();
-            });
-            sprite = this.physics.add.sprite(0, 0, 'button_right').setInteractive();
-            this.scaleSprite(sprite, buttonScale * 1.3);
-            sprite.setDepth(100);
-            sprite.x = buttonScale * 4;
-            sprite.y = this.isVertical ? gameHeight - buttonScale * 3 : halfHeight + buttonScale;
-            sprite.body.x = sprite.body.x + 100;
-            sprite.on('pointerdown', (pointer) => {
-                this.tetris.moveRight();
-                this.arcanoid.moveRight();
-            });
-            sprite = this.physics.add.sprite(0, 0, 'button_down').setInteractive();
-            this.scaleSprite(sprite, buttonScale * 1.3);
-            sprite.setDepth(100);
-            sprite.x = buttonScale * 3;
-            sprite.y = this.isVertical ? gameHeight - buttonScale * 2 : halfHeight + buttonScale * 2;
-            sprite.on('pointerdown', (pointer) => {
-                this.time.timeScale = 15.5;
-                this.arcanoid.speedUp();
-            });
-            sprite.on('pointerup', (pointer) => {
-                this.time.timeScale = 1;
-                this.arcanoid.slowDown();
-            });
-            sprite = this.physics.add.sprite(0, 0, 'button_action').setInteractive();
-            this.scaleSprite(sprite, buttonScale * 1.5);
-            sprite.setDepth(100);
-            sprite.x = gameWidth - buttonScale * 2.5;
-            sprite.y = this.isVertical ? gameHeight - buttonScale * 2.5 : halfHeight + buttonScale;
-            sprite.on('pointerdown', (pointer) => {
-                this.tetris.rotate();
-                this.arcanoid.fire();
-            });
+            if (this.sys.game.device.os.desktop == false) {
+                let sprite = this.physics.add.sprite(0, 0, 'button_left').setInteractive();
+                this.scaleSprite(sprite, buttonScale);
+                sprite.setDepth(100);
+                sprite.x = buttonScale * 2;
+                sprite.y = this.isVertical ? gameHeight - buttonScale * 3 : halfHeight + buttonScale;
+                sprite.on('pointerdown', (pointer) => {
+                    this.tetris.moveLeft();
+                    this.arcanoid.moveLeft();
+                });
+                sprite = this.physics.add.sprite(0, 0, 'button_right').setInteractive();
+                this.scaleSprite(sprite, buttonScale);
+                sprite.setDepth(100);
+                sprite.x = buttonScale * 4;
+                sprite.y = this.isVertical ? gameHeight - buttonScale * 3 : halfHeight + buttonScale;
+                sprite.body.x = sprite.body.x + 100;
+                sprite.on('pointerdown', (pointer) => {
+                    this.tetris.moveRight();
+                    this.arcanoid.moveRight();
+                });
+                sprite = this.physics.add.sprite(0, 0, 'button_down').setInteractive();
+                this.scaleSprite(sprite, buttonScale);
+                sprite.setDepth(100);
+                sprite.x = buttonScale * 3;
+                sprite.y = this.isVertical ? gameHeight - buttonScale * 2 : halfHeight + buttonScale * 2;
+                sprite.on('pointerdown', (pointer) => {
+                    this.time.timeScale = 15.5;
+                });
+                sprite.on('pointerup', (pointer) => {
+                    this.time.timeScale = 1;
+                });
+                sprite = this.physics.add.sprite(0, 0, 'button_action').setInteractive();
+                this.scaleSprite(sprite, buttonScale * 1.5);
+                sprite.setDepth(100);
+                sprite.x = gameWidth - buttonScale * 2.5;
+                sprite.y = this.isVertical ? gameHeight - buttonScale * 2.5 : halfHeight + buttonScale;
+                sprite.on('pointerdown', (pointer) => {
+                    this.tetris.rotate();
+                    this.arcanoid.fire();
+                });
+            }
             if (debug) {
                 this.debugDrawGrid();
             }
