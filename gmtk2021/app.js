@@ -404,8 +404,7 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             this.isBallMoving = false;
             this.platformPosition = 3;
             console.log(this);
-            this.leftBullet = {};
-            this.rightBullet = {};
+            this.bullets = [];
             this.setupBall();
             this.setupPlatform();
             this.setupWalls();
@@ -442,17 +441,25 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
                 this.isBallMoving = true;
             }
             let leftBulletCellPosition = this.getCellCenter({ x: this.platformPosition - 1, y: 17 });
-            this.leftBullet = this.physics.add.image(leftBulletCellPosition.x, leftBulletCellPosition.y, 'bullet');
+            let leftBullet = this.physics.add.image(leftBulletCellPosition.x, leftBulletCellPosition.y, 'bullet');
             let rightBulletCellPosition = this.getCellCenter({ x: this.platformPosition + 2, y: 17 });
-            this.rightBullet = this.physics.add.image(rightBulletCellPosition.x, rightBulletCellPosition.y, 'bullet');
+            let rightBullet = this.physics.add.image(rightBulletCellPosition.x, rightBulletCellPosition.y, 'bullet');
             for (let block of this.blocks) {
-                this.physics.add.collider(block, this.leftBullet, this.onBulletBlock, null, this);
-                this.physics.add.collider(block, this.rightBullet, this.onBulletBlock, null, this);
+                this.physics.add.collider(block, leftBullet, this.onBulletBlock, null, this);
+                this.physics.add.collider(block, rightBullet, this.onBulletBlock, null, this);
             }
+            this.bullets.push(leftBullet, rightBullet);
         }
         moveBullet() {
-            this.leftBullet.y -= this.cellSize;
-            this.rightBullet.y -= this.cellSize;
+            let firstRowY = this.getCellCenter({ x: this.platformPosition, y: 1 });
+            for (let bullet of this.bullets) {
+                if (bullet.y > firstRowY.y) {
+                    bullet.y -= this.cellSize;
+                }
+                else {
+                    bullet.destroy();
+                }
+            }
         }
         setupPlatform() {
             let cellPosition = this.getCellCenter({ x: this.platformPosition, y: 17 });
