@@ -133,6 +133,11 @@ export class MainScene extends Phaser.Scene {
                 this.arcanoid.moveRight()
             }
 
+            if ([Phaser.Input.Keyboard.KeyCodes.UP, Phaser.Input.Keyboard.KeyCodes.W, Phaser.Input.Keyboard.KeyCodes.SPACE].includes(event.keyCode)) {
+                event.stopPropagation()
+                this.tetris.rotate()
+            }
+
             if ([Phaser.Input.Keyboard.KeyCodes.DOWN, Phaser.Input.Keyboard.KeyCodes.S].includes(event.keyCode)) {
                 event.stopPropagation()
                 this.time.timeScale = 15.5

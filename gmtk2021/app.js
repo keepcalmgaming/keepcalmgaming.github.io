@@ -107,26 +107,44 @@ define("game/tetraminos", ["require", "exports"], function (require, exports) {
     const TETRAMINOS = {
         palka: {
             b: [[0, 0], [0, 1], [0, 2], [0, 3]],
-            next: 'horpalka',
-            moveLeft: 2
+            next: 'horpalka'
         },
-        // 'horpalka': {next: 'palka'},
+        horpalka: {
+            b: [[0, 0], [1, 0], [2, 0], [3, 0]],
+            next: 'palka'
+        },
         t: {
             b: [[0, 0], [1, 0], [2, 0], [1, 1]],
-            next: 't-r'
+            next: 'tr'
         },
-        // 't-r': {next: 't-u'},
-        // 't-u': {next: 't-r'},
+        tr: {
+            b: [[0, 0], [0, 1], [1, 1], [0, 2]],
+            next: 'tu'
+        },
+        tu: {
+            b: [[0, 1], [1, 0], [1, 1], [2, 1]],
+            next: 'tl'
+        },
+        tl: {
+            b: [[1, 0], [1, 1], [0, 1], [1, 2]],
+            next: 't'
+        },
         z: {
             b: [[0, 0], [0, 1], [1, 1], [1, 2]],
             next: 'horz'
         },
-        // horz: { next: 'z'}
+        horz: {
+            b: [[0, 1], [1, 1], [1, 0], [2, 0]],
+            next: 'z'
+        },
         n: {
             b: [[1, 0], [1, 1], [0, 1], [0, 2]],
             next: 'horn'
         },
-        // horn: { next: 'n' },
+        horn: {
+            b: [[0, 0], [1, 0], [1, 1], [2, 1]],
+            next: 'n'
+        },
         square: {
             b: [[0, 0], [0, 1], [1, 0], [1, 1]],
             next: 'square'
@@ -135,6 +153,13 @@ define("game/tetraminos", ["require", "exports"], function (require, exports) {
     class TGenerator {
         static get(name) {
             return TETRAMINOS[name];
+        }
+        static next(name) {
+            if (TETRAMINOS[name] == undefined) {
+                console.error('next tetramino not found', name);
+                return undefined;
+            }
+            return TETRAMINOS[name].next;
         }
         static random() {
             let keys = Object.keys(TETRAMINOS);
@@ -150,6 +175,9 @@ define("game/tetris", ["require", "exports", "game/base_game", "game/tetraminos"
         constructor(config) {
             super(config);
             this.scoreFullLine = 100;
+            this.tx = 0;
+            this.ty = 0;
+            this.tname = 'none';
             this.blocks = this.physics.add.group();
             this.movingBlocks = this.physics.add.group();
             console.log('Tetris', this.config);
@@ -160,16 +188,62 @@ define("game/tetris", ["require", "exports", "game/base_game", "game/tetraminos"
                 this.blocks.add(block);
             }
             this.movingBlocks.clear();
-            let tname = tetraminos_1.TGenerator.random();
-            let tetramino = tetraminos_1.TGenerator.get(tname);
+            this.tname = tetraminos_1.TGenerator.random();
+            let tetramino = tetraminos_1.TGenerator.get(this.tname);
             let blocks = tetramino.b;
-            let startX = Math.floor(Math.random() * (this.x - 2));
+            this.tx = Math.floor(Math.random() * (this.x - 3));
+            this.ty = 0;
             for (let point of blocks) {
-                let coords = this.getCellCenter({ x: startX + point[0], y: point[1] });
+                let pos = { x: this.tx + point[0], y: point[1] };
+                let coords = this.getCellCenter(pos);
                 let block = this.physics.add.image(coords.x, coords.y, 'block');
                 block.setOrigin(0.5);
                 this.scaleSprite(block, this.cellSize * 0.9);
                 this.movingBlocks.add(block);
+            }
+        }
+        getAdjustment(blocks) {
+            let shiftX = 0;
+            let shiftY = 0;
+            for (let block of blocks) {
+                if ((this.tx + block[0]) >= this.x) {
+                    let diff = this.x - (this.tx + block[0] + 1);
+                    if (diff < shiftX) {
+                        shiftX = diff;
+                    }
+                }
+            }
+            return { shiftX, shiftY };
+        }
+        canSpawn(blocks, a) {
+            // for (let block of blocks) {
+            // 	if (this.isPositionFull({x: this.tx + block[0] + a.shiftX, y: this.ty + block[1] + y.shiftY})) {
+            // 		return false
+            // 	}
+            // }
+            return true;
+        }
+        rotate() {
+            let next = tetraminos_1.TGenerator.next(this.tname);
+            let nextT = tetraminos_1.TGenerator.get(next);
+            if (nextT === undefined) {
+                return;
+            }
+            let adjustment = this.getAdjustment(nextT.b);
+            if (this.canSpawn(nextT.b, adjustment)) {
+                this.tx += adjustment.shiftX;
+                this.ty += adjustment.shiftY;
+                this.tname = next;
+                this.movingBlocks.destroy(true);
+                this.movingBlocks = this.physics.add.group();
+                for (let point of nextT.b) {
+                    let pos = { x: this.tx + point[0], y: this.ty + point[1] };
+                    let coords = this.getCellCenter(pos);
+                    let block = this.physics.add.image(coords.x, coords.y, 'block');
+                    block.setOrigin(0.5);
+                    this.scaleSprite(block, this.cellSize * 0.9);
+                    this.movingBlocks.add(block);
+                }
             }
         }
         moveLeft() {
@@ -184,6 +258,7 @@ define("game/tetris", ["require", "exports", "game/base_game", "game/tetraminos"
             for (let block of this.movingBlocks.getChildren()) {
                 block.x = block.x - this.cellSize;
             }
+            this.tx -= 1;
             this.checkFullLines();
         }
         moveRight() {
@@ -199,6 +274,7 @@ define("game/tetris", ["require", "exports", "game/base_game", "game/tetraminos"
             for (let block of this.movingBlocks.getChildren()) {
                 block.x = block.x + this.cellSize;
             }
+            this.tx += 1;
             this.checkFullLines();
         }
         moveDown() {
@@ -220,6 +296,7 @@ define("game/tetris", ["require", "exports", "game/base_game", "game/tetraminos"
             for (let block of this.movingBlocks.getChildren()) {
                 block.y = block.y + this.cellSize;
             }
+            this.ty += 1;
             this.checkFullLines();
         }
         checkFullLines() {
@@ -426,6 +503,10 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                     event.stopPropagation();
                     this.tetris.moveRight();
                     this.arcanoid.moveRight();
+                }
+                if ([Phaser.Input.Keyboard.KeyCodes.UP, Phaser.Input.Keyboard.KeyCodes.W, Phaser.Input.Keyboard.KeyCodes.SPACE].includes(event.keyCode)) {
+                    event.stopPropagation();
+                    this.tetris.rotate();
                 }
                 if ([Phaser.Input.Keyboard.KeyCodes.DOWN, Phaser.Input.Keyboard.KeyCodes.S].includes(event.keyCode)) {
                     event.stopPropagation();

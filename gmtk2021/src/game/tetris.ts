@@ -1,10 +1,18 @@
 import { BaseGame } from './base_game'
 import { Tetramino, TGenerator } from './tetraminos'
 
+type Adjustment = {
+	shiftX: number,
+	shiftY: number
+}
+
 export class Tetris extends BaseGame {
 	private blocks?: Phaser.Physics.Arcade.Group
 
 	private let scoreFullLine: number = 100
+	private tx: number = 0
+	private ty: number = 0
+	private tname: string = 'none'
 
 	constructor(config: any) {
 		super(config)
@@ -13,7 +21,6 @@ export class Tetris extends BaseGame {
 		console.log('Tetris', this.config)
 
 		this.spawnFigure()
-
 	}
 
 	private spawnFigure() {
@@ -22,19 +29,72 @@ export class Tetris extends BaseGame {
 		}
 		this.movingBlocks.clear()
 
-		let tname = TGenerator.random()
-		let tetramino: Tetramino = TGenerator.get(tname)
+		this.tname = TGenerator.random()
+		let tetramino: Tetramino = TGenerator.get(this.tname)
 		let blocks = tetramino.b
 
-		let startX = Math.floor(Math.random() * (this.x - 2))
+		this.tx = Math.floor(Math.random() * (this.x - 3))
+		this.ty = 0
 
 		for (let point of blocks) {
-			let coords = this.getCellCenter({x: startX + point[0], y: point[1]})
+			let pos = {x: this.tx + point[0], y: point[1]}
+			let coords = this.getCellCenter(pos)
 
 			let block = this.physics.add.image(coords.x, coords.y, 'block')
 			block.setOrigin(0.5)
 			this.scaleSprite(block, this.cellSize * 0.9)
 			this.movingBlocks.add(block)
+		}
+	}
+
+	private getAdjustment(blocks): Adjustment {
+		let shiftX = 0
+		let shiftY = 0
+		for (let block of blocks) {
+			if ((this.tx + block[0]) >= this.x) {
+				let diff = this.x - (this.tx + block[0] + 1)
+				if (diff < shiftX) {
+					shiftX = diff
+				}
+			}
+		}
+
+		return {shiftX, shiftY}
+	}
+
+	private canSpawn(blocks, a: Adjustment): boolean {
+		// for (let block of blocks) {
+		// 	if (this.isPositionFull({x: this.tx + block[0] + a.shiftX, y: this.ty + block[1] + y.shiftY})) {
+		// 		return false
+		// 	}
+		// }
+		return true
+	}
+
+	public rotate() {
+		let next = TGenerator.next(this.tname)
+		let nextT = TGenerator.get(next)
+
+		if (nextT === undefined) { return }
+
+		let adjustment = this.getAdjustment(nextT.b)
+		if (this.canSpawn(nextT.b, adjustment)) {
+			this.tx += adjustment.shiftX
+			this.ty += adjustment.shiftY
+			this.tname = next
+
+			this.movingBlocks.destroy(true)
+			this.movingBlocks = this.physics.add.group()
+
+			for (let point of nextT.b) {
+				let pos = {x: this.tx + point[0], y: this.ty + point[1]}
+				let coords = this.getCellCenter(pos)
+
+				let block = this.physics.add.image(coords.x, coords.y, 'block')
+				block.setOrigin(0.5)
+				this.scaleSprite(block, this.cellSize * 0.9)
+				this.movingBlocks.add(block)
+			}
 		}
 	}
 
@@ -52,6 +112,7 @@ export class Tetris extends BaseGame {
 		for (let block of this.movingBlocks.getChildren()) {
 			block.x = block.x - this.cellSize
 		}
+		this.tx -= 1
 
 		this.checkFullLines()
 	}
@@ -71,6 +132,7 @@ export class Tetris extends BaseGame {
 		for (let block of this.movingBlocks.getChildren()) {
 			block.x = block.x + this.cellSize
 		}
+		this.tx += 1
 
 		this.checkFullLines()
 	}
@@ -96,6 +158,7 @@ export class Tetris extends BaseGame {
 		for (let block of this.movingBlocks.getChildren()) {
 			block.y = block.y + this.cellSize
 		}
+		this.ty += 1
 
 		this.checkFullLines()
 	}
