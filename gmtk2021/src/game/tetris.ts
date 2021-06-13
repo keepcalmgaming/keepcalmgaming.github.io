@@ -96,6 +96,22 @@ export class Tetris extends BaseGame {
 		}
 	}
 
+	public spawnStupidLine() {
+		for (let block of this.blocks.getChildren()) {
+			block.y = block.y - this.cellSize
+			if (block.y <= (this.offsetY + this.cellSize)) {
+				this.addScore(-42)
+			}
+		}
+
+		for (let x = 0; x<this.x; x++) {
+			if (Math.random() > 0.5) {
+				let block = this.spawnBlock({x: x, y: this.y - 1})
+				this.blocks.add(block)
+			}
+		}
+	}
+
 	public moveLeft() {
 		for (let block of this.movingBlocks.getChildren()) {
 			if (this.getSpritePosition(block).x <= 0) {

@@ -293,6 +293,20 @@ define("game/tetris", ["require", "exports", "game/base_game", "game/tetraminos"
                 console.log('cannot rotate');
             }
         }
+        spawnStupidLine() {
+            for (let block of this.blocks.getChildren()) {
+                block.y = block.y - this.cellSize;
+                if (block.y <= (this.offsetY + this.cellSize)) {
+                    this.addScore(-42);
+                }
+            }
+            for (let x = 0; x < this.x; x++) {
+                if (Math.random() > 0.5) {
+                    let block = this.spawnBlock({ x: x, y: this.y - 1 });
+                    this.blocks.add(block);
+                }
+            }
+        }
         moveLeft() {
             for (let block of this.movingBlocks.getChildren()) {
                 if (this.getSpritePosition(block).x <= 0) {
@@ -387,6 +401,7 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
     class Arcanoid extends base_game_2.BaseGame {
         constructor(config) {
             super(config);
+            this.isFloorTouched = true;
             this.platformPosition = 3;
             console.log(this);
             this.setupBall();
@@ -412,6 +427,11 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             this.platformPosition++;
             this.platform.x += this.cellSize;
         }
+        fire() {
+            if (this.isFloorTouched) {
+                this.ball.setVelocity(this.cellSize * 5, -(this.cellSize * 5));
+            }
+        }
         setupPlatform() {
             let cellPosition = this.getCellCenter({ x: this.platformPosition, y: 17 });
             let platform = this.physics.add.image(cellPosition.x + this.cellSize / 2, cellPosition.y, 'platform').setImmovable();
@@ -424,6 +444,7 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             let cellPosition = this.getCellCenter({ x: 4, y: 16 });
             this.ball = this.physics.add.image(cellPosition.x, cellPosition.y, 'ball');
             this.ball.setCircle();
+            this.ball.setOrigin(0.5);
             this.scaleSprite(this.ball, this.cellSize / 2);
             this.ball.setCollideWorldBounds(false);
             this.ball.setBounce(1);
@@ -485,7 +506,7 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             cellPosition = this.getCellCenter({ x: 5, y: 18 });
             wall = this.physics.add.image(cellPosition.x, cellPosition.y, 'horizontal_wall').setAlpha(alpha).setImmovable();
             this.scaleSprite(wall, this.cellSize * 12);
-            this.physics.add.collider(wall, this.ball, this.wallHit);
+            this.physics.add.collider(wall, this.ball, this.floorHit.bind(this));
         }
         setupVerticalWalls(alpha) {
             let cellPosition = this.getCellCenter({ x: -1, y: 9 });
@@ -503,6 +524,16 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
                 ball.body.velocity.x *= -1;
                 ball.body.velocity.y *= -1;
             }
+        }
+        floorHit(cell, ball) {
+            this.isFloorTouched = true;
+            // ball.destroy()
+            // this.setupBall()
+            let cellPosition = this.getCellCenter({ x: 4, y: 16 });
+            ball.x = cellPosition.x;
+            ball.y = cellPosition.y;
+            ball.setOrigin(0.5);
+            ball.setVelocity(0, 0);
         }
         platformHit(cell, ball) {
         }
@@ -545,13 +576,14 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
         addScore(i) {
             if (i == -42) {
                 this.scene.stop('main');
-                if (this.score > window.HIGHSCORE) {
-                    window.HIGHSCORE = this.score;
-                }
                 this.scene.start('endgame');
             }
             this.score += i;
             this.textScore.text = this.score;
+            if (this.score > window.HIGHSCORE) {
+                window.HIGHSCORE = this.score;
+                this.textHigh.text = window.HIGHSCORE;
+            }
             if (i > 42) {
                 this.arcanoid.spawnLine();
             }
@@ -592,10 +624,16 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                 callbackScope: this.tetris
             });
             this.time.addEvent({
-                delay: 40000,
+                delay: 100000,
                 loop: true,
                 callback: this.arcanoid.spawnLine,
                 callbackScope: this.arcanoid
+            });
+            this.time.addEvent({
+                delay: 100000,
+                loop: true,
+                callback: this.tetris.spawnStupidLine,
+                callbackScope: this.tetris
             });
             this.time.timeScale = 1;
             console.log('Game Created', this.x, this.y);
@@ -615,6 +653,7 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                     event.preventDefault();
                     event.stopPropagation();
                     this.tetris.rotate();
+                    this.arcanoid.fire();
                 }
                 if ([Phaser.Input.Keyboard.KeyCodes.DOWN, Phaser.Input.Keyboard.KeyCodes.S].includes(event.keyCode)) {
                     event.preventDefault();
@@ -668,6 +707,7 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             sprite.y = this.isVertical ? gameHeight - buttonScale * 2.5 : halfHeight + buttonScale;
             sprite.on('pointerdown', (pointer) => {
                 this.tetris.rotate();
+                this.arcanoid.fire();
             });
             if (debug) {
                 this.debugDrawGrid();
@@ -682,6 +722,8 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
         setupText() {
             this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 3, 'gamefont', 'SCORE', this.cellSize / 2);
             this.textScore = this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 4, 'gamefont', '0', this.cellSize / 2);
+            this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 6, 'gamefont', 'HIGH', this.cellSize / 2);
+            this.textHigh = this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 7, 'gamefont', window.HIGHSCORE, this.cellSize / 2);
         }
         getScale(sprite, dim) {
             return dim / sprite.width;

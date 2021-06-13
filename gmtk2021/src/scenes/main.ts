@@ -36,6 +36,7 @@ export class MainScene extends Phaser.Scene {
     private score: number = 0
 
     public textScore?: Phaser.GameObjects.BitmapText
+    public textHigh?: Phaser.GameObjects.BitmapText
 
     constructor(
         sceneConfig: object
@@ -63,14 +64,16 @@ export class MainScene extends Phaser.Scene {
     addScore(i: number) {
         if (i == -42) {
             this.scene.stop('main')
-            if (this.score > window.HIGHSCORE) {
-                window.HIGHSCORE = this.score
-            }
             this.scene.start('endgame')
         }
 
         this.score += i
         this.textScore.text = this.score
+
+        if (this.score > window.HIGHSCORE) {
+            window.HIGHSCORE = this.score
+            this.textHigh.text = window.HIGHSCORE
+        }
 
         if (i > 42) {
             this.arcanoid.spawnLine()
@@ -122,10 +125,16 @@ export class MainScene extends Phaser.Scene {
         })
 
         this.time.addEvent({
-            delay: 40000,
+            delay: 100000,
             loop: true,
             callback: this.arcanoid.spawnLine,
             callbackScope: this.arcanoid
+        })
+        this.time.addEvent({
+            delay: 100000,
+            loop: true,
+            callback: this.tetris.spawnStupidLine,
+            callbackScope: this.tetris
         })
 
         this.time.timeScale = 1;
@@ -230,6 +239,9 @@ export class MainScene extends Phaser.Scene {
     setupText() {
         this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 3, 'gamefont', 'SCORE', this.cellSize /2)
         this.textScore = this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 4, 'gamefont', '0', this.cellSize /2)
+
+        this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 6, 'gamefont', 'HIGH', this.cellSize /2)
+        this.textHigh = this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 7, 'gamefont', window.HIGHSCORE, this.cellSize /2)
     }
 
     getScale(sprite: Phaser.GameObjects.Sprite, dim: number) {
