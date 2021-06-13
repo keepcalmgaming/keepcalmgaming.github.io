@@ -30,6 +30,8 @@ export class MainScene extends Phaser.Scene {
     private x: number
     private y: number
 
+    private particles: any
+
     private tetris: Tetris
     private arcanoid: Arcanoid
 
@@ -62,9 +64,25 @@ export class MainScene extends Phaser.Scene {
     private music?: Phaser.Sound.BaseSound
 
     addScore(i: number) {
+        if (i == -84) {
+            let emitter = this.particles.createEmitter({
+                x: this.arcanoid.ball.x,
+                y: this.arcanoid.ball.y,
+                speed: 100,
+                blendMode: 'ADD',
+                lifespan: 800,
+                frames: 10
+            });
+            emitter.explode()
+            this.tetris.spawnStupidLine()
+
+            return
+        }
+
         if (i == -42) {
             this.scene.stop('main')
             this.scene.start('endgame')
+            return
         }
 
         this.score += i
@@ -94,6 +112,8 @@ export class MainScene extends Phaser.Scene {
         // this.music.play()
 
         this.score = 0
+
+        this.particles = this.add.particles('particle');
 
         this.tetris = new Tetris({
             cellSize: this.cellSize,
@@ -201,7 +221,7 @@ export class MainScene extends Phaser.Scene {
         })
 
         sprite = this.physics.add.sprite(0, 0, 'button_down').setInteractive()
-        this.scaleSprite(sprite, buttonScale * 0.85)
+        this.scaleSprite(sprite, buttonScale)
         sprite.setDepth(100)
         sprite.x = buttonScale * 3
         sprite.y = this.isVertical ? gameHeight - buttonScale * 2 : halfHeight + buttonScale*2
@@ -264,6 +284,7 @@ export class MainScene extends Phaser.Scene {
         this.load.image('button_down', 'images/button_down.png')
         this.load.image('button_action', 'images/action_button.png')
         this.load.image('platform', 'images/platform.png')
+        this.load.image('particle', 'images/particle.png')
 
         this.load.bitmapFont('gamefont', 'font/gamefont.png', 'font/gamefont.fnt');
     }

@@ -528,6 +528,7 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
         }
         floorHit(cell, ball) {
             this.isFloorTouched = true;
+            this.addScore(-84);
             // ball.destroy()
             // this.setupBall()
             let cellPosition = this.getCellCenter({ x: 4, y: 16 });
@@ -575,9 +576,23 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             }
         }
         addScore(i) {
+            if (i == -84) {
+                let emitter = this.particles.createEmitter({
+                    x: this.arcanoid.ball.x,
+                    y: this.arcanoid.ball.y,
+                    speed: 100,
+                    blendMode: 'ADD',
+                    lifespan: 800,
+                    frames: 10
+                });
+                emitter.explode();
+                this.tetris.spawnStupidLine();
+                return;
+            }
             if (i == -42) {
                 this.scene.stop('main');
                 this.scene.start('endgame');
+                return;
             }
             this.score += i;
             this.textScore.text = this.score;
@@ -598,6 +613,7 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             // this.music = this.sound.add('music')
             // this.music.play()
             this.score = 0;
+            this.particles = this.add.particles('particle');
             this.tetris = new tetris_1.Tetris({
                 cellSize: this.cellSize,
                 x: this.x,
@@ -691,7 +707,7 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                 this.arcanoid.moveRight();
             });
             sprite = this.physics.add.sprite(0, 0, 'button_down').setInteractive();
-            this.scaleSprite(sprite, buttonScale * 0.85);
+            this.scaleSprite(sprite, buttonScale);
             sprite.setDepth(100);
             sprite.x = buttonScale * 3;
             sprite.y = this.isVertical ? gameHeight - buttonScale * 2 : halfHeight + buttonScale * 2;
@@ -744,6 +760,7 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             this.load.image('button_down', 'images/button_down.png');
             this.load.image('button_action', 'images/action_button.png');
             this.load.image('platform', 'images/platform.png');
+            this.load.image('particle', 'images/particle.png');
             this.load.bitmapFont('gamefont', 'font/gamefont.png', 'font/gamefont.fnt');
         }
         debugDrawGrid() {
@@ -802,7 +819,7 @@ define("scenes/endgame", ["require", "exports"], function (require, exports) {
     }
     exports.EndgameScene = EndgameScene;
 });
-define("app", ["require", "exports", "scenes/main", "scenes/endgame"], function (require, exports, main_1, endgame_1) {
+define("app", ["require", "exports", "scenes/greeting", "scenes/main", "scenes/endgame"], function (require, exports, greeting_1, main_1, endgame_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const gameHeight = window.innerHeight;
@@ -817,8 +834,7 @@ define("app", ["require", "exports", "scenes/main", "scenes/endgame"], function 
                 debug: false
             }
         },
-        scene: [main_1.MainScene, endgame_1.EndgameScene]
-        // scene: [ GreetingScene, MainScene, EndgameScene ]
+        scene: [greeting_1.GreetingScene, main_1.MainScene, endgame_1.EndgameScene]
     };
     class App {
         constructor() {

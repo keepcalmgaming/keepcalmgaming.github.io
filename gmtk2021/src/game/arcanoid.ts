@@ -164,6 +164,8 @@ export class Arcanoid extends BaseGame {
 	floorHit(cell: Phaser.GameObjects.GameObject, ball: Phaser.GameObjects.GameObject) {
 		this.isFloorTouched = true;
 
+		this.addScore(-84)
+
 		// ball.destroy()
 
 		// this.setupBall()
