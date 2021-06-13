@@ -13,7 +13,7 @@ define("scenes/greeting", ["require", "exports"], function (require, exports) {
             var content = [
                 "Two games, one win",
                 "",
-                "Topic of GMTK Game Jam 2020 is “JOINED TOGETHER”.",
+                "Topic of GMTK Game Jam 2021 is “JOINED TOGETHER”.",
                 "Here's our small game about Tetris and Arcanoid.",
                 "Use keyboard or on-screen controls to play.",
                 "",
@@ -37,14 +37,16 @@ define("scenes/greeting", ["require", "exports"], function (require, exports) {
                 window.SaveState = {};
             }
             this.input.on('pointerdown', () => {
-                if (!clicked || true) {
+                if (!clicked) {
+                    console.log('greeting pointerdown');
                     this.scene.switch('main');
                     clicked = true;
                 }
             });
             this.input.keyboard.on('keydown', (event) => {
                 event.preventDefault();
-                if (!clicked || true) {
+                if (!clicked) {
+                    console.log('greeting keydown');
                     this.scene.switch('main');
                     clicked = true;
                 }
@@ -712,6 +714,11 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                     this.time.timeScale = 15.5;
                     this.arcanoid.speedUp();
                 }
+                if ([Phaser.Input.Keyboard.KeyCodes.M].includes(event.keyCode)) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this.game.sound.mute = !this.game.sound.mute;
+                }
             });
             this.input.keyboard.on('keyup', (event) => {
                 if ([Phaser.Input.Keyboard.KeyCodes.DOWN, Phaser.Input.Keyboard.KeyCodes.S].includes(event.keyCode)) {
@@ -777,6 +784,20 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             this.textScore = this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 4, 'gamefont', '0', this.cellSize / 2);
             this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 6, 'gamefont', 'HIGH', this.cellSize / 2);
             this.textHigh = this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 7, 'gamefont', window.HIGHSCORE, this.cellSize / 2);
+            // let sprite = this.physics.add.sprite(0, 0, 'particle')
+            // sprite.setOrigin(0.5)
+            // this.scaleSprite(sprite, this.cellSize/3)
+            // sprite.setDepth(100)
+            // sprite.x = halfWidth - this.cellSize*0.75
+            // sprite.y = this.cellSize * 17
+            // sprite = this.physics.add.sprite(0, 0, 'particle')
+            // sprite.setOrigin(0.5)
+            // this.scaleSprite(sprite, this.cellSize/3)
+            // sprite.setDepth(100)
+            // sprite.x = halfWidth + this.cellSize*0.5
+            // sprite.y = this.cellSize * 17
+            this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 18, 'gamefont', "M TO", this.cellSize / 2);
+            this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 19, 'gamefont', "MUTE", this.cellSize / 2);
             // let sprite = this.physics.add.sprite(0, 0, 'button_sound').setInteractive()
             // sprite.setOrigin(0.5)
             // this.scaleSprite(sprite, this.cellSize*2)

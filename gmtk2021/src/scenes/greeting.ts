@@ -15,7 +15,7 @@ export class GreetingScene extends Phaser.Scene {
         var content = [
             "Two games, one win",
             "",
-            "Topic of GMTK Game Jam 2020 is “JOINED TOGETHER”.",
+            "Topic of GMTK Game Jam 2021 is “JOINED TOGETHER”.",
             "Here's our small game about Tetris and Arcanoid.",
             "Use keyboard or on-screen controls to play.",
             "",
@@ -45,7 +45,8 @@ export class GreetingScene extends Phaser.Scene {
         }
 
         this.input.on('pointerdown', () => {
-            if (!clicked || true) {
+            if (!clicked) {
+              console.log('greeting pointerdown')
               this.scene.switch('main')
               clicked = true
             }
@@ -53,7 +54,8 @@ export class GreetingScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown', (event: any) => {
             event.preventDefault()
-            if (!clicked || true) {
+            if (!clicked) {
+              console.log('greeting keydown')
               this.scene.switch('main')
               clicked = true
             }

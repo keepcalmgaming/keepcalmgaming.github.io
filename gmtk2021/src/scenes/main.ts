@@ -188,6 +188,12 @@ export class MainScene extends Phaser.Scene {
                 this.time.timeScale = 15.5
                 this.arcanoid.speedUp();
             }
+
+            if ([Phaser.Input.Keyboard.KeyCodes.M].includes(event.keyCode)) {
+                event.preventDefault()
+                event.stopPropagation()
+                this.game.sound.mute = !this.game.sound.mute
+            }
         });
 
         this.input.keyboard.on('keyup', (event: any) => {
@@ -265,6 +271,23 @@ export class MainScene extends Phaser.Scene {
         this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 6, 'gamefont', 'HIGH', this.cellSize /2)
         this.textHigh = this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 7, 'gamefont', window.HIGHSCORE, this.cellSize /2)
 
+
+        // let sprite = this.physics.add.sprite(0, 0, 'particle')
+        // sprite.setOrigin(0.5)
+        // this.scaleSprite(sprite, this.cellSize/3)
+        // sprite.setDepth(100)
+        // sprite.x = halfWidth - this.cellSize*0.75
+        // sprite.y = this.cellSize * 17
+
+        // sprite = this.physics.add.sprite(0, 0, 'particle')
+        // sprite.setOrigin(0.5)
+        // this.scaleSprite(sprite, this.cellSize/3)
+        // sprite.setDepth(100)
+        // sprite.x = halfWidth + this.cellSize*0.5
+        // sprite.y = this.cellSize * 17
+
+        this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 18, 'gamefont', "M TO", this.cellSize /2)
+        this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 19, 'gamefont', "MUTE", this.cellSize /2)
         // let sprite = this.physics.add.sprite(0, 0, 'button_sound').setInteractive()
         // sprite.setOrigin(0.5)
         // this.scaleSprite(sprite, this.cellSize*2)
