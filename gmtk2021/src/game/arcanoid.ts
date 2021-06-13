@@ -1,17 +1,8 @@
 import { BaseGame } from './base_game'
 
-const START_BLOCKS = [
-	{x: 0, y: 1},
-	{x: 0, y: 5},
-	{x: 3, y: 1},
-	{x: 2, y: 2},
-	{x: 8, y: 2},
-]
-
-
 export class Arcanoid extends BaseGame {
 	private ball: any
-	private blocks?: Phaser.Physics.Arcade.Group
+	private blocks
 
 	private platformPosition: number = 3
 
@@ -70,18 +61,41 @@ export class Arcanoid extends BaseGame {
 		this.ball.setVelocity(200, -200)
 	}
 
+	private createBlock(pos) {
+		let cellPosition = this.getCellCenter(pos)
+		let block = this.physics.add.image(cellPosition.x, cellPosition.y, 'block').setAlpha(100).setImmovable()
+		this.scaleSprite(block, this.cellSize * 0.9)
+		this.physics.add.collider(block, this.ball, this.onBallBlock, null, this)	
+		this.blocks.push(block)
+	}
+
 	private setupBlocks() {
-		for (let pos of START_BLOCKS) {
-			let cellPosition = this.getCellCenter(pos)
-			let block = this.physics.add.image(cellPosition.x, cellPosition.y, 'block').setAlpha(100).setImmovable()
-			this.physics.add.collider(block, this.ball, this.onBallBlock, null, this)	
+		this.blocks = []
+		const FULL_LINES = 5
+		for (let x = 0; x < this.x; x++) {
+			for (let y = 0; y < FULL_LINES; y++) {
+				this.createBlock({x: x, y: y})
+			}
 		}
 	}
 
 	private onBallBlock(block, ball) {
 		console.log('ball hit')
 		this.addScore(10)
+		//js delete from array
+		let i = this.blocks.indexOf(block)
+		this.blocks.splice(i, 1)
 		block.destroy()
+	}
+
+	public spawnLine() {
+		for (let block of this.blocks) {
+			block.y = block.y + this.cellSize
+		}
+
+		for (let x = 0; x < this.x; x++) {
+			this.createBlock({x: x, y: 0})
+		}
 	}
 
 	public setupWalls() {

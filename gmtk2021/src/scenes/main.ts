@@ -73,6 +73,10 @@ export class MainScene extends Phaser.Scene {
     addScore(i: number) {
         this.score += i
         this.textScore.text = this.score
+
+        if (i > 42) {
+            this.arcanoid.spawnLine()
+        }
         console.log('score is ', this.score)
     }
 

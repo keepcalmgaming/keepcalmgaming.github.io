@@ -373,16 +373,10 @@ define("game/tetris", ["require", "exports", "game/base_game", "game/tetraminos"
 define("game/arcanoid", ["require", "exports", "game/base_game"], function (require, exports, base_game_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const START_BLOCKS = [
-        { x: 0, y: 1 },
-        { x: 0, y: 5 },
-        { x: 3, y: 1 },
-        { x: 2, y: 2 },
-        { x: 8, y: 2 },
-    ];
     class Arcanoid extends base_game_2.BaseGame {
         constructor(config) {
             super(config);
+            this.platformPosition = 3;
             console.log(this);
             this.setupBall();
             this.setupPlatform();
@@ -394,23 +388,25 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             super.update();
         }
         moveLeft() {
-            if (this.getSpritePosition(this.platform).x <= 2) {
+            if (this.platformPosition < 2) {
                 return;
             }
+            this.platformPosition--;
             this.platform.x -= this.cellSize;
         }
         moveRight() {
-            if (this.getSpritePosition(this.platform).x > this.x - 4) {
+            if (this.platformPosition > 6) {
                 return;
             }
+            this.platformPosition++;
             this.platform.x += this.cellSize;
         }
         setupPlatform() {
-            let cellPosition = this.getCellCenter({ x: 4, y: 17 });
+            let cellPosition = this.getCellCenter({ x: this.platformPosition, y: 17 });
             let platform = this.physics.add.image(cellPosition.x + this.cellSize / 2, cellPosition.y, 'platform').setImmovable();
-            // platform.setOrigin(0)
             this.scaleSprite(platform, 4 * this.cellSize);
             this.physics.add.collider(platform, this.ball, this.platformHit);
+            this.physics.add.overlap(platform, this.ball, this.platformOverlap);
             this.platform = platform;
         }
         setupBall() {
@@ -423,17 +419,37 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             this.ball.body.stopVelocityOnCollide = false;
             this.ball.setVelocity(200, -200);
         }
+        createBlock(pos) {
+            let cellPosition = this.getCellCenter(pos);
+            let block = this.physics.add.image(cellPosition.x, cellPosition.y, 'block').setAlpha(100).setImmovable();
+            this.scaleSprite(block, this.cellSize * 0.9);
+            this.physics.add.collider(block, this.ball, this.onBallBlock, null, this);
+            this.blocks.push(block);
+        }
         setupBlocks() {
-            for (let pos of START_BLOCKS) {
-                let cellPosition = this.getCellCenter(pos);
-                let block = this.physics.add.image(cellPosition.x, cellPosition.y, 'block').setAlpha(100).setImmovable();
-                this.physics.add.collider(block, this.ball, this.onBallBlock, null, this);
+            this.blocks = [];
+            const FULL_LINES = 5;
+            for (let x = 0; x < this.x; x++) {
+                for (let y = 0; y < FULL_LINES; y++) {
+                    this.createBlock({ x: x, y: y });
+                }
             }
         }
         onBallBlock(block, ball) {
             console.log('ball hit');
             this.addScore(10);
+            //js delete from array
+            let i = this.blocks.indexOf(block);
+            this.blocks.splice(i, 1);
             block.destroy();
+        }
+        spawnLine() {
+            for (let block of this.blocks) {
+                block.y = block.y + this.cellSize;
+            }
+            for (let x = 0; x < this.x; x++) {
+                this.createBlock({ x: x, y: 0 });
+            }
         }
         setupWalls() {
             let alpha = 0;
@@ -460,7 +476,11 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             this.scaleSprite(wall, this.cellSize);
             this.physics.add.collider(wall, this.ball, this.wallHit);
         }
+        platformOverlap(cell, ball) {
+            console.log("platformOverlap!");
+        }
         platformHit(cell, ball) {
+            console.log("Hit!");
         }
         wallHit(cell, ball) {
         }
@@ -501,6 +521,9 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
         addScore(i) {
             this.score += i;
             this.textScore.text = this.score;
+            if (i > 42) {
+                this.arcanoid.spawnLine();
+            }
             console.log('score is ', this.score);
         }
         create() {
