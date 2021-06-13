@@ -41,6 +41,10 @@ export class Tetris extends BaseGame {
 			let block = this.spawnBlock(pos)
 			this.movingBlocks.add(block)
 		}
+
+		if (!this.canSpawn(blocks, {shiftX: 0, shiftY: 0})) {
+			this.addScore(-42)
+		}
 	}
 
 	private getAdjustment(blocks): Adjustment {
@@ -59,11 +63,11 @@ export class Tetris extends BaseGame {
 	}
 
 	private canSpawn(blocks, a: Adjustment): boolean {
-		// for (let block of blocks) {
-		// 	if (this.isPositionFull({x: this.tx + block[0] + a.shiftX, y: this.ty + block[1] + a.shiftY})) {
-		// 		return false
-		// 	}
-		// }
+		for (let block of blocks) {
+			if (this.isPositionFull({x: this.tx + block[0] + a.shiftX, y: this.ty + block[1] + a.shiftY})) {
+				return false
+			}
+		}
 		return true
 	}
 
@@ -74,7 +78,7 @@ export class Tetris extends BaseGame {
 		if (nextT === undefined) { return }
 
 		let adjustment = this.getAdjustment(nextT.b)
-		if (this.canSpawn(nextT.b, adjustment)) {
+		if (true /*this.canSpawn(nextT.b, adjustment)*/) {
 			this.tx += adjustment.shiftX
 			this.ty += adjustment.shiftY
 			this.tname = next

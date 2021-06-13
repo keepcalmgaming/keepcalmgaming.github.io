@@ -4,24 +4,21 @@ const gameWidth = window.innerWidth
 const halfHeight = gameHeight / 2
 const halfWidth = gameWidth / 2
 
-export class GreetingScene extends Phaser.Scene {
+export class EndgameScene extends Phaser.Scene {
     constructor(
         sceneConfig: object
     ) {
-        super({key: 'greeting'})
+        super({key: 'endgame'})
     }
 
     create() {
         var content = [
-            "Two games, one win",
+            "GAME OVER",
+            "HIGHSCORE: " + window.HIGHSCORE,
             "",
-            "Topic of GMTK Game Jam 2020 is “JOINED TOGETHER”.",
-            "Here's our small game about Tetris and Arcanoid.",
-            "Use keyboard or on-screen controls to play."
+            "Thank you for playing!",
             "",
-            "Enjoy!",
-            "",
-            "https://keepcalmgaming.github.io"
+            "(Click to restart)",
         ];
         this.cameras.main.setBackgroundColor('#959F7D');
         
@@ -31,13 +28,6 @@ export class GreetingScene extends Phaser.Scene {
         text.x = halfWidth - bounds.width/2;
         text.y = halfHeight - bounds.height/2;
 
-        // this.load.once('complete', () => {
-        //     let music = this.sound.add('music')
-        //     music.play()
-        // }, this);
-        // this.load.audio('music', 'sounds/NavigatorOST.mp3')
-        // this.load.start();
-
         let clicked = false
 
         if (!window.SaveState) {
@@ -46,6 +36,7 @@ export class GreetingScene extends Phaser.Scene {
 
         this.input.on('pointerdown', () => {
             if (!clicked || true) {
+              this.scene.stop('endgame')
               this.scene.switch('main')
               clicked = true
             }

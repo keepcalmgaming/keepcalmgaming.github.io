@@ -11,17 +11,18 @@ define("scenes/greeting", ["require", "exports"], function (require, exports) {
         }
         create() {
             var content = [
-                "JOINT TOGETHER",
+                "Two games, one win",
                 "",
                 "Topic of GMTK Game Jam 2020 is “JOINED TOGETHER”.",
                 "Here's our small game about Tetris and Arcanoid.",
+                "Use keyboard or on-screen controls to play.",
                 "",
                 "Enjoy!",
                 "",
                 "https://keepcalmgaming.github.io"
             ];
-            this.cameras.main.setBackgroundColor('#FFFFFF');
-            var text = this.add.text(0, 0, content, { align: 'center', font: '25px', color: '#000000', wordWrap: { width: gameWidth - 100 } });
+            this.cameras.main.setBackgroundColor('#959F7D');
+            var text = this.add.text(0, 0, content, { align: 'center', font: '25px', color: '#0F110D', wordWrap: { width: gameWidth - 100 } });
             var bounds = text.getBounds();
             text.x = halfWidth - bounds.width / 2;
             text.y = halfHeight - bounds.height / 2;
@@ -36,6 +37,13 @@ define("scenes/greeting", ["require", "exports"], function (require, exports) {
                 window.SaveState = {};
             }
             this.input.on('pointerdown', () => {
+                if (!clicked || true) {
+                    this.scene.switch('main');
+                    clicked = true;
+                }
+            });
+            this.input.keyboard.on('keydown', (event) => {
+                event.preventDefault();
                 if (!clicked || true) {
                     this.scene.switch('main');
                     clicked = true;
@@ -237,6 +245,9 @@ define("game/tetris", ["require", "exports", "game/base_game", "game/tetraminos"
                 let block = this.spawnBlock(pos);
                 this.movingBlocks.add(block);
             }
+            if (!this.canSpawn(blocks, { shiftX: 0, shiftY: 0 })) {
+                this.addScore(-42);
+            }
         }
         getAdjustment(blocks) {
             let shiftX = 0;
@@ -252,11 +263,11 @@ define("game/tetris", ["require", "exports", "game/base_game", "game/tetraminos"
             return { shiftX, shiftY };
         }
         canSpawn(blocks, a) {
-            // for (let block of blocks) {
-            // 	if (this.isPositionFull({x: this.tx + block[0] + a.shiftX, y: this.ty + block[1] + a.shiftY})) {
-            // 		return false
-            // 	}
-            // }
+            for (let block of blocks) {
+                if (this.isPositionFull({ x: this.tx + block[0] + a.shiftX, y: this.ty + block[1] + a.shiftY })) {
+                    return false;
+                }
+            }
             return true;
         }
         rotate() {
@@ -266,7 +277,7 @@ define("game/tetris", ["require", "exports", "game/base_game", "game/tetraminos"
                 return;
             }
             let adjustment = this.getAdjustment(nextT.b);
-            if (this.canSpawn(nextT.b, adjustment)) {
+            if (true /*this.canSpawn(nextT.b, adjustment)*/) {
                 this.tx += adjustment.shiftX;
                 this.ty += adjustment.shiftY;
                 this.tname = next;
@@ -406,7 +417,7 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             let platform = this.physics.add.image(cellPosition.x + this.cellSize / 2, cellPosition.y, 'platform').setImmovable();
             this.scaleSprite(platform, 4 * this.cellSize);
             this.physics.add.collider(platform, this.ball, this.platformHit);
-            this.physics.add.overlap(platform, this.ball, this.platformOverlap);
+            this.physics.add.overlap(platform, this.ball, this.platformOverlap.bind(this));
             this.platform = platform;
         }
         setupBall() {
@@ -483,11 +494,14 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             this.scaleSprite(wall, this.cellSize);
             this.physics.add.collider(wall, this.ball, this.wallHit);
         }
-        platformOverlap(cell, ball) {
-            console.log("platformOverlap!");
+        platformOverlap(platform, ball) {
+            if (ball.body.velocity.y > 0) {
+                ball.y = (this.getCellCenter({ x: 0, y: 16 }).y + ball.y) / 2;
+                ball.body.velocity.x *= -1;
+                ball.body.velocity.y *= -1;
+            }
         }
         platformHit(cell, ball) {
-            console.log("Hit!");
         }
         wallHit(cell, ball) {
         }
@@ -526,6 +540,13 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             }
         }
         addScore(i) {
+            if (i == -42) {
+                this.scene.stop('main');
+                if (this.score > window.HIGHSCORE) {
+                    window.HIGHSCORE = this.score;
+                }
+                this.scene.start('endgame');
+            }
             this.score += i;
             this.textScore.text = this.score;
             if (i > 42) {
@@ -540,6 +561,7 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             this.setupEvents();
             // this.music = this.sound.add('music')
             // this.music.play()
+            this.score = 0;
             this.tetris = new tetris_1.Tetris({
                 cellSize: this.cellSize,
                 x: this.x,
@@ -581,10 +603,12 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                     this.arcanoid.moveRight();
                 }
                 if ([Phaser.Input.Keyboard.KeyCodes.UP, Phaser.Input.Keyboard.KeyCodes.W, Phaser.Input.Keyboard.KeyCodes.SPACE].includes(event.keyCode)) {
+                    event.preventDefault();
                     event.stopPropagation();
                     this.tetris.rotate();
                 }
                 if ([Phaser.Input.Keyboard.KeyCodes.DOWN, Phaser.Input.Keyboard.KeyCodes.S].includes(event.keyCode)) {
+                    event.preventDefault();
                     event.stopPropagation();
                     this.time.timeScale = 15.5;
                     this.arcanoid.speedUp();
@@ -645,27 +669,6 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             this.tetris.update();
         }
         setupEvents() {
-            // if (!this.mainframe || !this.mfGroup) return
-            // this.monsters = this.physics.add.group()
-            // this.physics.add.collider(this.monsters, this.mfGroup, this.mainframeHit)
-            // this.bullets = this.physics.add.group()
-            // this.physics.add.collider(this.monsters, this.bullets, this.bulletHit)
-            // // MONSTER SPAWNS
-            // for (let monsterSpawn of this.monsterSpawns) {
-            //     this.time.addEvent({
-            //         delay: 3000,
-            //         loop: true,
-            //         callback: this.createMonster,
-            //         callbackScope: this,
-            //         args: [ monsterSpawn ]
-            //     })
-            // }
-            // this.time.addEvent({
-            //     delay: 1000,
-            //     loop: true,
-            //     callback: this.towerShoot,
-            //     callbackScope: this
-            // })
         }
         setupText() {
             this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 3, 'gamefont', 'SCORE', this.cellSize / 2);
@@ -690,14 +693,6 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             this.load.image('button_action', 'images/action_button.png');
             this.load.image('platform', 'images/platform.png');
             this.load.bitmapFont('gamefont', 'font/gamefont.png', 'font/gamefont.fnt');
-            // this.load.image('bullet', 'images/bullet2.png')
-            // this.load.image('mainframe', 'images/mainframe.png')
-            // this.load.image('monster', 'images/monster.png')
-            // this.load.image('monsterplace', 'images/monsterplace.png')
-            // this.load.image('tower', 'images/tower.png')
-            // this.load.image('towerplace', 'images/towerplace.png')
-            // this.load.image('wallbrick', 'images/wallbrick.png')
-            // this.load.audio('music', 'sounds/GameOST.mp3')
         }
         debugDrawGrid() {
             console.log('drawing field');
@@ -708,7 +703,54 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
     }
     exports.MainScene = MainScene;
 });
-define("app", ["require", "exports", "scenes/main"], function (require, exports, main_1) {
+define("scenes/endgame", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    const gameHeight = window.innerHeight;
+    const gameWidth = window.innerWidth;
+    const halfHeight = gameHeight / 2;
+    const halfWidth = gameWidth / 2;
+    class EndgameScene extends Phaser.Scene {
+        constructor(sceneConfig) {
+            super({ key: 'endgame' });
+        }
+        create() {
+            var content = [
+                "GAME OVER",
+                "HIGHSCORE: " + window.HIGHSCORE,
+                "",
+                "Thank you for playing!",
+                "",
+                "(Click to restart)",
+            ];
+            this.cameras.main.setBackgroundColor('#959F7D');
+            var text = this.add.text(0, 0, content, { align: 'center', font: '25px', color: '#0F110D', wordWrap: { width: gameWidth - 100 } });
+            var bounds = text.getBounds();
+            text.x = halfWidth - bounds.width / 2;
+            text.y = halfHeight - bounds.height / 2;
+            let clicked = false;
+            if (!window.SaveState) {
+                window.SaveState = {};
+            }
+            this.input.on('pointerdown', () => {
+                if (!clicked || true) {
+                    this.scene.stop('endgame');
+                    this.scene.switch('main');
+                    clicked = true;
+                }
+            });
+            this.input.keyboard.on('keydown', (event) => {
+                event.preventDefault();
+                if (!clicked || true) {
+                    this.scene.switch('main');
+                    clicked = true;
+                }
+            });
+        }
+    }
+    exports.EndgameScene = EndgameScene;
+});
+define("app", ["require", "exports", "scenes/main", "scenes/endgame"], function (require, exports, main_1, endgame_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const gameHeight = window.innerHeight;
@@ -723,7 +765,8 @@ define("app", ["require", "exports", "scenes/main"], function (require, exports,
                 debug: false
             }
         },
-        scene: [main_1.MainScene]
+        scene: [main_1.MainScene, endgame_1.EndgameScene]
+        // scene: [ GreetingScene, MainScene, EndgameScene ]
     };
     class App {
         constructor() {
@@ -731,6 +774,7 @@ define("app", ["require", "exports", "scenes/main"], function (require, exports,
         }
         start() {
             this.log('Generating game...');
+            window.HIGHSCORE = 0;
             let g = new Phaser.Game(config);
             this.log('Ready to play');
         }

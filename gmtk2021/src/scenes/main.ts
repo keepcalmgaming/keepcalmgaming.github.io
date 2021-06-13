@@ -35,16 +35,6 @@ export class MainScene extends Phaser.Scene {
 
     private score: number = 0
 
-    // private mfGroup?: Phaser.Physics.Arcade.StaticGroup
-    // private mainframe?: Phaser.GameObjects.Sprite
-    // private tower?: Phaser.GameObjects.Sprite
-    // private towerSpawns: Phaser.GameObjects.Sprite[] = []
-    // private monsterSpawns: Phaser.GameObjects.Sprite[] = []
-
-    // private monsters?: Phaser.Physics.Arcade.Group
-    // private bullets?: Phaser.Physics.Arcade.Group
-
-    // public textLives?: Phaser.GameObjects.Text
     public textScore?: Phaser.GameObjects.BitmapText
 
     constructor(
@@ -71,6 +61,14 @@ export class MainScene extends Phaser.Scene {
     private music?: Phaser.Sound.BaseSound
 
     addScore(i: number) {
+        if (i == -42) {
+            this.scene.stop('main')
+            if (this.score > window.HIGHSCORE) {
+                window.HIGHSCORE = this.score
+            }
+            this.scene.start('endgame')
+        }
+
         this.score += i
         this.textScore.text = this.score
 
@@ -91,6 +89,8 @@ export class MainScene extends Phaser.Scene {
 
         // this.music = this.sound.add('music')
         // this.music.play()
+
+        this.score = 0
 
         this.tetris = new Tetris({
             cellSize: this.cellSize,
@@ -139,11 +139,13 @@ export class MainScene extends Phaser.Scene {
             }
 
             if ([Phaser.Input.Keyboard.KeyCodes.UP, Phaser.Input.Keyboard.KeyCodes.W, Phaser.Input.Keyboard.KeyCodes.SPACE].includes(event.keyCode)) {
+                event.preventDefault()
                 event.stopPropagation()
                 this.tetris.rotate()
             }
 
             if ([Phaser.Input.Keyboard.KeyCodes.DOWN, Phaser.Input.Keyboard.KeyCodes.S].includes(event.keyCode)) {
+                event.preventDefault()
                 event.stopPropagation()
                 this.time.timeScale = 15.5
                 this.arcanoid.speedUp();
@@ -214,31 +216,6 @@ export class MainScene extends Phaser.Scene {
     }
 
     setupEvents() {
-        // if (!this.mainframe || !this.mfGroup) return
-
-        // this.monsters = this.physics.add.group()
-        // this.physics.add.collider(this.monsters, this.mfGroup, this.mainframeHit)
-
-        // this.bullets = this.physics.add.group()
-        // this.physics.add.collider(this.monsters, this.bullets, this.bulletHit)
-
-        // // MONSTER SPAWNS
-        // for (let monsterSpawn of this.monsterSpawns) {
-        //     this.time.addEvent({
-        //         delay: 3000,
-        //         loop: true,
-        //         callback: this.createMonster,
-        //         callbackScope: this,
-        //         args: [ monsterSpawn ]
-        //     })
-        // }
-
-        // this.time.addEvent({
-        //     delay: 1000,
-        //     loop: true,
-        //     callback: this.towerShoot,
-        //     callbackScope: this
-        // })
     }
 
     setupText() {
@@ -268,15 +245,6 @@ export class MainScene extends Phaser.Scene {
         this.load.image('platform', 'images/platform.png')
 
         this.load.bitmapFont('gamefont', 'font/gamefont.png', 'font/gamefont.fnt');
-        // this.load.image('bullet', 'images/bullet2.png')
-        // this.load.image('mainframe', 'images/mainframe.png')
-        // this.load.image('monster', 'images/monster.png')
-        // this.load.image('monsterplace', 'images/monsterplace.png')
-        // this.load.image('tower', 'images/tower.png')
-        // this.load.image('towerplace', 'images/towerplace.png')
-        // this.load.image('wallbrick', 'images/wallbrick.png')
-
-        // this.load.audio('music', 'sounds/GameOST.mp3')
     }
 
     debugDrawGrid() {
