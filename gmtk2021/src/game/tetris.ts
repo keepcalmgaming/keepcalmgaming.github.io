@@ -4,6 +4,8 @@ import { Tetramino, TGenerator } from './tetraminos'
 export class Tetris extends BaseGame {
 	private blocks?: Phaser.Physics.Arcade.Group
 
+	private let scoreFullLine: number = 100
+
 	constructor(config: any) {
 		super(config)
 		this.blocks = this.physics.add.group()
@@ -105,6 +107,7 @@ export class Tetris extends BaseGame {
 			let line = this.blocks.getChildren().filter(block => this.getSpritePosition(block).y == i)
 			if line.length == this.x {
 				shouldFallDown = true
+				this.addScore(this.scoreFullLine)
 				for (let block of line) {
 					// this.blocks.remove(block)
 					block.destroy()

@@ -33,6 +33,8 @@ export class MainScene extends Phaser.Scene {
     private tetris: Tetris
     private arcanoid: Arcanoid
 
+    private score: number = 0
+
     // private mfGroup?: Phaser.Physics.Arcade.StaticGroup
     // private mainframe?: Phaser.GameObjects.Sprite
     // private tower?: Phaser.GameObjects.Sprite
@@ -68,6 +70,11 @@ export class MainScene extends Phaser.Scene {
 
     private music?: Phaser.Sound.BaseSound
 
+    addScore(i: number) {
+        this.score += i
+        console.log('score is ', this.score)
+    }
+
     create() {
         this.cameras.main.setBackgroundColor('#959F7D');
 
@@ -87,7 +94,8 @@ export class MainScene extends Phaser.Scene {
             offsetX: this.offsetX,
             offsetY: this.offsetY,
             physics: this.physics,
-            rectangle: rectangle
+            rectangle: rectangle,
+            addScore: this.addScore.bind(this)
         })
 
         this.arcanoid = new Arcanoid({
@@ -97,7 +105,8 @@ export class MainScene extends Phaser.Scene {
             offsetX: this.offsetX + this.cellSize * (this.x + 4),
             offsetY: this.offsetY,
             physics: this.physics,
-            rectangle: rectangle
+            rectangle: rectangle,
+            addScore: this.addScore.bind(this)
         })
 
         this.time.addEvent({

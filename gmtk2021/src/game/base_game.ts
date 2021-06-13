@@ -8,6 +8,7 @@ export class BaseGame {
 	protected offsetY: number
 	protected physics: any
 	protected rectangle: any
+	protected addScore: function
 
 	constructor(config: any) {
 		this.config = config
@@ -18,6 +19,7 @@ export class BaseGame {
 		this.offsetY = this.config.offsetY
 		this.physics = this.config.physics
 		this.rectangle = this.config.rectangle
+		this.addScore = this.config.addScore
 
 		console.log(this.config)
 
@@ -46,7 +48,6 @@ export class BaseGame {
     private setupRectangle() {
     	this.rectangle.strokeRect(this.offsetX - this.cellSize / 4, this.offsetY - this.cellSize / 4, 
         	this.cellSize * (this.x + 1) - this.cellSize / 2, this.cellSize * (this.y + 1) - this.cellSize / 2)
-
     }
 
 	private getScale(sprite: Phaser.GameObjects.Sprite, dim: number) {
@@ -69,6 +70,5 @@ export class BaseGame {
 		let x = positionX.toFixed()
 		let y = positionY.toFixed()
 		return {x: x, y: y}
-
 	}
 }

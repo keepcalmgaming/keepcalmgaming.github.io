@@ -58,6 +58,7 @@ define("game/base_game", ["require", "exports"], function (require, exports) {
             this.offsetY = this.config.offsetY;
             this.physics = this.config.physics;
             this.rectangle = this.config.rectangle;
+            this.addScore = this.config.addScore;
             console.log(this.config);
             this.setupBackgroundCells();
             this.setupRectangle();
@@ -148,6 +149,7 @@ define("game/tetris", ["require", "exports", "game/base_game", "game/tetraminos"
     class Tetris extends base_game_1.BaseGame {
         constructor(config) {
             super(config);
+            this.scoreFullLine = 100;
             this.blocks = this.physics.add.group();
             this.movingBlocks = this.physics.add.group();
             console.log('Tetris', this.config);
@@ -226,6 +228,7 @@ define("game/tetris", ["require", "exports", "game/base_game", "game/tetraminos"
                 let line = this.blocks.getChildren().filter(block => this.getSpritePosition(block).y == i);
                 if (line.length == this.x) {
                     shouldFallDown = true;
+                    this.addScore(this.scoreFullLine);
                     for (let block of line) {
                         // this.blocks.remove(block)
                         block.destroy();
@@ -357,6 +360,7 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             super({ key: 'main' });
             this.offsetX = 0;
             this.offsetY = 0;
+            this.score = 0;
             // super(sceneConfig)
             this.x = minSide;
             this.y = maxSide;
@@ -372,6 +376,10 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                 this.offsetY = this.cellSize * 2;
             }
         }
+        addScore(i) {
+            this.score += i;
+            console.log('score is ', this.score);
+        }
         create() {
             this.cameras.main.setBackgroundColor('#959F7D');
             let rectangle = this.add.graphics({ lineStyle: { width: this.cellSize / 4, color: 0x0F110D } });
@@ -386,7 +394,8 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                 offsetX: this.offsetX,
                 offsetY: this.offsetY,
                 physics: this.physics,
-                rectangle: rectangle
+                rectangle: rectangle,
+                addScore: this.addScore.bind(this)
             });
             this.arcanoid = new arcanoid_1.Arcanoid({
                 cellSize: this.cellSize,
@@ -395,7 +404,8 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                 offsetX: this.offsetX + this.cellSize * (this.x + 4),
                 offsetY: this.offsetY,
                 physics: this.physics,
-                rectangle: rectangle
+                rectangle: rectangle,
+                addScore: this.addScore.bind(this)
             });
             this.time.addEvent({
                 delay: 1000,
