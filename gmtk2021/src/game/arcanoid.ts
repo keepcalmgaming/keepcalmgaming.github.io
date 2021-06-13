@@ -4,7 +4,7 @@ export class Arcanoid extends BaseGame {
 	private ball: any
 	private blocks
 	private platform: any
-	private isFloorTouched = false
+	private isBallMoving = false
 
 	private platformPosition: number = 3
 
@@ -31,6 +31,10 @@ export class Arcanoid extends BaseGame {
 			return
 		}
 
+		if (!this.isBallMoving) {
+			this.ball.x -= this.cellSize
+		}
+
 		this.platformPosition--;
 		this.platform.x -= this.cellSize;
 	}
@@ -40,14 +44,19 @@ export class Arcanoid extends BaseGame {
 			return
 		}
 
+		if (!this.isBallMoving) {
+			this.ball.x += this.cellSize
+		}
+
 		this.platformPosition++;
 		this.platform.x += this.cellSize;
 	}
 
 	public fire() {
-		if (this.isFloorTouched) {
+		if (!this.isBallMoving) {
 			this.ball.setVelocity(this.cellSize * 5, -(this.cellSize * 5))
-			this.isFloorTouched = false;
+			this.ball.setMaxVelocity(this.ball.body.velocity.x * 2, -(this.ball.body.velocity.y * 2))
+			this.isBallMoving = true;
 		}
 
     let leftBulletCellPosition = this.getCellCenter({x: this.platformPosition - 1, y: 17})
@@ -86,9 +95,8 @@ export class Arcanoid extends BaseGame {
 		this.ball.setCollideWorldBounds(false);
 		this.ball.setBounce(1);
 		this.ball.body.stopVelocityOnCollide = false;
-		this.ball.setVelocity(this.cellSize * 5, -(this.cellSize * 5))
 
-		this.ball.setMaxVelocity(this.ball.body.velocity.x * 2, -(this.ball.body.velocity.y * 2))
+		this.ball.setVelocity(0, 0)
 	}
 
 	public speedUp() {
@@ -190,17 +198,14 @@ export class Arcanoid extends BaseGame {
     }
 
 	floorHit(cell: Phaser.GameObjects.GameObject, ball: Phaser.GameObjects.GameObject) {
-		this.isFloorTouched = true;
-
 		this.addScore(-84)
 
-		// ball.destroy()
+		this.isBallMoving = false;
 
-		// this.setupBall()
+		let cellPosition = this.getCellCenter({x: this.platformPosition + 1, y: 16})
+		ball.x = cellPosition.x 
+		ball.y = cellPosition.y 
 
-		let cellPosition = this.getCellCenter({x: 4, y: 16})
-		ball.x = cellPosition.x
-		ball.y = cellPosition.y
 		ball.setOrigin(0.5)
 		ball.setVelocity(0, 0)
     }
