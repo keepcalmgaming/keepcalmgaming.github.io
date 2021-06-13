@@ -3,6 +3,7 @@ import { BaseGame } from './base_game'
 export class Arcanoid extends BaseGame {
 	private ball: any
 	private blocks
+	private platform: any
 
 	private platformPosition: number = 3
 
@@ -46,7 +47,7 @@ export class Arcanoid extends BaseGame {
 		let platform = this.physics.add.image(cellPosition.x + this.cellSize / 2, cellPosition.y, 'platform').setImmovable();
 		this.scaleSprite(platform, 4 * this.cellSize)
 		this.physics.add.collider(platform, this.ball, this.platformHit)
-		this.physics.add.overlap(platform, this.ball, this.platformOverlap)
+		this.physics.add.overlap(platform, this.ball, this.platformOverlap.bind(this))
 	    this.platform = platform
 	}
 
@@ -140,12 +141,15 @@ export class Arcanoid extends BaseGame {
 
 	}
 	
-	platformOverlap(cell: Phaser.GameObjects.GameObject, ball: Phaser.GameObjects.GameObject) {
-		console.log("platformOverlap!")
+	platformOverlap(platform: Phaser.GameObjects.GameObject, ball: Phaser.GameObjects.GameObject) {
+		if (ball.body.velocity.y > 0) {
+			ball.y = (this.getCellCenter({x: 0, y: 16}).y + ball.y) / 2
+			ball.body.velocity.x *= -1
+			ball.body.velocity.y *= -1
+		}
     }
 
 	platformHit(cell: Phaser.GameObjects.GameObject, ball: Phaser.GameObjects.GameObject) {
-		console.log("Hit!")
     }
 
 	wallHit(cell: Phaser.GameObjects.GameObject, ball: Phaser.GameObjects.GameObject) {
