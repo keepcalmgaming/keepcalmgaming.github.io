@@ -572,43 +572,44 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                     this.time.timeScale = 1;
                 }
             });
-            if (this.isVertical) {
-                console.log(this.isVertical);
-                let sprite = this.physics.add.sprite(0, 0, 'cell').setInteractive();
-                sprite.setDepth(100);
-                sprite.x = 50;
-                sprite.y = gameHeight - 100;
-                sprite.on('pointerdown', (pointer) => {
-                    this.tetris.moveLeft();
-                    this.arcanoid.moveLeft();
-                });
-                sprite = this.physics.add.sprite(0, 0, 'cell').setInteractive();
-                sprite.setDepth(100);
-                sprite.x = 150;
-                sprite.y = gameHeight - 100;
-                sprite.on('pointerdown', (pointer) => {
-                    this.tetris.moveRight();
-                    this.arcanoid.moveRight();
-                });
-                sprite = this.physics.add.sprite(0, 0, 'cell').setInteractive();
-                sprite.setDepth(100);
-                sprite.x = 100;
-                sprite.y = gameHeight - 50;
-                sprite.on('pointerdown', (pointer) => {
-                    this.time.timeScale = 15.5;
-                });
-                sprite.on('pointerup', (pointer) => {
-                    this.time.timeScale = 1;
-                });
-                sprite = this.physics.add.sprite(0, 0, 'cell').setInteractive();
-                sprite.setScale(1.5);
-                sprite.setDepth(100);
-                sprite.x = gameWidth - 150;
-                sprite.y = gameHeight - 80;
-                sprite.on('pointerdown', (pointer) => {
-                    this.tetris.rotate();
-                });
-            }
+            let buttonScale = this.isVertical ? gameWidth / 10 : gameHeight / 20;
+            let sprite = this.physics.add.sprite(0, 0, 'button_left').setInteractive();
+            this.scaleSprite(sprite, buttonScale);
+            sprite.setDepth(100);
+            sprite.x = buttonScale * 2;
+            sprite.y = this.isVertical ? gameHeight - buttonScale * 3 : halfHeight + buttonScale;
+            sprite.on('pointerdown', (pointer) => {
+                this.tetris.moveLeft();
+                this.arcanoid.moveLeft();
+            });
+            sprite = this.physics.add.sprite(0, 0, 'button_right').setInteractive();
+            this.scaleSprite(sprite, buttonScale);
+            sprite.setDepth(100);
+            sprite.x = buttonScale * 4;
+            sprite.y = this.isVertical ? gameHeight - buttonScale * 3 : halfHeight + buttonScale;
+            sprite.on('pointerdown', (pointer) => {
+                this.tetris.moveRight();
+                this.arcanoid.moveRight();
+            });
+            sprite = this.physics.add.sprite(0, 0, 'button_down').setInteractive();
+            this.scaleSprite(sprite, buttonScale * 0.85);
+            sprite.setDepth(100);
+            sprite.x = buttonScale * 3;
+            sprite.y = this.isVertical ? gameHeight - buttonScale * 2 : halfHeight + buttonScale * 2;
+            sprite.on('pointerdown', (pointer) => {
+                this.time.timeScale = 15.5;
+            });
+            sprite.on('pointerup', (pointer) => {
+                this.time.timeScale = 1;
+            });
+            sprite = this.physics.add.sprite(0, 0, 'button_action').setInteractive();
+            this.scaleSprite(sprite, buttonScale * 1.5);
+            sprite.setDepth(100);
+            sprite.x = gameWidth - buttonScale * 2.5;
+            sprite.y = this.isVertical ? gameHeight - buttonScale * 2.5 : halfHeight + buttonScale;
+            sprite.on('pointerdown', (pointer) => {
+                this.tetris.rotate();
+            });
             if (debug) {
                 this.debugDrawGrid();
             }
@@ -657,6 +658,10 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             this.load.image('bullet', 'images/bullet.png');
             this.load.image('vertical_wall', 'images/vertical_wall.png');
             this.load.image('horizontal_wall', 'images/horizontal_wall.png');
+            this.load.image('button_left', 'images/left_button.png');
+            this.load.image('button_right', 'images/right_button.png');
+            this.load.image('button_down', 'images/button_down.png');
+            this.load.image('button_action', 'images/action_button.png');
             // this.load.image('bullet', 'images/bullet2.png')
             // this.load.image('mainframe', 'images/mainframe.png')
             // this.load.image('monster', 'images/monster.png')
