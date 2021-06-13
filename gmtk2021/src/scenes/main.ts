@@ -151,6 +151,13 @@ export class MainScene extends Phaser.Scene {
             callbackScope: this.arcanoid
         })
 
+        this.time.addEvent({
+            delay: 10,
+            loop: true,
+            callback: this.arcanoid.moveBullet,
+            callbackScope: this.arcanoid
+        })
+
         this.time.timeScale = 1;
 
         console.log('Game Created', this.x, this.y)
@@ -192,7 +199,6 @@ export class MainScene extends Phaser.Scene {
         })
         
         let buttonScale = this.isVertical ? gameWidth/10 : gameHeight/20
-
         if (this.sys.game.device.os.desktop == false) {
             let sprite = this.physics.add.sprite(0, 0, 'button_left').setInteractive()
             this.scaleSprite(sprite, buttonScale)

@@ -12,7 +12,8 @@ export class Arcanoid extends BaseGame {
 		super(config)
 
 		console.log(this)
-
+    this.leftBullet = {}
+    this.rightBullet = {}
 		this.setupBall();
 		this.setupPlatform()
 		this.setupWalls();
@@ -48,6 +49,23 @@ export class Arcanoid extends BaseGame {
 			this.ball.setVelocity(this.cellSize * 5, -(this.cellSize * 5))
 			this.isFloorTouched = false;
 		}
+
+    let leftBulletCellPosition = this.getCellCenter({x: this.platformPosition - 1, y: 17})
+		this.leftBullet = this.physics.add.image(leftBulletCellPosition.x, leftBulletCellPosition.y, 'bullet')
+
+    let rightBulletCellPosition = this.getCellCenter({x: this.platformPosition + 2, y: 17})
+		this.rightBullet = this.physics.add.image(rightBulletCellPosition.x, rightBulletCellPosition.y, 'bullet')
+
+		for (let block of this.blocks) {
+			this.physics.add.collider(block, this.leftBullet, this.onBulletBlock, null, this)
+			this.physics.add.collider(block, this.rightBullet, this.onBulletBlock, null, this)
+		}
+
+	}
+
+	public moveBullet() {
+    this.leftBullet.y -= this.cellSize
+    this.rightBullet.y -= this.cellSize
 	}
 
 	public setupPlatform() {
@@ -56,7 +74,7 @@ export class Arcanoid extends BaseGame {
 		this.scaleSprite(platform, 4 * this.cellSize)
 		this.physics.add.collider(platform, this.ball, this.platformHit)
 		this.physics.add.overlap(platform, this.ball, this.platformOverlap.bind(this))
-	    this.platform = platform
+	  this.platform = platform
 	}
 
 	public setupBall() {
@@ -85,7 +103,7 @@ export class Arcanoid extends BaseGame {
 		let cellPosition = this.getCellCenter(pos)
 		let block = this.physics.add.image(cellPosition.x, cellPosition.y, 'block').setAlpha(100).setImmovable()
 		this.scaleSprite(block, this.cellSize * 0.9)
-		this.physics.add.collider(block, this.ball, this.onBallBlock, null, this)	
+		this.physics.add.collider(block, this.ball, this.onBallBlock, null, this)
 		this.blocks.push(block)
 	}
 
@@ -106,6 +124,16 @@ export class Arcanoid extends BaseGame {
 		let i = this.blocks.indexOf(block)
 		this.blocks.splice(i, 1)
 		block.destroy()
+	}
+
+	private onBulletBlock(block, bullet) {
+		console.log('bullet hit')
+		this.addScore(10)
+		//js delete from array
+		let i = this.blocks.indexOf(block)
+		this.blocks.splice(i, 1)
+		block.destroy()
+		bullet.destroy()
 	}
 
 	public spawnLine() {
