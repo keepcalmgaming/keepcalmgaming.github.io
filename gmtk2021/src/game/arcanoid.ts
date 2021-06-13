@@ -58,7 +58,19 @@ export class Arcanoid extends BaseGame {
 		this.ball.setCollideWorldBounds(false);
 		this.ball.setBounce(1);
 		this.ball.body.stopVelocityOnCollide = false;
-		this.ball.setVelocity(200, -200)
+		this.ball.setVelocity(this.cellSize * 5, -(this.cellSize * 5))
+
+    let fuck = this.ball.body.velocity.y > 0 ? 1 : -1
+    let you = this.ball.body.velocity.x > 0 ? 1 : -1
+		this.ball.setMaxVelocity(this.ball.body.velocity.x * 2, -(this.ball.body.velocity.y * 2))
+	}
+
+	public speedUp() {
+		this.ball.setVelocity(this.ball.body.velocity.x * 2, this.ball.body.velocity.y * 2)	
+	}
+
+	public slowDown() {
+	  this.ball.setVelocity(this.ball.body.velocity.x / 2, this.ball.body.velocity.y / 2)	
 	}
 
 	private createBlock(pos) {

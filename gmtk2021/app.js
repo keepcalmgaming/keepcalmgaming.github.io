@@ -417,7 +417,16 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             this.ball.setCollideWorldBounds(false);
             this.ball.setBounce(1);
             this.ball.body.stopVelocityOnCollide = false;
-            this.ball.setVelocity(200, -200);
+            this.ball.setVelocity(this.cellSize * 5, -(this.cellSize * 5));
+            let fuck = this.ball.body.velocity.y > 0 ? 1 : -1;
+            let you = this.ball.body.velocity.x > 0 ? 1 : -1;
+            this.ball.setMaxVelocity(this.ball.body.velocity.x * 2, -(this.ball.body.velocity.y * 2));
+        }
+        speedUp() {
+            this.ball.setVelocity(this.ball.body.velocity.x * 2, this.ball.body.velocity.y * 2);
+        }
+        slowDown() {
+            this.ball.setVelocity(this.ball.body.velocity.x / 2, this.ball.body.velocity.y / 2);
         }
         createBlock(pos) {
             let cellPosition = this.getCellCenter(pos);
@@ -580,12 +589,14 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                 if ([Phaser.Input.Keyboard.KeyCodes.DOWN, Phaser.Input.Keyboard.KeyCodes.S].includes(event.keyCode)) {
                     event.stopPropagation();
                     this.time.timeScale = 15.5;
+                    this.arcanoid.speedUp();
                 }
             });
             this.input.keyboard.on('keyup', (event) => {
                 if ([Phaser.Input.Keyboard.KeyCodes.DOWN, Phaser.Input.Keyboard.KeyCodes.S].includes(event.keyCode)) {
                     event.stopPropagation();
                     this.time.timeScale = 1;
+                    this.arcanoid.slowDown();
                 }
             });
             let buttonScale = this.isVertical ? gameWidth / 10 : gameHeight / 20;

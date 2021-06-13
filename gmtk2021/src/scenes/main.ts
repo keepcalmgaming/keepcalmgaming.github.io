@@ -146,6 +146,7 @@ export class MainScene extends Phaser.Scene {
             if ([Phaser.Input.Keyboard.KeyCodes.DOWN, Phaser.Input.Keyboard.KeyCodes.S].includes(event.keyCode)) {
                 event.stopPropagation()
                 this.time.timeScale = 15.5
+                this.arcanoid.speedUp();
             }
         });
 
@@ -153,6 +154,7 @@ export class MainScene extends Phaser.Scene {
             if ([Phaser.Input.Keyboard.KeyCodes.DOWN, Phaser.Input.Keyboard.KeyCodes.S].includes(event.keyCode)) {
                 event.stopPropagation()
                 this.time.timeScale = 1
+                this.arcanoid.slowDown();
             }
         })
         
