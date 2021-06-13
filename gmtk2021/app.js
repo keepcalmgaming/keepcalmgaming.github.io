@@ -401,7 +401,7 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
     class Arcanoid extends base_game_2.BaseGame {
         constructor(config) {
             super(config);
-            this.isFloorTouched = true;
+            this.isFloorTouched = false;
             this.platformPosition = 3;
             console.log(this);
             this.setupBall();

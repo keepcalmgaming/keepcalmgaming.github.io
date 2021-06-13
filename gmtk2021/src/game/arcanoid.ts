@@ -4,7 +4,7 @@ export class Arcanoid extends BaseGame {
 	private ball: any
 	private blocks
 	private platform: any
-	private isFloorTouched = true
+	private isFloorTouched = false
 
 	private platformPosition: number = 3
 
