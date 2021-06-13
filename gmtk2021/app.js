@@ -65,6 +65,13 @@ define("game/base_game", ["require", "exports"], function (require, exports) {
         }
         update() {
         }
+        spawnBlock(pos) {
+            let coords = this.getCellCenter(pos);
+            let block = this.physics.add.image(coords.x, coords.y, 'block');
+            block.setOrigin(0.5);
+            this.scaleSprite(block, this.cellSize * 0.9);
+            return block;
+        }
         setupBackgroundCells() {
             let startOffset = 0;
             for (let i = 0; i < this.x; i++) {
@@ -227,10 +234,7 @@ define("game/tetris", ["require", "exports", "game/base_game", "game/tetraminos"
             this.ty = 0;
             for (let point of blocks) {
                 let pos = { x: this.tx + point[0], y: point[1] };
-                let coords = this.getCellCenter(pos);
-                let block = this.physics.add.image(coords.x, coords.y, 'block');
-                block.setOrigin(0.5);
-                this.scaleSprite(block, this.cellSize * 0.9);
+                let block = this.spawnBlock(pos);
                 this.movingBlocks.add(block);
             }
         }
@@ -270,10 +274,7 @@ define("game/tetris", ["require", "exports", "game/base_game", "game/tetraminos"
                 this.movingBlocks = this.physics.add.group();
                 for (let point of nextT.b) {
                     let pos = { x: this.tx + point[0], y: this.ty + point[1] };
-                    let coords = this.getCellCenter(pos);
-                    let block = this.physics.add.image(coords.x, coords.y, 'block');
-                    block.setOrigin(0.5);
-                    this.scaleSprite(block, this.cellSize * 0.9);
+                    let block = this.spawnBlock(pos);
                     this.movingBlocks.add(block);
                 }
             }
@@ -578,6 +579,14 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                 });
                 sprite.on('pointerup', (pointer) => {
                     this.time.timeScale = 1;
+                });
+                sprite = this.physics.add.sprite(0, 0, 'cell').setInteractive();
+                sprite.setScale(1.5);
+                sprite.setDepth(100);
+                sprite.x = gameWidth - 150;
+                sprite.y = gameHeight - 80;
+                sprite.on('pointerdown', (pointer) => {
+                    this.tetris.rotate();
                 });
             }
             if (debug) {

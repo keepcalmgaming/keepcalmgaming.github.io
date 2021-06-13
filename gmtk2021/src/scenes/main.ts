@@ -181,6 +181,15 @@ export class MainScene extends Phaser.Scene {
             sprite.on('pointerup', (pointer: any) => {
                 this.time.timeScale = 1
             })
+
+            sprite = this.physics.add.sprite(0, 0, 'cell').setInteractive()
+            sprite.setScale(1.5)
+            sprite.setDepth(100)
+            sprite.x = gameWidth - 150
+            sprite.y = gameHeight - 80
+            sprite.on('pointerdown', (pointer: any) => {
+                this.tetris.rotate()
+            })
         }
 
         if (debug) {

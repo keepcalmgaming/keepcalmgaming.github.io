@@ -31,6 +31,14 @@ export class BaseGame {
 		
 	}
 
+	protected spawnBlock(pos): Phaser.GameObjects.Sprite {
+		let coords = this.getCellCenter(pos)
+		let block = this.physics.add.image(coords.x, coords.y, 'block')
+		block.setOrigin(0.5)
+		this.scaleSprite(block, this.cellSize * 0.9)
+		return block
+	}
+
 	private setupBackgroundCells() {
 		let startOffset = 0
 

@@ -38,11 +38,7 @@ export class Tetris extends BaseGame {
 
 		for (let point of blocks) {
 			let pos = {x: this.tx + point[0], y: point[1]}
-			let coords = this.getCellCenter(pos)
-
-			let block = this.physics.add.image(coords.x, coords.y, 'block')
-			block.setOrigin(0.5)
-			this.scaleSprite(block, this.cellSize * 0.9)
+			let block = this.spawnBlock(pos)
 			this.movingBlocks.add(block)
 		}
 	}
@@ -88,11 +84,7 @@ export class Tetris extends BaseGame {
 
 			for (let point of nextT.b) {
 				let pos = {x: this.tx + point[0], y: this.ty + point[1]}
-				let coords = this.getCellCenter(pos)
-
-				let block = this.physics.add.image(coords.x, coords.y, 'block')
-				block.setOrigin(0.5)
-				this.scaleSprite(block, this.cellSize * 0.9)
+				let block = this.spawnBlock(pos)
 				this.movingBlocks.add(block)
 			}
 		}
