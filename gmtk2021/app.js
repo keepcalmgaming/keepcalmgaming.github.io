@@ -385,33 +385,33 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             super(config);
             console.log(this);
             this.setupBall();
+            this.setupPlatform();
             this.setupWalls();
             this.setupBlocks();
-            // start of most left block 
-            let platformOffsetX = this.offsetX + ((this.cellSize / 2) * 9);
-            let platformOffsetY = (this.offsetY + (this.cellSize * 18) - (this.cellSize / 2));
-            let platform = this.physics.add.image(platformOffsetX, platformOffsetY, 'block').setImmovable();
-            this.scaleSprite(platform, this.cellSize * 0.9);
-            this.physics.add.collider(platform, this.ball, this.platformHit);
-            this.platform = platform;
             console.log('Arcanoid', this.config);
         }
         update() {
             super.update();
         }
         moveLeft() {
-            if (this.getSpritePosition(this.platform).x <= 0) {
+            if (this.getSpritePosition(this.platform).x <= 2) {
                 return;
             }
             this.platform.x -= this.cellSize;
         }
         moveRight() {
-            if (this.getSpritePosition(this.platform).x > this.x - 2) {
+            if (this.getSpritePosition(this.platform).x > this.x - 4) {
                 return;
             }
             this.platform.x += this.cellSize;
         }
-        stopPlatform() {
+        setupPlatform() {
+            let cellPosition = this.getCellCenter({ x: 4, y: 17 });
+            let platform = this.physics.add.image(cellPosition.x + this.cellSize / 2, cellPosition.y, 'platform').setImmovable();
+            // platform.setOrigin(0)
+            this.scaleSprite(platform, 4 * this.cellSize);
+            this.physics.add.collider(platform, this.ball, this.platformHit);
+            this.platform = platform;
         }
         setupBall() {
             let cellPosition = this.getCellCenter({ x: 4, y: 16 });
@@ -427,11 +427,12 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             for (let pos of START_BLOCKS) {
                 let cellPosition = this.getCellCenter(pos);
                 let block = this.physics.add.image(cellPosition.x, cellPosition.y, 'block').setAlpha(100).setImmovable();
-                this.physics.add.collider(block, this.ball, this.onBallBlock);
+                this.physics.add.collider(block, this.ball, this.onBallBlock, null, this);
             }
         }
         onBallBlock(block, ball) {
             console.log('ball hit');
+            this.addScore(10);
             block.destroy();
         }
         setupWalls() {
@@ -477,15 +478,6 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
     const minSide = 10;
     const maxSide = 18;
     class MainScene extends Phaser.Scene {
-        // private mfGroup?: Phaser.Physics.Arcade.StaticGroup
-        // private mainframe?: Phaser.GameObjects.Sprite
-        // private tower?: Phaser.GameObjects.Sprite
-        // private towerSpawns: Phaser.GameObjects.Sprite[] = []
-        // private monsterSpawns: Phaser.GameObjects.Sprite[] = []
-        // private monsters?: Phaser.Physics.Arcade.Group
-        // private bullets?: Phaser.Physics.Arcade.Group
-        // public textLives?: Phaser.GameObjects.Text
-        // public textScore?: Phaser.GameObjects.Text
         constructor(sceneConfig) {
             super({ key: 'main' });
             this.offsetX = 0;
@@ -508,6 +500,7 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
         }
         addScore(i) {
             this.score += i;
+            this.textScore.text = this.score;
             console.log('score is ', this.score);
         }
         create() {
@@ -587,6 +580,7 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             sprite.setDepth(100);
             sprite.x = buttonScale * 4;
             sprite.y = this.isVertical ? gameHeight - buttonScale * 3 : halfHeight + buttonScale;
+            sprite.body.x = sprite.body.x + 100;
             sprite.on('pointerdown', (pointer) => {
                 this.tetris.moveRight();
                 this.arcanoid.moveRight();
@@ -642,8 +636,8 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             // })
         }
         setupText() {
-            // this.textLives = this.add.text(20, 20, `LIVES: ${this.towergame.lives}`, { fontFamily: 'Verdana', fontSize: 20, color: '#4C191B', align: 'center' })
-            // this.textScore = this.add.text(gameWidth - 120, 20, `SCORE: ${this.towergame.score}`, { fontFamily: 'Verdana', fontSize: 20, color: '#4C191B', align: 'center' })
+            this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 3, 'gamefont', 'SCORE', this.cellSize / 2);
+            this.textScore = this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 4, 'gamefont', '0', this.cellSize / 2);
         }
         getScale(sprite, dim) {
             return dim / sprite.width;
@@ -662,6 +656,8 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             this.load.image('button_right', 'images/right_button.png');
             this.load.image('button_down', 'images/button_down.png');
             this.load.image('button_action', 'images/action_button.png');
+            this.load.image('platform', 'images/platform.png');
+            this.load.bitmapFont('gamefont', 'font/gamefont.png', 'font/gamefont.fnt');
             // this.load.image('bullet', 'images/bullet2.png')
             // this.load.image('mainframe', 'images/mainframe.png')
             // this.load.image('monster', 'images/monster.png')

@@ -45,7 +45,7 @@ export class MainScene extends Phaser.Scene {
     // private bullets?: Phaser.Physics.Arcade.Group
 
     // public textLives?: Phaser.GameObjects.Text
-    // public textScore?: Phaser.GameObjects.Text
+    public textScore?: Phaser.GameObjects.BitmapText
 
     constructor(
         sceneConfig: object
@@ -72,6 +72,7 @@ export class MainScene extends Phaser.Scene {
 
     addScore(i: number) {
         this.score += i
+        this.textScore.text = this.score
         console.log('score is ', this.score)
     }
 
@@ -168,6 +169,7 @@ export class MainScene extends Phaser.Scene {
         sprite.setDepth(100)
         sprite.x = buttonScale * 4
         sprite.y = this.isVertical ? gameHeight - buttonScale * 3 : halfHeight + buttonScale
+        sprite.body.x = sprite.body.x + 100
         sprite.on('pointerdown', (pointer: any) => {
             this.tetris.moveRight()
             this.arcanoid.moveRight()
@@ -234,8 +236,8 @@ export class MainScene extends Phaser.Scene {
     }
 
     setupText() {
-        // this.textLives = this.add.text(20, 20, `LIVES: ${this.towergame.lives}`, { fontFamily: 'Verdana', fontSize: 20, color: '#4C191B', align: 'center' })
-        // this.textScore = this.add.text(gameWidth - 120, 20, `SCORE: ${this.towergame.score}`, { fontFamily: 'Verdana', fontSize: 20, color: '#4C191B', align: 'center' })
+        this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 3, 'gamefont', 'SCORE', this.cellSize /2)
+        this.textScore = this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 4, 'gamefont', '0', this.cellSize /2)
     }
 
     getScale(sprite: Phaser.GameObjects.Sprite, dim: number) {
@@ -258,6 +260,8 @@ export class MainScene extends Phaser.Scene {
         this.load.image('button_down', 'images/button_down.png')
         this.load.image('button_action', 'images/action_button.png')
         this.load.image('platform', 'images/platform.png')
+
+        this.load.bitmapFont('gamefont', 'font/gamefont.png', 'font/gamefont.fnt');
         // this.load.image('bullet', 'images/bullet2.png')
         // this.load.image('mainframe', 'images/mainframe.png')
         // this.load.image('monster', 'images/monster.png')

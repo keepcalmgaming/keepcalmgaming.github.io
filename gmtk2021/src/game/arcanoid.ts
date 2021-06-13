@@ -70,12 +70,13 @@ export class Arcanoid extends BaseGame {
 		for (let pos of START_BLOCKS) {
 			let cellPosition = this.getCellCenter(pos)
 			let block = this.physics.add.image(cellPosition.x, cellPosition.y, 'block').setAlpha(100).setImmovable()
-			this.physics.add.collider(block, this.ball, this.onBallBlock)	
+			this.physics.add.collider(block, this.ball, this.onBallBlock, null, this)	
 		}
 	}
 
 	private onBallBlock(block, ball) {
 		console.log('ball hit')
+		this.addScore(10)
 		block.destroy()
 	}
 
