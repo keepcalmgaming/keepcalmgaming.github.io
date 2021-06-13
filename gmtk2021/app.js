@@ -175,11 +175,8 @@ define("game/tetris", ["require", "exports", "game/base_game", "game/tetraminos"
                 if (this.getSpritePosition(block).x <= 0) {
                     return;
                 }
-                for (let staticBlock of this.blocks.getChildren()) {
-                    if (this.isBlocksAreOnTheSameLine(block, staticBlock) &&
-                        this.getSpritePosition(block).x - 1 == this.getSpritePosition(staticBlock).x) {
-                        return;
-                    }
+                if (this.isPositionFull({ x: this.getSpritePosition(block).x - 1, y: this.getSpritePosition(block).y })) {
+                    return;
                 }
             }
             for (let block of this.movingBlocks.getChildren()) {
@@ -192,11 +189,9 @@ define("game/tetris", ["require", "exports", "game/base_game", "game/tetraminos"
                 if (this.getSpritePosition(block).x >= this.x - 1) {
                     return;
                 }
-                for (let staticBlock of this.blocks.getChildren()) {
-                    if (this.isBlocksAreOnTheSameLine(block, staticBlock) &&
-                        this.getSpritePosition(block).x == this.getSpritePosition(staticBlock).x - 1) {
-                        return;
-                    }
+                let newX = ++this.getSpritePosition(block).x;
+                if (this.isPositionFull({ x: newX, y: this.getSpritePosition(block).y })) {
+                    return;
                 }
             }
             for (let block of this.movingBlocks.getChildren()) {
@@ -248,6 +243,16 @@ define("game/tetris", ["require", "exports", "game/base_game", "game/tetraminos"
         }
         isBlocksAreOnTheSameLine(block1, block2) {
             return this.getSpritePosition(block1).y == this.getSpritePosition(block2).y;
+        }
+        isPositionFull(position) {
+            for (let block of this.blocks.getChildren()) {
+                let blockPosition = this.getSpritePosition(block);
+                // console.log(blockPosition, block, blockPosition.x)
+                if ((blockPosition.x == position.x) && (blockPosition.y == position.y)) {
+                    return true;
+                }
+            }
+            return false;
         }
         update() {
             super.update();
