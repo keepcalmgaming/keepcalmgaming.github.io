@@ -4,6 +4,7 @@ export class Arcanoid extends BaseGame {
 	private ball: any
 	private blocks
 	private platform: any
+	private isFloorTouched = false
 
 	private platformPosition: number = 3
 
@@ -40,6 +41,12 @@ export class Arcanoid extends BaseGame {
 
 		this.platformPosition++;
 		this.platform.x += this.cellSize;
+	}
+
+	public fire() {
+		if (this.isFloorTouched) {
+			this.ball.setVelocity(this.cellSize * 5, -(this.cellSize * 5))
+		}
 	}
 
 	public setupPlatform() {
@@ -128,7 +135,7 @@ export class Arcanoid extends BaseGame {
 		cellPosition = this.getCellCenter({x: 5, y: 18})
 		wall = this.physics.add.image(cellPosition.x, cellPosition.y, 'horizontal_wall').setAlpha(alpha).setImmovable()
 		this.scaleSprite(wall, this.cellSize * 12)
-		this.physics.add.collider(wall, this.ball, this.wallHit)	
+		this.physics.add.collider(wall, this.ball, this.floorHit.bind(this))	
 	}
 	
 	public setupVerticalWalls(alpha: number) {
@@ -150,6 +157,14 @@ export class Arcanoid extends BaseGame {
 			ball.body.velocity.x *= -1
 			ball.body.velocity.y *= -1
 		}
+    }
+
+	floorHit(cell: Phaser.GameObjects.GameObject, ball: Phaser.GameObjects.GameObject) {
+		this.isFloorTouched = true;
+		let cellPosition = this.getCellCenter({x: 4, y: 16})
+		ball.x = cellPosition.x
+		ball.y = cellPosition.y
+		ball.setVelocity(0, 0)
     }
 
 	platformHit(cell: Phaser.GameObjects.GameObject, ball: Phaser.GameObjects.GameObject) {

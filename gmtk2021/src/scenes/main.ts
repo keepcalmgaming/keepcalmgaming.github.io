@@ -149,6 +149,7 @@ export class MainScene extends Phaser.Scene {
                 event.preventDefault()
                 event.stopPropagation()
                 this.tetris.rotate()
+                this.arcanoid.fire()
             }
 
             if ([Phaser.Input.Keyboard.KeyCodes.DOWN, Phaser.Input.Keyboard.KeyCodes.S].includes(event.keyCode)) {
@@ -209,6 +210,7 @@ export class MainScene extends Phaser.Scene {
         sprite.y = this.isVertical ? gameHeight - buttonScale*2.5 : halfHeight + buttonScale
         sprite.on('pointerdown', (pointer: any) => {
             this.tetris.rotate()
+            this.arcanoid.fire()
         })
 
         if (debug) {
