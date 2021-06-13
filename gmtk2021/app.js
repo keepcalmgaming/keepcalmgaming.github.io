@@ -407,10 +407,10 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             this.platformPosition = 3;
             console.log(this);
             this.bullets = [];
-            this.setupBall();
             this.setupPlatform();
-            this.setupWalls();
             this.setupBlocks();
+            this.setupWalls();
+            this.setupBall(3, 16);
             console.log('Arcanoid', this.config);
         }
         update() {
@@ -442,6 +442,11 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
                 this.ball.setMaxVelocity(this.ball.body.velocity.x * 2, -(this.ball.body.velocity.y * 2));
                 this.isBallMoving = true;
             }
+            if (this.prevShot) {
+                if ((new Date().getTime() - this.prevShot) < 1000) {
+                    return;
+                }
+            }
             let leftBulletCellPosition = this.getCellCenter({ x: this.platformPosition - 1, y: 17 });
             let leftBullet = this.physics.add.image(leftBulletCellPosition.x, leftBulletCellPosition.y, 'bullet');
             let rightBulletCellPosition = this.getCellCenter({ x: this.platformPosition + 2, y: 17 });
@@ -451,6 +456,7 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
                 this.physics.add.collider(block, rightBullet, this.onBulletBlock, null, this);
             }
             this.bullets.push(leftBullet, rightBullet);
+            this.prevShot = new Date().getTime();
         }
         moveBullet() {
             let firstRowY = this.getCellCenter({ x: this.platformPosition, y: 1 });
@@ -467,12 +473,10 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             let cellPosition = this.getCellCenter({ x: this.platformPosition, y: 17 });
             let platform = this.physics.add.image(cellPosition.x + this.cellSize / 2, cellPosition.y, 'platform').setImmovable();
             this.scaleSprite(platform, 4 * this.cellSize);
-            this.physics.add.collider(platform, this.ball, this.platformHit);
-            this.physics.add.overlap(platform, this.ball, this.platformOverlap.bind(this));
             this.platform = platform;
         }
-        setupBall() {
-            let cellPosition = this.getCellCenter({ x: 4, y: 16 });
+        setupBall(x, y) {
+            let cellPosition = this.getCellCenter({ x, y });
             this.ball = this.physics.add.image(cellPosition.x, cellPosition.y, 'ball');
             this.ball.setCircle();
             this.ball.setOrigin(0.5);
@@ -480,6 +484,15 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             this.ball.setCollideWorldBounds(false);
             this.ball.setBounce(1);
             this.ball.body.stopVelocityOnCollide = false;
+            this.physics.add.collider(this.platform, this.ball, this.platformHit);
+            this.physics.add.overlap(this.platform, this.ball, this.platformOverlap.bind(this));
+            this.physics.add.collider(this.leftVerticalWall, this.ball, this.wallHit);
+            this.physics.add.collider(this.rightVerticalWall, this.ball, this.wallHit);
+            this.physics.add.collider(this.topHorizontalWall, this.ball, this.wallHit);
+            this.physics.add.collider(this.bottomHorizontalWall, this.ball, this.floorHit.bind(this));
+            for (let block of this.blocks) {
+                this.physics.add.collider(block, this.ball, this.onBallBlock, null, this);
+            }
             this.ball.setVelocity(0, 0);
         }
         speedUp() {
@@ -492,7 +505,6 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             let cellPosition = this.getCellCenter(pos);
             let block = this.physics.add.image(cellPosition.x, cellPosition.y, 'block').setAlpha(100).setImmovable();
             this.scaleSprite(block, this.cellSize * 0.9);
-            this.physics.add.collider(block, this.ball, this.onBallBlock, null, this);
             this.blocks.push(block);
         }
         setupBlocks() {
@@ -539,23 +551,19 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
         }
         setupHorizontalWalls(alpha) {
             let cellPosition = this.getCellCenter({ x: 5, y: -1 });
-            let wall = this.physics.add.image(cellPosition.x, cellPosition.y, 'horizontal_wall').setAlpha(alpha).setImmovable();
-            this.scaleSprite(wall, this.cellSize * 12);
-            this.physics.add.collider(wall, this.ball, this.wallHit);
+            this.topHorizontalWall = this.physics.add.image(cellPosition.x, cellPosition.y, 'horizontal_wall').setAlpha(alpha).setImmovable();
+            this.scaleSprite(this.topHorizontalWall, this.cellSize * 12);
             cellPosition = this.getCellCenter({ x: 5, y: 18 });
-            wall = this.physics.add.image(cellPosition.x, cellPosition.y, 'horizontal_wall').setAlpha(alpha).setImmovable();
-            this.scaleSprite(wall, this.cellSize * 12);
-            this.physics.add.collider(wall, this.ball, this.floorHit.bind(this));
+            this.bottomHorizontalWall = this.physics.add.image(cellPosition.x, cellPosition.y, 'horizontal_wall').setAlpha(alpha).setImmovable();
+            this.scaleSprite(this.bottomHorizontalWall, this.cellSize * 12);
         }
         setupVerticalWalls(alpha) {
             let cellPosition = this.getCellCenter({ x: -1, y: 9 });
-            let wall = this.physics.add.image(cellPosition.x, cellPosition.y, 'vertical_wall').setAlpha(alpha).setImmovable();
-            this.scaleSprite(wall, this.cellSize);
-            this.physics.add.collider(wall, this.ball, this.wallHit);
+            this.leftVerticalWall = this.physics.add.image(cellPosition.x, cellPosition.y, 'vertical_wall').setAlpha(alpha).setImmovable();
+            this.scaleSprite(this.leftVerticalWall, this.cellSize);
             cellPosition = this.getCellCenter({ x: 10, y: 9 });
-            wall = this.physics.add.image(cellPosition.x, cellPosition.y, 'vertical_wall').setAlpha(alpha).setImmovable();
-            this.scaleSprite(wall, this.cellSize);
-            this.physics.add.collider(wall, this.ball, this.wallHit);
+            this.rightVerticalWall = this.physics.add.image(cellPosition.x, cellPosition.y, 'vertical_wall').setAlpha(alpha).setImmovable();
+            this.scaleSprite(this.rightVerticalWall, this.cellSize);
         }
         platformOverlap(platform, ball) {
             if (ball.body.velocity.y > 0) {
@@ -567,11 +575,8 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
         floorHit(cell, ball) {
             this.addScore(-84);
             this.isBallMoving = false;
-            let cellPosition = this.getCellCenter({ x: this.platformPosition + 1, y: 16 });
-            ball.x = cellPosition.x;
-            ball.y = cellPosition.y;
-            ball.setOrigin(0.5);
-            ball.setVelocity(0, 0);
+            ball.destroy();
+            this.setupBall(this.platformPosition, 16);
         }
         platformHit(cell, ball) {
         }
@@ -677,13 +682,13 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                 callbackScope: this.tetris
             });
             this.time.addEvent({
-                delay: 100000,
+                delay: 50000,
                 loop: true,
                 callback: this.arcanoid.spawnLine,
                 callbackScope: this.arcanoid
             });
             this.time.addEvent({
-                delay: 10,
+                delay: 100,
                 loop: true,
                 callback: this.arcanoid.moveBullet,
                 callbackScope: this.arcanoid

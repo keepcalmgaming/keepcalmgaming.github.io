@@ -57,11 +57,19 @@ export class Arcanoid extends BaseGame {
 		this.platform.x += this.cellSize;
 	}
 
+	private prevShot
+
 	public fire() {
 		if (!this.isBallMoving) {
 			this.ball.setVelocity(this.cellSize * 5, -(this.cellSize * 5))
 			this.ball.setMaxVelocity(this.ball.body.velocity.x * 2, -(this.ball.body.velocity.y * 2))
 			this.isBallMoving = true;
+		}
+
+		if (this.prevShot) {
+			if ((new Date().getTime() - this.prevShot) < 1000) {
+				return
+			}
 		}
 
     let leftBulletCellPosition = this.getCellCenter({x: this.platformPosition - 1, y: 17})
@@ -77,6 +85,7 @@ export class Arcanoid extends BaseGame {
 
 		this.bullets.push(leftBullet, rightBullet)
 
+		this.prevShot = new Date().getTime()
 	}
 
 	public moveBullet() {

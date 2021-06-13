@@ -145,14 +145,14 @@ export class MainScene extends Phaser.Scene {
         })
 
         this.time.addEvent({
-            delay: 100000,
+            delay: 50000,
             loop: true,
             callback: this.arcanoid.spawnLine,
             callbackScope: this.arcanoid
         })
 
         this.time.addEvent({
-            delay: 10,
+            delay: 100,
             loop: true,
             callback: this.arcanoid.moveBullet,
             callbackScope: this.arcanoid
