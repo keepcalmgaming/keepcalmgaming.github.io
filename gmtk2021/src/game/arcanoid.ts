@@ -143,6 +143,7 @@ export class Arcanoid extends BaseGame {
 	private createBlock(pos) {
 		let cellPosition = this.getCellCenter(pos)
 		let block = this.physics.add.image(cellPosition.x, cellPosition.y, 'block').setAlpha(100).setImmovable()
+		this.physics.add.collider(block, this.ball, this.onBallBlock, null, this)
 		this.scaleSprite(block, this.cellSize * 0.9)
 		this.blocks.push(block)
 	}
