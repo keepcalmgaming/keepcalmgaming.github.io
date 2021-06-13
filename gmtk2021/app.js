@@ -149,6 +149,38 @@ define("game/tetraminos", ["require", "exports"], function (require, exports) {
             b: [[0, 0], [0, 1], [1, 0], [1, 1]],
             next: 'square'
         },
+        l: {
+            b: [[0, 0], [0, 1], [0, 2], [1, 2]],
+            next: 'lr'
+        },
+        lr: {
+            b: [[0, 1], [1, 1], [2, 1], [2, 0]],
+            next: 'lu'
+        },
+        lu: {
+            b: [[0, 0], [1, 0], [1, 1], [1, 2]],
+            next: 'll'
+        },
+        ll: {
+            b: [[0, 1], [0, 0], [1, 0], [2, 0]],
+            next: 'l'
+        },
+        j: {
+            b: [[0, 2], [1, 2], [1, 1], [1, 0]],
+            next: 'jr'
+        },
+        jr: {
+            b: [[0, 0], [1, 0], [2, 0], [2, 1]],
+            next: 'ju'
+        },
+        ju: {
+            b: [[0, 2], [0, 1], [0, 0], [1, 0]],
+            next: 'jl'
+        },
+        jl: {
+            b: [[0, 0], [0, 1], [1, 1], [2, 1]],
+            next: 'j'
+        }
     };
     class TGenerator {
         static get(name) {
