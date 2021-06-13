@@ -194,7 +194,7 @@ export class MainScene extends Phaser.Scene {
         let buttonScale = this.isVertical ? gameWidth/10 : gameHeight/20
 
         let sprite = this.physics.add.sprite(0, 0, 'button_left').setInteractive()
-        this.scaleSprite(sprite, buttonScale)
+        this.scaleSprite(sprite, buttonScale*1.3)
         sprite.setDepth(100)
         sprite.x = buttonScale * 2
         sprite.y = this.isVertical ? gameHeight - buttonScale * 3 : halfHeight + buttonScale
@@ -204,7 +204,7 @@ export class MainScene extends Phaser.Scene {
         })
 
         sprite = this.physics.add.sprite(0, 0, 'button_right').setInteractive()
-        this.scaleSprite(sprite, buttonScale)
+        this.scaleSprite(sprite, buttonScale*1.3)
         sprite.setDepth(100)
         sprite.x = buttonScale * 4
         sprite.y = this.isVertical ? gameHeight - buttonScale * 3 : halfHeight + buttonScale
@@ -215,15 +215,17 @@ export class MainScene extends Phaser.Scene {
         })
 
         sprite = this.physics.add.sprite(0, 0, 'button_down').setInteractive()
-        this.scaleSprite(sprite, buttonScale)
+        this.scaleSprite(sprite, buttonScale*1.3)
         sprite.setDepth(100)
         sprite.x = buttonScale * 3
         sprite.y = this.isVertical ? gameHeight - buttonScale * 2 : halfHeight + buttonScale*2
         sprite.on('pointerdown', (pointer: any) => {
             this.time.timeScale = 15.5
+            this.arcanoid.speedUp();
         })
         sprite.on('pointerup', (pointer: any) => {
             this.time.timeScale = 1
+            this.arcanoid.slowDown();
         })
 
         sprite = this.physics.add.sprite(0, 0, 'button_action').setInteractive()
