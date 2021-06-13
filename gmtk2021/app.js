@@ -26,12 +26,12 @@ define("scenes/greeting", ["require", "exports"], function (require, exports) {
             var bounds = text.getBounds();
             text.x = halfWidth - bounds.width / 2;
             text.y = halfHeight - bounds.height / 2;
-            // this.load.once('complete', () => {
-            //     let music = this.sound.add('music')
-            //     music.play()
-            // }, this);
-            // this.load.audio('music', 'sounds/NavigatorOST.mp3')
-            // this.load.start();
+            this.load.once('complete', () => {
+                let music = this.sound.add('music');
+                music.play();
+            }, this);
+            this.load.audio('music', 'sounds/track.mp3');
+            this.load.start();
             let clicked = false;
             if (!window.SaveState) {
                 window.SaveState = {};
@@ -301,7 +301,7 @@ define("game/tetris", ["require", "exports", "game/base_game", "game/tetraminos"
                 }
             }
             for (let x = 0; x < this.x; x++) {
-                if (Math.random() > 0.7) {
+                if (Math.random() > 0.3) {
                     let block = this.spawnBlock({ x: x, y: this.y - 1 });
                     this.blocks.add(block);
                 }
@@ -401,9 +401,11 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
     class Arcanoid extends base_game_2.BaseGame {
         constructor(config) {
             super(config);
-            this.isFloorTouched = false;
+            this.isBallMoving = false;
             this.platformPosition = 3;
             console.log(this);
+            this.leftBullet = {};
+            this.rightBullet = {};
             this.setupBall();
             this.setupPlatform();
             this.setupWalls();
@@ -417,6 +419,9 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             if (this.platformPosition < 2) {
                 return;
             }
+            if (!this.isBallMoving) {
+                this.ball.x -= this.cellSize;
+            }
             this.platformPosition--;
             this.platform.x -= this.cellSize;
         }
@@ -424,14 +429,30 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             if (this.platformPosition > 6) {
                 return;
             }
+            if (!this.isBallMoving) {
+                this.ball.x += this.cellSize;
+            }
             this.platformPosition++;
             this.platform.x += this.cellSize;
         }
         fire() {
-            if (this.isFloorTouched) {
+            if (!this.isBallMoving) {
                 this.ball.setVelocity(this.cellSize * 5, -(this.cellSize * 5));
-                this.isFloorTouched = false;
+                this.ball.setMaxVelocity(this.ball.body.velocity.x * 2, -(this.ball.body.velocity.y * 2));
+                this.isBallMoving = true;
             }
+            let leftBulletCellPosition = this.getCellCenter({ x: this.platformPosition - 1, y: 17 });
+            this.leftBullet = this.physics.add.image(leftBulletCellPosition.x, leftBulletCellPosition.y, 'bullet');
+            let rightBulletCellPosition = this.getCellCenter({ x: this.platformPosition + 2, y: 17 });
+            this.rightBullet = this.physics.add.image(rightBulletCellPosition.x, rightBulletCellPosition.y, 'bullet');
+            for (let block of this.blocks) {
+                this.physics.add.collider(block, this.leftBullet, this.onBulletBlock, null, this);
+                this.physics.add.collider(block, this.rightBullet, this.onBulletBlock, null, this);
+            }
+        }
+        moveBullet() {
+            this.leftBullet.y -= this.cellSize;
+            this.rightBullet.y -= this.cellSize;
         }
         setupPlatform() {
             let cellPosition = this.getCellCenter({ x: this.platformPosition, y: 17 });
@@ -450,8 +471,7 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             this.ball.setCollideWorldBounds(false);
             this.ball.setBounce(1);
             this.ball.body.stopVelocityOnCollide = false;
-            this.ball.setVelocity(this.cellSize * 5, -(this.cellSize * 5));
-            this.ball.setMaxVelocity(this.ball.body.velocity.x * 2, -(this.ball.body.velocity.y * 2));
+            this.ball.setVelocity(0, 0);
         }
         speedUp() {
             this.ball.setVelocity(this.ball.body.velocity.x * 2, this.ball.body.velocity.y * 2);
@@ -482,6 +502,15 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             let i = this.blocks.indexOf(block);
             this.blocks.splice(i, 1);
             block.destroy();
+        }
+        onBulletBlock(block, bullet) {
+            console.log('bullet hit');
+            this.addScore(10);
+            //js delete from array
+            let i = this.blocks.indexOf(block);
+            this.blocks.splice(i, 1);
+            block.destroy();
+            bullet.destroy();
         }
         spawnLine() {
             for (let block of this.blocks) {
@@ -527,11 +556,9 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             }
         }
         floorHit(cell, ball) {
-            this.isFloorTouched = true;
             this.addScore(-84);
-            // ball.destroy()
-            // this.setupBall()
-            let cellPosition = this.getCellCenter({ x: 4, y: 16 });
+            this.isBallMoving = false;
+            let cellPosition = this.getCellCenter({ x: this.platformPosition + 1, y: 16 });
             ball.x = cellPosition.x;
             ball.y = cellPosition.y;
             ball.setOrigin(0.5);
@@ -646,6 +673,12 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
                 callback: this.arcanoid.spawnLine,
                 callbackScope: this.arcanoid
             });
+            this.time.addEvent({
+                delay: 10,
+                loop: true,
+                callback: this.arcanoid.moveBullet,
+                callbackScope: this.arcanoid
+            });
             this.time.timeScale = 1;
             console.log('Game Created', this.x, this.y);
             // this.input.keyboard.on('keydown-SPACE', () => console.log('hello'))
@@ -737,6 +770,16 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             this.textScore = this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 4, 'gamefont', '0', this.cellSize / 2);
             this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 6, 'gamefont', 'HIGH', this.cellSize / 2);
             this.textHigh = this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 7, 'gamefont', window.HIGHSCORE, this.cellSize / 2);
+            // let sprite = this.physics.add.sprite(0, 0, 'button_sound').setInteractive()
+            // sprite.setOrigin(0.5)
+            // this.scaleSprite(sprite, this.cellSize*2)
+            // sprite.setDepth(100)
+            // sprite.x = halfWidth
+            // sprite.y = this.cellSize * 10
+            // sprite.on('pointerdown', (pointer: any) => {
+            //     this.tetris.moveLeft()
+            //     this.arcanoid.moveLeft()
+            // })
         }
         getScale(sprite, dim) {
             return dim / sprite.width;
@@ -755,6 +798,8 @@ define("scenes/main", ["require", "exports", "game/tetris", "game/arcanoid"], fu
             this.load.image('button_right', 'images/right_button.png');
             this.load.image('button_down', 'images/button_down.png');
             this.load.image('button_action', 'images/action_button.png');
+            this.load.image('button_sound', 'images/button_sound.png');
+            this.load.image('button_reset', 'images/button_reset.png');
             this.load.image('platform', 'images/platform.png');
             this.load.image('particle', 'images/particle.png');
             this.load.bitmapFont('gamefont', 'font/gamefont.png', 'font/gamefont.fnt');

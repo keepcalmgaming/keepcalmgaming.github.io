@@ -105,7 +105,7 @@ export class Tetris extends BaseGame {
 		}
 
 		for (let x = 0; x<this.x; x++) {
-			if (Math.random() > 0.7) {
+			if (Math.random() > 0.3) {
 				let block = this.spawnBlock({x: x, y: this.y - 1})
 				this.blocks.add(block)
 			}

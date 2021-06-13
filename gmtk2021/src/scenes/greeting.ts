@@ -17,7 +17,7 @@ export class GreetingScene extends Phaser.Scene {
             "",
             "Topic of GMTK Game Jam 2020 is “JOINED TOGETHER”.",
             "Here's our small game about Tetris and Arcanoid.",
-            "Use keyboard or on-screen controls to play."
+            "Use keyboard or on-screen controls to play.",
             "",
             "Enjoy!",
             "",
@@ -31,12 +31,12 @@ export class GreetingScene extends Phaser.Scene {
         text.x = halfWidth - bounds.width/2;
         text.y = halfHeight - bounds.height/2;
 
-        // this.load.once('complete', () => {
-        //     let music = this.sound.add('music')
-        //     music.play()
-        // }, this);
-        // this.load.audio('music', 'sounds/NavigatorOST.mp3')
-        // this.load.start();
+        this.load.once('complete', () => {
+            let music = this.sound.add('music')
+            music.play()
+        }, this);
+        this.load.audio('music', 'sounds/track.mp3')
+        this.load.start();
 
         let clicked = false
 

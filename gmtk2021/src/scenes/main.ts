@@ -264,6 +264,17 @@ export class MainScene extends Phaser.Scene {
 
         this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 6, 'gamefont', 'HIGH', this.cellSize /2)
         this.textHigh = this.add.bitmapText(halfWidth - this.cellSize, this.cellSize * 7, 'gamefont', window.HIGHSCORE, this.cellSize /2)
+
+        // let sprite = this.physics.add.sprite(0, 0, 'button_sound').setInteractive()
+        // sprite.setOrigin(0.5)
+        // this.scaleSprite(sprite, this.cellSize*2)
+        // sprite.setDepth(100)
+        // sprite.x = halfWidth
+        // sprite.y = this.cellSize * 10
+        // sprite.on('pointerdown', (pointer: any) => {
+        //     this.tetris.moveLeft()
+        //     this.arcanoid.moveLeft()
+        // })
     }
 
     getScale(sprite: Phaser.GameObjects.Sprite, dim: number) {
@@ -285,6 +296,8 @@ export class MainScene extends Phaser.Scene {
         this.load.image('button_right', 'images/right_button.png')
         this.load.image('button_down', 'images/button_down.png')
         this.load.image('button_action', 'images/action_button.png')
+        this.load.image('button_sound', 'images/button_sound.png')
+        this.load.image('button_reset', 'images/button_reset.png')
         this.load.image('platform', 'images/platform.png')
         this.load.image('particle', 'images/particle.png')
 
