@@ -19,17 +19,9 @@ export class Arcanoid extends BaseGame {
 		console.log(this)
 
 		this.setupBall();
+		this.setupPlatform()
 		this.setupWalls();
 		this.setupBlocks();
-
-		// start of most left block 
-		let platformOffsetX = this.offsetX + ((this.cellSize / 2) * 9);
-		let platformOffsetY = (this.offsetY + (this.cellSize * 18) - (this.cellSize / 2));
-
-		let platform = this.physics.add.image(platformOffsetX, platformOffsetY, 'block').setImmovable();
-		this.scaleSprite(platform, this.cellSize * 0.9)
-		this.physics.add.collider(platform, this.ball, this.platformHit)
-	    this.platform = platform
 
 		console.log('Arcanoid', this.config)
 	}
@@ -39,7 +31,7 @@ export class Arcanoid extends BaseGame {
 	}
 
 	public moveLeft() {
-		if this.getSpritePosition(this.platform).x <= 0 {
+		if (this.getSpritePosition(this.platform).x <= 2) {
 			return
 		}
 
@@ -47,14 +39,20 @@ export class Arcanoid extends BaseGame {
 	}
 
 	public moveRight() {
-		if this.getSpritePosition(this.platform).x > this.x - 2 {
+		if this.getSpritePosition(this.platform).x > this.x - 4 {
 			return
 		}
 
 		this.platform.x += this.cellSize;
 	}
 
-	public stopPlatform() {
+	public setupPlatform() {
+		let cellPosition = this.getCellCenter({x: 4, y: 17})
+		let platform = this.physics.add.image(cellPosition.x + this.cellSize / 2, cellPosition.y, 'platform').setImmovable();
+		// platform.setOrigin(0)
+		this.scaleSprite(platform, 4 * this.cellSize)
+		this.physics.add.collider(platform, this.ball, this.platformHit)
+	    this.platform = platform
 	}
 
 	public setupBall() {

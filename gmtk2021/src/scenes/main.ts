@@ -253,11 +253,15 @@ export class MainScene extends Phaser.Scene {
         this.load.image('bullet', 'images/bullet.png')
         this.load.image('vertical_wall', 'images/vertical_wall.png')
         this.load.image('horizontal_wall', 'images/horizontal_wall.png')
+<<<<<<< HEAD
 
         this.load.image('button_left', 'images/left_button.png')
         this.load.image('button_right', 'images/right_button.png')
         this.load.image('button_down', 'images/button_down.png')
         this.load.image('button_action', 'images/action_button.png')
+=======
+        this.load.image('platform', 'images/platform.png')
+>>>>>>> Implemented platform
         // this.load.image('bullet', 'images/bullet2.png')
         // this.load.image('mainframe', 'images/mainframe.png')
         // this.load.image('monster', 'images/monster.png')
