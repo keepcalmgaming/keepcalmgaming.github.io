@@ -150,12 +150,6 @@ export class MainScene extends Phaser.Scene {
             callback: this.arcanoid.spawnLine,
             callbackScope: this.arcanoid
         })
-        this.time.addEvent({
-            delay: 100000,
-            loop: true,
-            callback: this.tetris.spawnStupidLine,
-            callbackScope: this.tetris
-        })
 
         this.time.timeScale = 1;
 
