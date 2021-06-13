@@ -60,6 +60,7 @@ export class Arcanoid extends BaseGame {
 	public setupBall() {
 		let cellPosition = this.getCellCenter({x: 4, y: 16})
 		this.ball = this.physics.add.image(cellPosition.x, cellPosition.y, 'ball');
+		this.ball.setCircle()
 		this.scaleSprite(this.ball, this.cellSize / 2);
 		this.ball.setCollideWorldBounds(false);
 		this.ball.setBounce(1);
@@ -68,21 +69,14 @@ export class Arcanoid extends BaseGame {
 	}
 
 	private setupBlocks() {
-		this.blocks = this.physics.add.group()
-
-		this.physics.add.collider(
-			this.ball, 
-			this.blocks, 
-			this.onBallBlock
-		);
-
 		for (let pos of START_BLOCKS) {
-			let block = this.spawnBlock(pos)
-			this.blocks.add(block)
+			let cellPosition = this.getCellCenter(pos)
+			let block = this.physics.add.image(cellPosition.x, cellPosition.y, 'block').setAlpha(100).setImmovable()
+			this.physics.add.collider(block, this.ball, this.onBallBlock)	
 		}
 	}
 
-	private onBallBlock(ball, block) {
+	private onBallBlock(block, ball) {
 		console.log('ball hit')
 		block.destroy()
 	}
