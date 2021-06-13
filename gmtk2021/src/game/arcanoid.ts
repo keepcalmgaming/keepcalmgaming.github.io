@@ -6,17 +6,23 @@ export class Arcanoid extends BaseGame {
 	private platform: any
 	private isBallMoving = false
 
+	private leftVerticalWall: any
+	private rightVerticalWall: any
+
+	private topHorizontalWall: any
+	private bottomHorizontalWall: any
+
 	private platformPosition: number = 3
 
 	constructor(config: any) {
 		super(config)
 
 		console.log(this)
-    this.bullets = []
-		this.setupBall();
+	    this.bullets = []
 		this.setupPlatform()
-		this.setupWalls();
 		this.setupBlocks();
+		this.setupWalls();
+		this.setupBall(3, 16);
 
 		console.log('Arcanoid', this.config)
 	}
@@ -88,13 +94,11 @@ export class Arcanoid extends BaseGame {
 		let cellPosition = this.getCellCenter({x: this.platformPosition, y: 17})
 		let platform = this.physics.add.image(cellPosition.x + this.cellSize / 2, cellPosition.y, 'platform').setImmovable();
 		this.scaleSprite(platform, 4 * this.cellSize)
-		this.physics.add.collider(platform, this.ball, this.platformHit)
-		this.physics.add.overlap(platform, this.ball, this.platformOverlap.bind(this))
 	  this.platform = platform
 	}
 
-	public setupBall() {
-		let cellPosition = this.getCellCenter({x: 4, y: 16})
+	public setupBall(x: number, y: number) {
+		let cellPosition = this.getCellCenter({x, y})
 		this.ball = this.physics.add.image(cellPosition.x, cellPosition.y, 'ball');
 		this.ball.setCircle()
 		this.ball.setOrigin(0.5)
@@ -102,6 +106,19 @@ export class Arcanoid extends BaseGame {
 		this.ball.setCollideWorldBounds(false);
 		this.ball.setBounce(1);
 		this.ball.body.stopVelocityOnCollide = false;
+
+		this.physics.add.collider(this.platform, this.ball, this.platformHit)
+		this.physics.add.overlap(this.platform, this.ball, this.platformOverlap.bind(this))
+
+		this.physics.add.collider(this.leftVerticalWall, this.ball, this.wallHit)	
+		this.physics.add.collider(this.rightVerticalWall, this.ball, this.wallHit)	
+
+		this.physics.add.collider(this.topHorizontalWall, this.ball, this.wallHit)	
+		this.physics.add.collider(this.bottomHorizontalWall, this.ball, this.floorHit.bind(this))	
+
+		for (let block of this.blocks) {
+			this.physics.add.collider(block, this.ball, this.onBallBlock, null, this)
+		}
 
 		this.ball.setVelocity(0, 0)
 	}
@@ -118,7 +135,6 @@ export class Arcanoid extends BaseGame {
 		let cellPosition = this.getCellCenter(pos)
 		let block = this.physics.add.image(cellPosition.x, cellPosition.y, 'block').setAlpha(100).setImmovable()
 		this.scaleSprite(block, this.cellSize * 0.9)
-		this.physics.add.collider(block, this.ball, this.onBallBlock, null, this)
 		this.blocks.push(block)
 	}
 
@@ -173,27 +189,22 @@ export class Arcanoid extends BaseGame {
 
 	public setupHorizontalWalls(alpha: number) {
 		let cellPosition = this.getCellCenter({x: 5, y: -1})
-		let wall = this.physics.add.image(cellPosition.x, cellPosition.y, 'horizontal_wall').setAlpha(alpha).setImmovable()
-		this.scaleSprite(wall, this.cellSize * 12)
-		this.physics.add.collider(wall, this.ball, this.wallHit)	
+		this.topHorizontalWall = this.physics.add.image(cellPosition.x, cellPosition.y, 'horizontal_wall').setAlpha(alpha).setImmovable()
+		this.scaleSprite(this.topHorizontalWall, this.cellSize * 12)
 
 		cellPosition = this.getCellCenter({x: 5, y: 18})
-		wall = this.physics.add.image(cellPosition.x, cellPosition.y, 'horizontal_wall').setAlpha(alpha).setImmovable()
-		this.scaleSprite(wall, this.cellSize * 12)
-		this.physics.add.collider(wall, this.ball, this.floorHit.bind(this))	
+		this.bottomHorizontalWall = this.physics.add.image(cellPosition.x, cellPosition.y, 'horizontal_wall').setAlpha(alpha).setImmovable()
+		this.scaleSprite(this.bottomHorizontalWall, this.cellSize * 12)
 	}
 	
 	public setupVerticalWalls(alpha: number) {
 		let cellPosition = this.getCellCenter({x: -1, y: 9})
-		let wall = this.physics.add.image(cellPosition.x, cellPosition.y, 'vertical_wall').setAlpha(alpha).setImmovable()
-		this.scaleSprite(wall, this.cellSize)
-		this.physics.add.collider(wall, this.ball, this.wallHit)	
+		this.leftVerticalWall = this.physics.add.image(cellPosition.x, cellPosition.y, 'vertical_wall').setAlpha(alpha).setImmovable()
+		this.scaleSprite(this.leftVerticalWall, this.cellSize)
 
 		cellPosition = this.getCellCenter({x: 10, y: 9})
-		wall = this.physics.add.image(cellPosition.x, cellPosition.y, 'vertical_wall').setAlpha(alpha).setImmovable()
-		this.scaleSprite(wall, this.cellSize)
-		this.physics.add.collider(wall, this.ball, this.wallHit)	
-
+		this.rightVerticalWall = this.physics.add.image(cellPosition.x, cellPosition.y, 'vertical_wall').setAlpha(alpha).setImmovable()
+		this.scaleSprite(this.rightVerticalWall, this.cellSize)
 	}
 	
 	platformOverlap(platform: Phaser.GameObjects.GameObject, ball: Phaser.GameObjects.GameObject) {
@@ -208,13 +219,8 @@ export class Arcanoid extends BaseGame {
 		this.addScore(-84)
 
 		this.isBallMoving = false;
-
-		let cellPosition = this.getCellCenter({x: this.platformPosition + 1, y: 16})
-		ball.x = cellPosition.x 
-		ball.y = cellPosition.y 
-
-		ball.setOrigin(0.5)
-		ball.setVelocity(0, 0)
+		ball.destroy()
+		this.setupBall(this.platformPosition, 16)
     }
 
 	platformHit(cell: Phaser.GameObjects.GameObject, ball: Phaser.GameObjects.GameObject) {
