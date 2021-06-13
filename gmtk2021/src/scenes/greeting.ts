@@ -33,6 +33,7 @@ export class GreetingScene extends Phaser.Scene {
 
         this.load.once('complete', () => {
             let music = this.sound.add('music')
+            music.loop = true;
             music.play()
         }, this);
         this.load.audio('music', 'sounds/track.mp3')
