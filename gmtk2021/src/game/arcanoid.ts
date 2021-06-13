@@ -13,6 +13,8 @@ export class Arcanoid extends BaseGame {
 	private ball: any
 	private blocks?: Phaser.Physics.Arcade.Group
 
+	private platformPosition: number = 3
+
 	constructor(config: any) {
 		super(config)
 
@@ -31,27 +33,29 @@ export class Arcanoid extends BaseGame {
 	}
 
 	public moveLeft() {
-		if (this.getSpritePosition(this.platform).x <= 2) {
+		if (this.platformPosition < 2) {
 			return
 		}
 
+		this.platformPosition--;
 		this.platform.x -= this.cellSize;
 	}
 
 	public moveRight() {
-		if this.getSpritePosition(this.platform).x > this.x - 4 {
+		if (this.platformPosition > 6) {
 			return
 		}
 
+		this.platformPosition++;
 		this.platform.x += this.cellSize;
 	}
 
 	public setupPlatform() {
-		let cellPosition = this.getCellCenter({x: 4, y: 17})
+		let cellPosition = this.getCellCenter({x: this.platformPosition, y: 17})
 		let platform = this.physics.add.image(cellPosition.x + this.cellSize / 2, cellPosition.y, 'platform').setImmovable();
-		// platform.setOrigin(0)
 		this.scaleSprite(platform, 4 * this.cellSize)
 		this.physics.add.collider(platform, this.ball, this.platformHit)
+		this.physics.add.overlap(platform, this.ball, this.platformOverlap)
 	    this.platform = platform
 	}
 
@@ -111,9 +115,14 @@ export class Arcanoid extends BaseGame {
 		this.physics.add.collider(wall, this.ball, this.wallHit)	
 
 	}
+	
+	platformOverlap(cell: Phaser.GameObjects.GameObject, ball: Phaser.GameObjects.GameObject) {
+		console.log("platformOverlap!")
+    }
 
 	platformHit(cell: Phaser.GameObjects.GameObject, ball: Phaser.GameObjects.GameObject) {
-   }
+		console.log("Hit!")
+    }
 
 	wallHit(cell: Phaser.GameObjects.GameObject, ball: Phaser.GameObjects.GameObject) {
     }
