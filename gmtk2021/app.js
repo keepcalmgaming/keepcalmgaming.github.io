@@ -418,8 +418,6 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             this.ball.setBounce(1);
             this.ball.body.stopVelocityOnCollide = false;
             this.ball.setVelocity(this.cellSize * 5, -(this.cellSize * 5));
-            let fuck = this.ball.body.velocity.y > 0 ? 1 : -1;
-            let you = this.ball.body.velocity.x > 0 ? 1 : -1;
             this.ball.setMaxVelocity(this.ball.body.velocity.x * 2, -(this.ball.body.velocity.y * 2));
         }
         speedUp() {
