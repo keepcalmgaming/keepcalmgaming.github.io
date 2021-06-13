@@ -28,6 +28,7 @@ define("scenes/greeting", ["require", "exports"], function (require, exports) {
             text.y = halfHeight - bounds.height / 2;
             this.load.once('complete', () => {
                 let music = this.sound.add('music');
+                music.loop = true;
                 music.play();
             }, this);
             this.load.audio('music', 'sounds/track.mp3');
@@ -504,6 +505,7 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
         createBlock(pos) {
             let cellPosition = this.getCellCenter(pos);
             let block = this.physics.add.image(cellPosition.x, cellPosition.y, 'block').setAlpha(100).setImmovable();
+            this.physics.add.collider(block, this.ball, this.onBallBlock, null, this);
             this.scaleSprite(block, this.cellSize * 0.9);
             this.blocks.push(block);
         }
