@@ -46,6 +46,7 @@ export class Arcanoid extends BaseGame {
 	public fire() {
 		if (this.isFloorTouched) {
 			this.ball.setVelocity(this.cellSize * 5, -(this.cellSize * 5))
+			this.isFloorTouched = false;
 		}
 	}
 

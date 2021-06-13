@@ -430,6 +430,7 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
         fire() {
             if (this.isFloorTouched) {
                 this.ball.setVelocity(this.cellSize * 5, -(this.cellSize * 5));
+                this.isFloorTouched = false;
             }
         }
         setupPlatform() {
