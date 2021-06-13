@@ -336,22 +336,16 @@ define("game/tetris", ["require", "exports", "game/base_game", "game/tetraminos"
             this.checkFullLines();
         }
         checkFullLines() {
-            var shouldFallDown = false;
             for (let i = 0; i < this.y; i++) {
                 let line = this.blocks.getChildren().filter(block => this.getSpritePosition(block).y == i);
                 if (line.length == this.x) {
-                    shouldFallDown = true;
                     this.addScore(this.scoreFullLine);
                     for (let block of line) {
-                        // this.blocks.remove(block)
+                        this.blocks.remove(block);
                         block.destroy();
                     }
-                }
-            }
-            if (shouldFallDown) {
-                for (let block of this.blocks.getChildren()) {
-                    let blockY = this.getSpritePosition(block).y;
-                    if (blockY < this.y - 1) {
+                    let blocksToFall = this.blocks.getChildren().filter(block => this.getSpritePosition(block).y < i);
+                    for (let block of blocksToFall) {
                         block.y = block.y + this.cellSize;
                     }
                 }
@@ -422,6 +416,7 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
         setupBall() {
             let cellPosition = this.getCellCenter({ x: 4, y: 16 });
             this.ball = this.physics.add.image(cellPosition.x, cellPosition.y, 'ball');
+            this.ball.setCircle();
             this.scaleSprite(this.ball, this.cellSize / 2);
             this.ball.setCollideWorldBounds(false);
             this.ball.setBounce(1);
@@ -429,14 +424,13 @@ define("game/arcanoid", ["require", "exports", "game/base_game"], function (requ
             this.ball.setVelocity(200, -200);
         }
         setupBlocks() {
-            this.blocks = this.physics.add.group();
-            this.physics.add.collider(this.ball, this.blocks, this.onBallBlock);
             for (let pos of START_BLOCKS) {
-                let block = this.spawnBlock(pos);
-                this.blocks.add(block);
+                let cellPosition = this.getCellCenter(pos);
+                let block = this.physics.add.image(cellPosition.x, cellPosition.y, 'block').setAlpha(100).setImmovable();
+                this.physics.add.collider(block, this.ball, this.onBallBlock);
             }
         }
-        onBallBlock(ball, block) {
+        onBallBlock(block, ball) {
             console.log('ball hit');
             block.destroy();
         }
