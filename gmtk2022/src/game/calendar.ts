@@ -21,14 +21,21 @@ const dowNames = [
 	'Sunday'
 ]
 
-enum Status { Future, Current, Seized, Failed }
+struct Day {
+    var date: Date
+    var rolledNumbers: [Int] = []
+    var currentNumber: Int?
+    var isWin = false
+    var gaveCashback = false
+}
 
 export class Day {
-	status: Status = Status.Future
 	dayOfWeek: DayOfWeek
 	dayOfMonth: number
 	monthName: string
 	rolls: Roll[]
+	currentRoll: Roll
+	isWin: boolean
 
 	constructor(dayOfMonth, dayOfWeek, monthName) {
 		this.dayOfMonth = dayOfMonth

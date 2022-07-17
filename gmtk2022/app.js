@@ -89,16 +89,17 @@ define("game/calendar", ["require", "exports"], function (require, exports) {
         'Saturday',
         'Sunday'
     ];
-    var Status;
-    (function (Status) {
-        Status[Status["Future"] = 0] = "Future";
-        Status[Status["Current"] = 1] = "Current";
-        Status[Status["Seized"] = 2] = "Seized";
-        Status[Status["Failed"] = 3] = "Failed";
-    })(Status || (Status = {}));
+    struct;
+    Day;
+    {
+        var date;
+        var rolledNumbers = [];
+        var currentNumber;
+        var isWin = false;
+        var gaveCashback = false;
+    }
     class Day {
         constructor(dayOfMonth, dayOfWeek, monthName) {
-            this.status = Status.Future;
             this.dayOfMonth = dayOfMonth;
             this.dayOfWeek = dayOfWeek;
             this.monthName = monthName;
@@ -290,6 +291,298 @@ define("app", ["require", "exports", "scenes/greeting", "scenes/main"], function
     }
     exports.App = App;
 });
+define("game/powerup", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var PowerUp;
+    (function (PowerUp) {
+        PowerUp[PowerUp["reroll"] = 0] = "reroll";
+        PowerUp[PowerUp["pseudorandomReroll"] = 1] = "pseudorandomReroll";
+        PowerUp[PowerUp["twoDices"] = 2] = "twoDices";
+        PowerUp[PowerUp["upwardReroll"] = 3] = "upwardReroll";
+        PowerUp[PowerUp["downwardReroll"] = 4] = "downwardReroll";
+        PowerUp[PowerUp["upsideDown"] = 5] = "upsideDown";
+    })(PowerUp = exports.PowerUp || (exports.PowerUp = {}));
+    function getPUTitle(p) {
+        switch (p) {
+            case PowerUp.reroll: return "Reroll";
+            case PowerUp.pseudorandomReroll: return "Pseudorandom Reroll";
+            case PowerUp.twoDices: return "Two Dices";
+            case PowerUp.upwardReroll: return "Upward Reroll";
+            case PowerUp.downwardReroll: return "Downward Reroll";
+            case PowerUp.upsideDown: return "Upside Down";
+        }
+    }
+    exports.getPUTitle = getPUTitle;
+});
+//     var title: String {
+//         switch self {
+//         case .reroll: return "Reroll"
+//         case .pseudorandomReroll: return "Pseudorandom Reroll"
+//         case .twoDices: return "Two Dices"
+//         case .upwardReroll: return "Upward Reroll"
+//         case .downwardReroll: return "Downward Reroll"
+//         case .upsideDown: return "Upside Down"
+//         }
+//     }
+//     var shortTitle: String {
+//         switch self {
+//         case .reroll: return "Reroll"
+//         case .pseudorandomReroll: return "Pseudo"
+//         case .twoDices: return "Two Dices"
+//         case .upwardReroll: return "Upward"
+//         case .downwardReroll: return "Downward"
+//         case .upsideDown: return "Upside Down"
+//         }
+//     }
+//     var description: String {
+//         switch self {
+//         case .reroll:
+//             return "Gives you opportunity to reroll the dice. Simple as that"
+//         case .pseudorandomReroll:
+//             return "You can reroll the dice, and it will show value that wasn't rolled today"
+//         case .twoDices:
+//             return "You roll 2 dices and it gives you 3 values at once: from the 1 dice, from the 2 dice and their sum"
+//         case .upwardReroll:
+//             return "Rerolled dice will show value more than the last roll. If two dices are rolled, it will be the value more than the one that has minimum value"
+//         case .downwardReroll:
+//             return "Rerolled dice will show value less than the last roll. If two dices are rolled, it will be the value less than the one that has maximum value"
+//         case .upsideDown:
+//             return "You can rotate the dice (or dices) upside down. Tip: the sum of opposite side values in the dice always equals 7"
+//         }
+//     }
+//     var price: Int {
+//         switch self {
+//         case .reroll: return 7
+//         case .pseudorandomReroll: return 12
+//         case .twoDices: return 20
+//         case .upwardReroll: return 24
+//         case .downwardReroll: return 24
+//         case .upsideDown: return 25
+//         }
+//     }
+//     var imageName: String {
+//         switch self {
+//         case .reroll: return "reroll"
+//         case .pseudorandomReroll: return "psreroll"
+//         case .twoDices: return "two"
+//         case .upwardReroll: return "up"
+//         case .downwardReroll: return "down"
+//         case .upsideDown: return "rotate"
+//         }
+//     }
+//     static var all: [PowerUp] {
+//         return [PowerUp.reroll, PowerUp.pseudorandomReroll, PowerUp.twoDices, PowerUp.upwardReroll, PowerUp.downwardReroll, PowerUp.upsideDown]
+//     }
+// }
+define("game/game", ["require", "exports", "game/calendar"], function (require, exports, calendar_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    BalanceStats = {
+        sundayBonus: 40
+    };
+    class CalenGame {
+        constructor() {
+            this.points = 0;
+            this.diceValue = null;
+            this.isFinished = false;
+            this.calendar = new calendar_2.Calendar();
+            this.calIndex = 0;
+            this.currentDay = this.calendar.days[0];
+        }
+        addPoints(amount) {
+            this.points += amount;
+            this.totalPoints += amount;
+        }
+        nextDay() {
+            this.diceValue = null;
+            this.diceValues = [];
+            this.currentDay.diceValues = this.diceValues;
+            this.currentDay.diceValue = this.diceValue;
+            // this.diceValues = []
+            this.diceValue = null;
+            this.calIndex++;
+            this.currentDay = this.calendar.days[this.calIndex];
+            if (this.currentDay.dayOfWeek == calendar_2.DayOfWeek.Sunday) {
+                this.addPoints(BalanceStats.sundayBonus);
+            }
+        }
+        checkWin() {
+        }
+        addRoll(r) {
+            this.diceValue = r;
+            // this.diceValues.append(r)
+            checkWin();
+        }
+        rollTheDice() {
+            this.addRoll(Math.floor(Math.random() * 6));
+        }
+        rollPseudoRandom() {
+            let rolls = [calendar_2.Roll.ONE, calendar_2.Roll.TWO, calendar_2.Roll.THREE, calendar_2.Roll.FOUR, calendar_2.Roll.FIVE, calendar_2.Roll.SIX];
+            let possibleRolls = [];
+            for (let i = 0; i < rolls.length; i++) {
+                if (!this.diceValues.includes(rolls[i])) {
+                    possibleRolls.push(rolls[i]);
+                }
+            }
+            let l = possibleRolls.length;
+            if (l > 0) {
+                let index = Math.floor(Math.random() * l);
+                this.addRoll(possibleRolls[index]);
+            }
+        }
+    }
+    exports.CalenGame = CalenGame;
+});
+//     func rollTheDicePseudorandomly() {
+//         var possibleValues = [1, 2, 3, 4, 5, 6]
+//         for rolled in currentDay.rolledNumbers {
+//             if let index = possibleValues.firstIndex(of: rolled) {
+//                 possibleValues.remove(at: index)
+//             }
+//         }
+//         if talents.contains(Talent.teaMaster) && currentDay.date.isTeaDay && self.diceValue != nil {
+//             if possibleValues.count > 1 {
+//                 possibleValues = [possibleValues.randomElement() ?? neededScore, neededScore]
+//             }
+//         }
+//         guard possibleValues.isEmpty == false else { return }
+//         self.diceValue = possibleValues.randomElement() ?? Int.random(in: 1...6)
+//         self.diceValues = nil
+//         checkWin()
+//         checkCardCount()
+//     }
+//     func rollTwoDices() {
+//         let v1 = Int.random(in: 1...6)
+//         let v2 = Int.random(in: 1...6)
+//         self.diceValues = [v1, v2]
+//         self.diceValue = nil
+//         checkWin()
+//         checkCardCount()
+//     }
+//     func upwardRoll() {
+//         if let diceValue = diceValue, diceValue < 6 {
+//             self.diceValue = Int.random(in: (diceValue + 1)...6)
+//             self.diceValues = nil
+//             checkWin()
+//         } else if let diceValues = diceValues, let v1 = diceValues.first, let v2 = diceValues.last, min(v1, v2) < 6 {
+//             self.diceValue = Int.random(in: (min(v1, v2) + 1)...6 )
+//             self.diceValues = nil
+//             checkWin()
+//         }
+//         checkCardCount()
+//     }
+//     func downwardRoll() {
+//         if let diceValue = diceValue, diceValue > 1 {
+//             self.diceValue = Int.random(in: 1...diceValue - 1)
+//             self.diceValues = nil
+//             checkWin()
+//         } else if let diceValues = diceValues, let v1 = diceValues.first, let v2 = diceValues.last, max(v1, v2) > 1 {
+//             self.diceValue = Int.random(in: 1...max(v1, v2) - 1)
+//             self.diceValues = nil
+//             checkWin()
+//         }
+//         checkCardCount()
+//     }
+//     func upsideDown() {
+//         if let diceValue = diceValue {
+//             self.diceValue = 7 - diceValue
+//             checkWin()
+//         } else if let diceValues = diceValues, let v1 = diceValues.first, let v2 = diceValues.last {
+//             self.diceValues = [7 - v1, 7 - v2]
+//             checkWin()
+//         }
+//         checkCardCount()
+//     }
+//     var neededScore: Int {
+//         let dayName = self.currentDay.date.formatted(.day)
+//         switch dayName {
+//         case "Monday":
+//             return 1
+//         case "Tuesday":
+//             return 2
+//         case "Wednesday":
+//             return 3
+//         case "Thursday":
+//             return 4
+//         case "Friday":
+//             return 5
+//         case "Saturday":
+//             return 6
+//         default:
+//             return 0
+//         }
+//     }
+//     func checkWin() {
+//         if let diceValue = diceValue {
+//             self.currentDay.rolledNumbers.append(diceValue)
+//             if diceValue == neededScore {
+//                 win()
+//             }
+//         } else if let diceValues = diceValues {
+//             guard let v1 = diceValues.first, let v2 = diceValues.last else { return }
+//             if v1 == neededScore || v2 == neededScore || v1 + v2 == neededScore {
+//                 win()
+//             }
+//         }
+//     }
+//     func win() {
+//         if currentDay.isWin == false {
+//             self.currentDay.isWin = true
+//             if talents.contains(Talent.compulsiveHoarder) {
+//                 points += BalanceStats.win / 2
+//                 totalPoints += BalanceStats.win / 2
+//                 powerUps.append(PowerUpItem(type: PowerUp.all.randomElement() ?? PowerUp.reroll))
+//             } else {
+//                 points += BalanceStats.win
+//                 totalPoints += BalanceStats.win
+//             }
+//             Haptic.play(.win)
+//         }
+//         if pastDays.count >= 5 {
+//             let count = pastDays.suffix(5).filter({ $0.isWin }).count
+//             if count == 5 {
+//                 //it's streak!
+//                 points += BalanceStats.winStreak
+//                 totalPoints += BalanceStats.winStreak
+//             }
+//         }
+//     }
+//     func countOfBoughtPowerUpsOfType(_ up: PowerUp) -> Int {
+//         return Game.shared.powerUps.filter({ $0.type == up }).count
+//     }
+//     func usePowerUp(_ powerUp: PowerUp) {
+//         guard let index = powerUps.firstIndex(where: ({ $0.type == powerUp})) else { return }
+//         powerUps.remove(at: index)
+//         switch powerUp {
+//         case .reroll:
+//             rollTheDice()
+//         case .pseudorandomReroll:
+//             rollTheDicePseudorandomly()
+//         case .twoDices:
+//             rollTwoDices()
+//         case .upwardReroll:
+//             upwardRoll()
+//         case .downwardReroll:
+//             downwardRoll()
+//         case .upsideDown:
+//             upsideDown()
+//         }
+//     }
+//     func isDateWasWon(date: Date) -> Bool {
+//         guard let day = pastDays.first(where: { Calendar.current.isDate(date, inSameDayAs: $0.date) }) else { return false }
+//         return day.isWin
+//     }
+//     var talentsToChoose: [Talent] {
+//         var possibleTalents = Talent.all
+//         for t in talents {
+//             if let index = possibleTalents.firstIndex(of: t) {
+//                 possibleTalents.remove(at: index)
+//             }
+//         }
+//         return Array(possibleTalents.shuffled().prefix(3))
+//     }
+// }
 define("game/utils", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
