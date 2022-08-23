@@ -4,22 +4,22 @@ const gameWidth = window.innerWidth
 const halfHeight = gameHeight / 2
 const halfWidth = gameWidth / 2
 
-export class GreetingScene extends Phaser.Scene {
+export class EndgameScene extends Phaser.Scene {
     constructor(
         sceneConfig: object
     ) {
-        super({key: 'greeting'})
+        super({key: 'endgame'})
     }
 
     create() {
         var content = [
-            "ROLL THE WAY",
-            "You have a game field 13x13. You start in the center. You play as a dice. Top value of the dice shows the amount of rotations you can do in any of possible directions. Rotating changes your top value.",
-            "You can’t finish your move on the cell you were located previously.",            
-            "Your goal is too step on as much cells as possible before you don’t have opportunity to move.",            
-            "Good luck.",
+            "Congrats!",
+            "You score is " + window.SCORE + " points!",
+            "Highscore is " + window.HIGHSCORE + " points!",
             "",
-            "https://keepcalmgaming.github.io"
+            "Thank you for playing!",
+            "",
+            "(Click to restart)",
         ];
         this.cameras.main.setBackgroundColor('#959F7D');
         
@@ -29,13 +29,6 @@ export class GreetingScene extends Phaser.Scene {
         text.x = halfWidth - bounds.width/2;
         text.y = halfHeight - bounds.height/2;
 
-        this.load.once('complete', () => {
-            let music = this.sound.add('music')
-            music.play()
-        }, this);
-        this.load.audio('music', 'sounds/track.mp3')
-        this.load.start();
-
         let clicked = false
 
         if (!window.SaveState) {
@@ -43,8 +36,8 @@ export class GreetingScene extends Phaser.Scene {
         }
 
         this.input.on('pointerdown', () => {
-            if (!clicked) {
-              console.log('greeting pointerdown')
+            if (!clicked || true) {
+              this.scene.stop('endgame')
               this.scene.switch('main')
               clicked = true
             }
@@ -52,8 +45,7 @@ export class GreetingScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown', (event: any) => {
             event.preventDefault()
-            if (!clicked) {
-              console.log('greeting keydown')
+            if (!clicked || true) {
               this.scene.switch('main')
               clicked = true
             }

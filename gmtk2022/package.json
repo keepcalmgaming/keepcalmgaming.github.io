@@ -14,7 +14,11 @@
   "license": "ISC",
   "devDependencies": {
     "concurrently": "^4.1.0",
-    "lite-server": "^2.4.0",
+    "lite-server": "^2.6.1",
     "typescript": "^3.4.5"
+  },
+  "dependencies": {
+    "run": "^1.4.0",
+    "start": "^5.1.0"
   }
 }

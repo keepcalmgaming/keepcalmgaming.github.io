@@ -1,5 +1,6 @@
 import { GreetingScene } from './scenes/greeting'
 import { MainScene } from './scenes/main'
+import { EndgameScene } from './scenes/endgame'
 
 const gameHeight = window.innerHeight
 const gameWidth = window.innerWidth
@@ -14,7 +15,7 @@ let config: GameConfig = {
             debug: false
         }
     },
-    scene: [ GreetingScene, MainScene ]
+    scene: [ GreetingScene, MainScene, EndgameScene ]
 }
 
 export class App {
@@ -22,6 +23,7 @@ export class App {
 
     public start(): void {
         this.log('Generating game...')
+        window.HIGHSCORE = 0
         let g = new Phaser.Game(config)
 
         this.log('Ready to play')
