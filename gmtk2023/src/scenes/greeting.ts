@@ -14,6 +14,7 @@ export class GreetingScene extends Phaser.Scene {
     create() {
         var content = [
             "Resolve",
+            "Unfinished GMTK2023 game with unlimited potential",
             "Good luck.",
             "",
             "https://keepcalmgaming.github.io"

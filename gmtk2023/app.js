@@ -13,6 +13,7 @@ define("scenes/greeting", ["require", "exports"], function (require, exports) {
         create() {
             var content = [
                 "Resolve",
+                "Unfinished GMTK2023 game with unlimited potential",
                 "Good luck.",
                 "",
                 "https://keepcalmgaming.github.io"
