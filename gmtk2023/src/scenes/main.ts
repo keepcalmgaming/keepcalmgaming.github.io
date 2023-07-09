@@ -22,7 +22,6 @@ type Position = {
     y: number
 }
 
-
 export class MainScene extends Phaser.Scene {
     private isVertical: boolean
 
@@ -65,6 +64,8 @@ export class MainScene extends Phaser.Scene {
             this.offsetX = halfWidth - this.cellSize * 6.5
             this.offsetY = this.cellSize * 5
         }
+
+        this.statistics = {gold: 0, childs: 0}
     }
 
     private music?: Phaser.Sound.BaseSound
@@ -125,10 +126,28 @@ export class MainScene extends Phaser.Scene {
 
     }
 
+    resolveTableCards(card1, card2) {
+        let isKing: RegExp = /.+_king$/
+        let isQueen: RegExp = /.+_queen$/
+        let kingVsKing = (isKing.test(card1.cardType) && isKing.test(card2.cardType))
+
+        let kingVsQueen = (isKing.test(card1.cardType) && isQueen.test(card2.cardType)) || (isKing.test(card2.cardType) && isQueen.test(card1.cardType))
+        
+        if (kingVsKing) {
+            console.log('gold + 1')
+            this.statistics.gold += 1
+        } else if(kingVsQueen) {
+            console.log('childS + 1')
+            this.statistics.childs += 1
+        }
+    }
+
     onTurnClicked() {
         console.log('onTurnClicked')
 
         this.turn.hide()
+
+        this.resolveTableCards(this.tableCards[0], this.tableCards[1])
 
         this.tableCards.forEach(function (card) {
             //TODO remove from playerCards, enemyCards

@@ -1,6 +1,7 @@
 define("scenes/greeting", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.GreetingScene = void 0;
     const gameHeight = window.innerHeight;
     const gameWidth = window.innerWidth;
     const halfHeight = gameHeight / 2;
@@ -53,6 +54,7 @@ define("scenes/greeting", ["require", "exports"], function (require, exports) {
 define("game/base_game", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.BaseGame = void 0;
     class BaseGame {
         constructor(config) {
             this.config = config;
@@ -116,6 +118,7 @@ define("game/base_game", ["require", "exports"], function (require, exports) {
 define("game/card", ["require", "exports", "game/base_game"], function (require, exports, base_game_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Card = void 0;
     class Card extends base_game_1.BaseGame {
         constructor(config) {
             super(config);
@@ -252,6 +255,7 @@ define("game/card", ["require", "exports", "game/base_game"], function (require,
 define("game/turn", ["require", "exports", "game/base_game"], function (require, exports, base_game_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Turn = void 0;
     class Turn extends base_game_2.BaseGame {
         constructor(config) {
             super(config);
@@ -289,6 +293,7 @@ define("game/turn", ["require", "exports", "game/base_game"], function (require,
 define("scenes/main", ["require", "exports", "game/card", "game/turn"], function (require, exports, card_1, turn_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.MainScene = void 0;
     const gameHeight = window.innerHeight;
     const gameWidth = window.innerWidth;
     const halfWidth = gameWidth / 2;
@@ -320,6 +325,7 @@ define("scenes/main", ["require", "exports", "game/card", "game/turn"], function
                 this.offsetX = halfWidth - this.cellSize * 6.5;
                 this.offsetY = this.cellSize * 5;
             }
+            this.statistics = { gold: 0, childs: 0 };
         }
         addScore(i) {
             if (i == -42) {
@@ -357,9 +363,24 @@ define("scenes/main", ["require", "exports", "game/card", "game/turn"], function
             console.log('onEnemyCardPlayed');
             this.turn.show();
         }
+        resolveTableCards(card1, card2) {
+            let isKing = /.+_king$/;
+            let isQueen = /.+_queen$/;
+            let kingVsKing = (isKing.test(card1.cardType) && isKing.test(card2.cardType));
+            let kingVsQueen = (isKing.test(card1.cardType) && isQueen.test(card2.cardType)) || (isKing.test(card2.cardType) && isQueen.test(card1.cardType));
+            if (kingVsKing) {
+                console.log('gold + 1');
+                this.statistics.gold += 1;
+            }
+            else if (kingVsQueen) {
+                console.log('childS + 1');
+                this.statistics.childs += 1;
+            }
+        }
         onTurnClicked() {
             console.log('onTurnClicked');
             this.turn.hide();
+            this.resolveTableCards(this.tableCards[0], this.tableCards[1]);
             this.tableCards.forEach(function (card) {
                 //TODO remove from playerCards, enemyCards
                 card.hide();
@@ -789,6 +810,7 @@ define("scenes/main", ["require", "exports", "game/card", "game/turn"], function
 define("scenes/endgame", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.EndgameScene = void 0;
     const gameHeight = window.innerHeight;
     const gameWidth = window.innerWidth;
     const halfHeight = gameHeight / 2;
@@ -837,6 +859,7 @@ define("scenes/endgame", ["require", "exports"], function (require, exports) {
 define("app", ["require", "exports", "scenes/greeting", "scenes/main", "scenes/endgame"], function (require, exports, greeting_1, main_1, endgame_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.App = void 0;
     const gameHeight = window.innerHeight;
     const gameWidth = window.innerWidth;
     let config = {
