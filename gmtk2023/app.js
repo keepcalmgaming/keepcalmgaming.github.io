@@ -385,6 +385,13 @@ define("scenes/main", ["require", "exports", "game/card", "game/turn"], function
                 //TODO remove from playerCards, enemyCards
                 card.hide();
             });
+            this.playerCards = this.playerCards.filter(card => card !== this.tableCards[0]);
+            this.playerCards = this.playerCards.filter(card => card !== this.tableCards[1]);
+            this.enemyCards = this.enemyCards.filter(card => card !== this.tableCards[0]);
+            this.enemyCards = this.enemyCards.filter(card => card !== this.tableCards[1]);
+            if (this.playerCards.length == 0 || this.enemyCards.length == 0) {
+                this.addScore(-42);
+            }
             this.tableCards = [];
             this.playerCardPlayed = false;
         }
