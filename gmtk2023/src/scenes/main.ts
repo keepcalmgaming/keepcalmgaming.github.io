@@ -22,6 +22,7 @@ type Position = {
     y: number
 }
 
+
 export class MainScene extends Phaser.Scene {
     private isVertical: boolean
 
