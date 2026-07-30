@@ -1,140 +1,226 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
     <title>Keep Calm Gaming</title>
+
+    <style>
+      :root {
+        --bg: #0f1115;
+        --surface: #1a1d24;
+        --surface-hover: #21252e;
+        --border: #2a2f3a;
+        --text: #e8eaed;
+        --text-muted: #9aa0ac;
+        --accent: #5b8def;
+        --accent-hover: #4374d6;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        min-height: 100vh;
+      }
+
+      .navbar {
+        background: var(--surface) !important;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .navbar-brand {
+        font-weight: 700;
+        letter-spacing: 0.5px;
+      }
+
+      .page-heading {
+        text-align: center;
+        margin: 3rem auto 0.5rem;
+        font-size: 1.9rem;
+        font-weight: 700;
+      }
+
+      .page-subheading {
+        text-align: center;
+        color: var(--text-muted);
+        margin-bottom: 3rem;
+        font-size: 1.05rem;
+      }
+
+      .games-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 1.75rem;
+        padding-bottom: 4rem;
+      }
+
+      .game-card {
+        display: flex;
+        flex-direction: column;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      }
+
+      .game-card:hover {
+        transform: translateY(-6px);
+        border-color: var(--accent);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+      }
+
+      .game-card__img {
+        width: 100%;
+        aspect-ratio: 16 / 10;
+        object-fit: cover;
+        background: #0b0d11;
+      }
+
+      .game-card__body {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        padding: 1.15rem 1.25rem 1.35rem;
+      }
+
+      .game-card__title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 0.4rem;
+      }
+
+      .game-card__text {
+        color: var(--text-muted);
+        font-size: 0.92rem;
+        line-height: 1.45;
+        flex: 1;
+        margin-bottom: 1.1rem;
+      }
+
+      .game-card__btn {
+        align-self: flex-start;
+        background: var(--accent);
+        border: none;
+        border-radius: 8px;
+        color: #fff;
+        font-weight: 600;
+        padding: 0.5rem 1.2rem;
+        text-decoration: none;
+        transition: background 0.15s ease;
+      }
+
+      .game-card__btn:hover {
+        background: var(--accent-hover);
+        color: #fff;
+        text-decoration: none;
+      }
+    </style>
   </head>
   <body>
-    <nav class="navbar navbar-dark bg-dark">
+    <nav class="navbar navbar-dark">
       <span class="navbar-brand mb-0 h1">Keep Calm Gaming</span>
     </nav>
 
     <div class="container">
-      <h1>Hello, we are Keep Calm Gaming and here is list of our games:</h1>
+      <h1 class="page-heading">We are Keep Calm Gaming</h1>
+      <p class="page-subheading">Here is the list of our games:</p>
 
-      <div class="row" style="height: 28rem;">
-        <div class="col">
-          <div class="card" style="width: 18rem;">
-            <img class="card-img-top" src="assets/wb.jpg" alt="Card image cap">
-            <div class="card-body">
-              <h5 class="card-title">Wrecking Bowling</h5>
-              <p class="card-text">GMTK 2018 Game Jam Submission.</p>
-              <a href="/gmtk2018/" class="btn btn-primary">Play game</a>
-            </div>
+      <div class="games-grid">
+        <div class="game-card">
+          <img class="game-card__img" src="assets/countdown.png" alt="Countdown">
+          <div class="game-card__body">
+            <h5 class="game-card__title">Countdown</h5>
+            <p class="game-card__text">GMTK 2026 Game Jam Submission.</p>
+            <a href="https://keepcalmgaming.itch.io/countdown" class="game-card__btn">Play game</a>
           </div>
         </div>
-        <div class="col-sm"></div>
-        <div class="col">
-          <div class="card" style="width: 18rem;">
-            <img class="card-img-top" src="assets/bsh.png" alt="Card image cap">
-            <div class="card-body">
-              <h5 class="card-title">B#</h5>
-              <p class="card-text">GMTK 2019 Game Jam Submission.</p>
-              <a href="/gmtk2019/" class="btn btn-primary">Play game</a>
-            </div>
+
+        <div class="game-card">
+          <img class="game-card__img" src="assets/8402.png" alt="8402">
+          <div class="game-card__body">
+            <h5 class="game-card__title">8402</h5>
+            <p class="game-card__text">GMTK 2026 Game Jam Option.</p>
+            <a href="https://keepcalmgaming.itch.io/8402" class="game-card__btn">Play game</a>
           </div>
         </div>
-        <div class="col-sm"></div>
-        <div class="col">
-          <div class="card" style="width: 18rem;">
-            <img class="card-img-top" src="assets/lrcc.png" alt="Card image cap">
-            <div class="card-body">
-              <h5 class="card-title">Left Right Cool Crap</h5>
-              <p class="card-text">GMTK 2020 Game Jam Submission.</p>
-              <a href="/gmtk2020/" class="btn btn-primary">Play game</a>
-            </div>
+
+        <div class="game-card">
+          <img class="game-card__img" src="assets/ploo.png" alt="Ploo">
+          <div class="game-card__body">
+            <h5 class="game-card__title">Ploo</h5>
+            <p class="game-card__text">GMTK 2025 Game Jam Submission.</p>
+            <a href="https://keepcalmgaming.itch.io/ploo" class="game-card__btn">Play game</a>
           </div>
         </div>
-        <div class="col-sm"></div>
-        <div class="col">
-          <div class="card" style="width: 18rem;">
-            <img class="card-img-top" src="assets/tgow.png" alt="Card image cap">
-            <div class="card-body">
-              <h5 class="card-title">Two Games One Win</h5>
-              <p class="card-text">GMTK 2021 Game Jam Submission.</p>
-              <a href="/gmtk2021/" class="btn btn-primary">Play game</a>
-            </div>
+
+        <div class="game-card">
+          <img class="game-card__img" src="assets/csmscl.png" alt="Cosmoscale">
+          <div class="game-card__body">
+            <h5 class="game-card__title">Cosmoscale</h5>
+            <p class="game-card__text">GMTK 2024 Game Jam Submission.</p>
+            <a href="https://keepcalmgaming.itch.io/cosmoscale" class="game-card__btn">Play game</a>
           </div>
         </div>
-        <div class="col-sm"></div>
-        <div class="col">
-          <div class="card" style="width: 18rem;">
-            <img class="card-img-top" src="assets/rtw.png" alt="Card image cap">
-            <div class="card-body">
-              <h5 class="card-title">ROLL THE WAY</h5>
-              <p class="card-text">GMTK 2022 Game Jam Submission.</p>
-              <a href="/gmtk2022/" class="btn btn-primary">Play game</a>
-            </div>
+
+        <div class="game-card">
+          <img class="game-card__img" src="assets/rslv.png" alt="Resolve">
+          <div class="game-card__body">
+            <h5 class="game-card__title">Resolve</h5>
+            <p class="game-card__text">Unfinished, unsubmitted GMTK 2023 Game Jam project.</p>
+            <a href="/gmtk2023/" class="game-card__btn">Play game</a>
           </div>
         </div>
-        <div class="col-sm"></div>
-        <div class="col">
-          <div class="card" style="width: 18rem;">
-            <img class="card-img-top" src="assets/rslv.png" alt="Card image cap">
-            <div class="card-body">
-              <h5 class="card-title">Resolve</h5>
-              <p class="card-text">Unfinished, unsubmitted GMTK 2023 Game Jam project.</p>
-              <a href="/gmtk2023/" class="btn btn-primary">Play game</a>
-            </div>
+
+        <div class="game-card">
+          <img class="game-card__img" src="assets/rtw.png" alt="ROLL THE WAY">
+          <div class="game-card__body">
+            <h5 class="game-card__title">ROLL THE WAY</h5>
+            <p class="game-card__text">GMTK 2022 Game Jam Submission.</p>
+            <a href="/gmtk2022/" class="game-card__btn">Play game</a>
           </div>
         </div>
-        <div class="col-sm"></div>
-        <div class="col">
-          <div class="card" style="width: 18rem;">
-            <img class="card-img-top" src="assets/csmscl.png" alt="Card image cap">
-            <div class="card-body">
-              <h5 class="card-title">Cosmoscale</h5>
-              <p class="card-text">GMTK 2024 Game Jam Submission.</p>
-              <a href="https://keepcalmgaming.itch.io/cosmoscale" class="btn btn-primary">Play game</a>
-            </div>
+
+        <div class="game-card">
+          <img class="game-card__img" src="assets/tgow.png" alt="Two Games One Win">
+          <div class="game-card__body">
+            <h5 class="game-card__title">Two Games One Win</h5>
+            <p class="game-card__text">GMTK 2021 Game Jam Submission.</p>
+            <a href="/gmtk2021/" class="game-card__btn">Play game</a>
           </div>
         </div>
-        <div class="col-sm"></div>
-        <div class="col">
-          <div class="card" style="width: 18rem;">
-            <img class="card-img-top" src="assets/ploo.png" alt="Card image cap">
-            <div class="card-body">
-              <h5 class="card-title">Ploo</h5>
-              <p class="card-text">GMTK 2025 Game Jam Submission.</p>
-              <a href="https://keepcalmgaming.itch.io/ploo" class="btn btn-primary">Play game</a>
-            </div>
+
+        <div class="game-card">
+          <img class="game-card__img" src="assets/lrcc.png" alt="Left Right Cool Crap">
+          <div class="game-card__body">
+            <h5 class="game-card__title">Left Right Cool Crap</h5>
+            <p class="game-card__text">GMTK 2020 Game Jam Submission.</p>
+            <a href="/gmtk2020/" class="game-card__btn">Play game</a>
           </div>
         </div>
-        <div class="col-sm"></div>
-        <div class="col">
-          <div class="card" style="width: 18rem;">
-            <img class="card-img-top" src="assets/8402.png" alt="Card image cap">
-            <div class="card-body">
-              <h5 class="card-title">Ploo</h5>
-              <p class="card-text">GMTK 2026 Game Jam Option.</p>
-              <a href="https://keepcalmgaming.itch.io/8402" class="btn btn-primary">Play game</a>
-            </div>
+
+        <div class="game-card">
+          <img class="game-card__img" src="assets/bsh.png" alt="B#">
+          <div class="game-card__body">
+            <h5 class="game-card__title">B#</h5>
+            <p class="game-card__text">GMTK 2019 Game Jam Submission.</p>
+            <a href="/gmtk2019/" class="game-card__btn">Play game</a>
           </div>
         </div>
-        <div class="col-sm"></div>
-        <div class="col">
-          <div class="card" style="width: 18rem;">
-            <img class="card-img-top" src="assets/countdown.png" alt="Card image cap">
-            <div class="card-body">
-              <h5 class="card-title">Ploo</h5>
-              <p class="card-text">GMTK 2025 Game Jam Submission.</p>
-              <a href="https://keepcalmgaming.itch.io/countdown" class="btn btn-primary">Play game</a>
-            </div>
+
+        <div class="game-card">
+          <img class="game-card__img" src="assets/wb.jpg" alt="Wrecking Bowling">
+          <div class="game-card__body">
+            <h5 class="game-card__title">Wrecking Bowling</h5>
+            <p class="game-card__text">GMTK 2018 Game Jam Submission.</p>
+            <a href="/gmtk2018/" class="game-card__btn">Play game</a>
           </div>
         </div>
       </div>
     </div>
-
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
   </body>
 </html>
