@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ZERO, ZERO</title>
+<style>
+:root{
+  --void:#05070d;
+  --panel:#080c14;
+  --line:#12241b;
+  --phos:#5dff9b;
+  --amber:#ffb340;
+  --alert:#ff4d5a;
+  --star:#e8f4ff;
+  --dim:#2f5c44;
+  --mono:"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--void);color:var(--phos);
+  font-family:var(--mono);font-variant-numeric:tabular-nums;
+  overflow:hidden;-webkit-font-smoothing:antialiased;
+  user-select:none;-webkit-user-select:none;
+}
+#app{
+  height:100%;display:grid;
+  grid-template-columns:300px 1fr 340px;
+  grid-template-rows:auto 1fr;
+  grid-template-areas:"top top top" "left field right";
+  gap:1px;background:var(--line);
+}
+#topbar{grid-area:top;background:var(--panel);padding:14px 20px 12px}
+#left{grid-area:left;background:var(--panel);padding:18px 16px;overflow:hidden}
+#field{grid-area:field;background:var(--void);position:relative;display:grid;place-items:center;overflow:hidden}
+#right{grid-area:right;background:var(--panel);padding:14px 12px;overflow:hidden}
+
+.eyebrow{font-size:11px;letter-spacing:.22em;color:var(--dim);text-transform:uppercase}
+#distance{
+  font-size:clamp(38px,6.4vw,84px);line-height:1;letter-spacing:.02em;
+  color:var(--phos);transition:color .12s;
+}
+#distance.committed{color:var(--alert)}
+.brakeline{display:flex;align-items:baseline;gap:12px;margin-top:8px;flex-wrap:wrap}
+#brake{font-size:clamp(16px,2vw,26px);color:var(--amber);transition:color .12s}
+#brake.committed{color:var(--alert)}
+.brakelabel{font-size:11px;letter-spacing:.18em;color:var(--dim)}
+#brakeref{font-size:11px;letter-spacing:.1em;color:var(--dim)}
+
+#commit{margin-top:10px;height:10px;position:relative;background:#0d1a13;overflow:hidden}
+#commitfill{height:100%;width:0;background:var(--amber);transition:background .12s}
+#commitfill.committed{background:var(--alert)}
+#commitmark{position:absolute;top:-3px;bottom:-3px;left:83.333%;width:2px;background:var(--star);opacity:.55}
+#commithint{margin-top:5px;font-size:10px;letter-spacing:.16em;color:var(--dim);height:12px}
+#commithint.committed{color:var(--alert)}
+
+.sect{font-size:10px;letter-spacing:.24em;color:var(--dim);margin-bottom:10px;text-transform:uppercase}
+.sect .unit{color:var(--phos);opacity:.75}
+.row{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid #0e1a14}
+.row .k{font-size:11px;letter-spacing:.14em;color:var(--dim)}
+.row .v{font-size:17px}
+.v.warn{color:var(--amber)}
+.v.bad{color:var(--alert)}
+
+#throttlewrap{margin-top:24px}
+#track{position:relative;height:20px;background:#0d1a13;margin-top:10px}
+#fill{position:absolute;top:0;bottom:0;left:50%;width:0;background:var(--phos)}
+#fill.rev{background:var(--alert)}
+#zero{position:absolute;top:-4px;bottom:-4px;left:50%;width:1px;background:var(--star);opacity:.6}
+#thrval{text-align:center;font-size:19px;margin-top:9px}
+#flash{margin-top:14px;font-size:12px;letter-spacing:.14em;min-height:16px;color:var(--amber)}
+
+canvas#sky{display:block}
+
+.grp{margin-bottom:16px}
+.grp[hidden]{display:none}
+button{
+  font-family:var(--mono);font-size:15px;color:var(--phos);
+  background:rgba(93,255,155,.07);border:1px solid rgba(93,255,155,.22);
+  padding:12px 0;cursor:pointer;transition:background .1s;letter-spacing:.04em;
+}
+button:hover{background:rgba(93,255,155,.16)}
+button:active{background:rgba(93,255,155,.34)}
+button:focus-visible{outline:2px solid var(--star);outline-offset:1px}
+.navpad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.navpad button{font-size:17px}
+.navpad .sp{visibility:hidden}
+
+/* tier selector */
+#tierrow{display:grid;grid-template-columns:56px 1fr 56px;gap:6px;align-items:stretch;margin-bottom:8px}
+#tierrow button{font-size:18px;padding:10px 0}
+#tierval{
+  display:grid;place-items:center;background:#0d1a13;
+  border:1px solid rgba(93,255,155,.16);line-height:1.1;
+}
+#tierstep{font-size:20px;color:var(--phos)}
+#tiername{font-size:9px;letter-spacing:.2em;color:var(--dim);margin-top:2px}
+
+.thrustrow{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.thrustrow .minus{color:var(--amber);background:rgba(255,179,64,.07);border-color:rgba(255,179,64,.22)}
+.thrustrow .minus:hover{background:rgba(255,179,64,.16)}
+.thrustrow .minus:active{background:rgba(255,179,64,.34)}
+.thrustrow button{font-size:20px;padding:15px 0}
+
+.keys{margin-top:14px;font-size:10px;line-height:1.9;color:var(--dim);letter-spacing:.08em}
+
+#ending{position:fixed;inset:0;background:rgba(3,5,9,.97);display:none;place-items:center;z-index:20;padding:24px}
+#ending.show{display:grid}
+.card{display:grid;grid-template-columns:auto auto;gap:44px;align-items:center}
+#title{font-size:34px;letter-spacing:.12em;margin-bottom:22px}
+#stats .row{min-width:320px}
+#trace{background:#080c14}
+.endfoot{margin-top:26px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.endfoot button{padding:12px 22px;font-size:13px;letter-spacing:.12em}
+#seed{font-size:11px;color:var(--dim);letter-spacing:.14em;margin-left:auto}
+
+#crt{
+  position:fixed;inset:0;pointer-events:none;z-index:30;
+  background:
+    repeating-linear-gradient(180deg,rgba(0,0,0,.20) 0 1px,transparent 1px 3px),
+    radial-gradient(ellipse at center,transparent 52%,rgba(0,0,0,.55) 100%);
+}
+@media (max-width:900px){
+  #app{grid-template-columns:1fr;grid-template-rows:auto 40vh auto auto;
+       grid-template-areas:"top" "field" "right" "left"}
+  #left,#right{overflow:visible}
+  .card{grid-template-columns:1fr;gap:20px;justify-items:center}
+  #stats .row{min-width:min(88vw,320px)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <header id="topbar">
+    <div class="eyebrow">Distance to home</div>
+    <div id="distance">0</div>
+    <div class="brakeline">
+      <span class="brakelabel">BRAKING DISTANCE</span>
+      <span id="brake">0</span>
+      <span id="brakeref"></span>
+    </div>
+    <div id="commit"><div id="commitfill"></div><div id="commitmark"></div></div>
+    <div id="commithint"></div>
+  </header>
+
+  <aside id="left">
+    <div class="sect">Telemetry</div>
+    <div class="row"><span class="k">SPEED</span><span class="v" id="t_speed">0</span></div>
+    <div class="row"><span class="k">CLOSING</span><span class="v" id="t_closing">0</span></div>
+    <div class="row"><span class="k">DRIFT</span><span class="v" id="t_drift">0</span></div>
+    <div class="row"><span class="k">BEARING</span><span class="v" id="t_bearing">000&deg;</span></div>
+    <div class="row"><span class="k">ETA</span><span class="v" id="t_eta">--:--</span></div>
+    <div class="row"><span class="k">ELAPSED</span><span class="v" id="t_elapsed">00:00</span></div>
+
+    <div id="throttlewrap">
+      <div class="sect">Throttle&nbsp;&nbsp;u/s&sup2;</div>
+      <div id="track"><div id="fill"></div><div id="zero"></div></div>
+      <div id="thrval">0</div>
+    </div>
+    <div id="flash"></div>
+  </aside>
+
+  <main id="field"><canvas id="sky"></canvas></main>
+
+  <aside id="right">
+    <div class="grp" id="g_nav">
+      <div class="sect">Navigation&nbsp;&nbsp;<span class="unit" id="u_nav">&plusmn;1 u/s</span></div>
+      <div class="navpad">
+        <button class="sp"></button>
+        <button data-nav="up">&#9650;</button>
+        <button class="sp"></button>
+        <button data-nav="left">&#9664;</button>
+        <button class="sp"></button>
+        <button data-nav="right">&#9654;</button>
+        <button class="sp"></button>
+        <button data-nav="down">&#9660;</button>
+        <button class="sp"></button>
+      </div>
+    </div>
+
+    <div class="grp" id="g_engine" hidden>
+      <div class="sect">Engine&nbsp;&nbsp;<span class="unit" id="u_eng">&plusmn;1 u/s&sup2;</span></div>
+      <div id="tierrow" hidden>
+        <button id="tierdown">&lt;</button>
+        <div id="tierval">
+          <div id="tierstep">1</div>
+          <div id="tiername">TIER 0</div>
+        </div>
+        <button id="tierup">&gt;</button>
+      </div>
+      <div class="thrustrow">
+        <button class="minus" id="thrdown">&minus;</button>
+        <button id="thrup">+</button>
+      </div>
+    </div>
+
+    <div class="keys" id="keylegend">
+      WASD / ARROWS &mdash; THRUSTERS
+    </div>
+  </aside>
+</div>
+
+<div id="ending">
+  <div>
+    <div id="title">&middot; CLEAN DOCK &middot;</div>
+    <div class="card">
+      <div id="stats"></div>
+      <canvas id="trace" width="380" height="380"></canvas>
+    </div>
+    <div class="endfoot">
+      <button id="again">FLY AGAIN</button>
+      <button id="retry">RETRY THIS SEED</button>
+      <button id="copy">COPY RESULT</button>
+      <span id="seed"></span>
+    </div>
+  </div>
+</div>
+
+<div id="crt"></div>
+
+<script>
+"use strict";
+
+/* ================== constants ================== */
+const DOCK_R = 5000, CLEAN_V = 25, HARD_V = 100;
+const SPAWN_R = 20000000, HOME_VISIBLE = 200000;
+const DT = 0.02, RECORD_EVERY = 10;
+const SPEED_LOG_RANGE = 7;          // stars saturate around 10^7 u/s
+const UNLOCK_ENGINE = 10;           // max speed that reveals thrust
+const UNLOCK_TIER   = 100;          // max speed that reveals the tier selector
+const NBSP = "\u2009";
+const $ = id => document.getElementById(id);
+
+/* Tier is unbounded upward. Floored at 0 because a step below 1 u/s has no
+   use: a clean dock only needs speed under 25. */
+const stepOf = t => Math.pow(10, t);
+
+function mulberry32(a){
+  return function(){
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+/* ================== simulation ================== */
+/* Visual heading is smoothed toward the true heading. Purely cosmetic:
+   the simulation still turns instantly. */
+const TURN_EASE = 9;    // exponential approach rate
+const TURN_MAX  = 7;    // rad/s cap, so a flip reads as rotation not a snap
+let renderAngle = 0;
+
+const sim = {
+  pos:{x:0,y:0}, vel:{x:0,y:0}, heading:{x:0,y:1},
+  throttle:0, tier:0, maxSpeed:0, maxTier:0, closest:Infinity,
+  elapsed:0, flybys:0, clicks:0, seed:0, result:null, wasInside:false
+};
+
+const path = [];
+let stepCount = 0;
+
+function spawn(seed){
+  const rng = mulberry32(seed);
+  const a = rng() * Math.PI * 2;
+  sim.pos.x = Math.cos(a) * SPAWN_R;
+  sim.pos.y = Math.sin(a) * SPAWN_R;
+
+  const da = rng() * Math.PI * 2, ds = 3 + rng() * 5;
+  sim.vel.x = Math.cos(da) * ds;
+  sim.vel.y = Math.sin(da) * ds;
+  const m = Math.hypot(sim.vel.x, sim.vel.y);
+  sim.heading.x = sim.vel.x / m;
+  sim.heading.y = sim.vel.y / m;
+
+  sim.throttle = 0; sim.tier = 0; sim.maxSpeed = 0; sim.maxTier = 0;
+  sim.elapsed = 0; sim.closest = SPAWN_R; sim.flybys = 0;
+  sim.clicks = 0; sim.result = null; sim.wasInside = false; sim.seed = seed;
+
+  path.length = 0; path.push({x:sim.pos.x, y:sim.pos.y});
+  stepCount = 0;
+  renderAngle = Math.atan2(-sim.heading.y, sim.heading.x);
+  refreshControls();
+}
+
+const speed    = () => Math.hypot(sim.vel.x, sim.vel.y);
+const distance = () => Math.hypot(sim.pos.x, sim.pos.y);
+
+/* With no redline there is no single "full brake". The honest reference is the
+   deceleration you can reach right now: whatever you are already burning, or
+   one click at the current tier, whichever is larger. */
+const brakeRef = () => Math.max(Math.abs(sim.throttle), stepOf(sim.tier));
+const brakeDistance = () => (sim.vel.x*sim.vel.x + sim.vel.y*sim.vel.y) / (2 * brakeRef());
+
+function toHomeUnit(){
+  const d = distance();
+  return d > 1e-4 ? {x:-sim.pos.x/d, y:-sim.pos.y/d} : {x:0, y:1};
+}
+function closingRate(){ const u = toHomeUnit(); return sim.vel.x*u.x + sim.vel.y*u.y; }
+function lateralDrift(){ const u = toHomeUnit(); return sim.vel.x*(-u.y) + sim.vel.y*u.x; }
+function affordableDrift(){
+  const d = distance(), c = closingRate();
+  return (d < 1 || c <= 0.01) ? Infinity : DOCK_R * c / d;
+}
+function compass(x, y){ const a = Math.atan2(x, y) * 180/Math.PI; return a < 0 ? a + 360 : a; }
+
+function nudge(ax, ay){
+  if (sim.result) return;
+  const s = stepOf(sim.tier);
+  sim.vel.x += ax * s; sim.vel.y += ay * s; sim.clicks++;
+}
+function adjustThrottle(dir){
+  if (sim.result) return;
+  sim.throttle += dir * stepOf(sim.tier);   // unbounded
+  sim.clicks++;
+}
+function changeTier(d){
+  if (sim.result) return;
+  const t = sim.tier + d;
+  if (t < 0){ flash("TIER FLOOR", "var(--dim)"); return; }
+  sim.tier = t;
+  if (t > sim.maxTier) sim.maxTier = t;
+  sim.clicks++;
+  refreshControls();
+}
+
+function step(dt){
+  if (sim.result) return;
+  sim.elapsed += dt;
+
+  let sp = Math.hypot(sim.vel.x, sim.vel.y);
+  if (sp > 1e-4){ sim.heading.x = sim.vel.x/sp; sim.heading.y = sim.vel.y/sp; }
+
+  sp += sim.throttle * dt;
+
+  // Zero-crossing clamp: without it the ship silently reverses when
+  // decelerating past zero, because heading is stale.
+  if (sp <= 0){
+    sp = 0;
+    if (sim.throttle !== 0){ sim.throttle = 0; flash("THRUST NULLED", "var(--amber)"); }
+  }
+
+  sim.vel.x = sim.heading.x * sp;
+  sim.vel.y = sim.heading.y * sp;
+  sim.pos.x += sim.vel.x * dt;
+  sim.pos.y += sim.vel.y * dt;
+
+  const d = Math.hypot(sim.pos.x, sim.pos.y);
+  if (d < sim.closest) sim.closest = d;
+
+  if (sp > sim.maxSpeed){
+    const before = sim.maxSpeed;
+    sim.maxSpeed = sp;
+    if (before < UNLOCK_ENGINE && sp >= UNLOCK_ENGINE){
+      refreshControls(); flash("ENGINE ONLINE", "var(--phos)");
+    }
+    if (before < UNLOCK_TIER && sp >= UNLOCK_TIER){
+      refreshControls(); flash("TIER CONTROL ONLINE", "var(--phos)");
+    }
+  }
+  checkDock(sp, d);
+}
+
+function checkDock(sp, d){
+  const inside = d <= DOCK_R;
+  if (inside){
+    if (sp <= CLEAN_V){ sim.result = "clean"; showEnding(); return; }
+    if (sp <= HARD_V){ sim.result = "hard"; showEnding(); return; }
+  }
+  if (sim.wasInside && !inside){ sim.flybys++; flash("FLYBY \u2014 TURN AROUND", "var(--alert)"); }
+  sim.wasInside = inside;
+}
+
+/* ================== formatting ================== */
+const SUP = {"0":"\u2070","1":"\u00b9","2":"\u00b2","3":"\u00b3","4":"\u2074",
+             "5":"\u2075","6":"\u2076","7":"\u2077","8":"\u2078","9":"\u2079"};
+const sup = n => String(n).split("").map(c => SUP[c] || c).join("");
+
+function big(v){
+  const neg = v < 0, a = Math.abs(v);
+  if (a >= 1e12) return (neg ? "-" : "") + a.toExponential(2).replace("e+", "e");
+  const s = Math.floor(a).toLocaleString("en-US").replace(/,/g, NBSP);
+  return neg ? "-" + s : s;
+}
+function stepLabel(t){ return t <= 8 ? big(stepOf(t)) : "10" + sup(t); }
+function clock(s){
+  if (!isFinite(s) || s < 0) return "--:--";
+  const t = Math.floor(s);
+  return String(Math.floor(t/60)).padStart(2,"0") + ":" + String(t%60).padStart(2,"0");
+}
+
+/* ================== controls ================== */
+const NAV = { up:[0,1], down:[0,-1], left:[-1,0], right:[1,0] };
+document.querySelectorAll("[data-nav]").forEach(b => {
+  b.addEventListener("click", () => { const v = NAV[b.dataset.nav]; nudge(v[0], v[1]); });
+});
+$("thrup").addEventListener("click", () => adjustThrottle(1));
+$("thrdown").addEventListener("click", () => adjustThrottle(-1));
+$("tierup").addEventListener("click", () => changeTier(1));
+$("tierdown").addEventListener("click", () => changeTier(-1));
+
+function refreshControls(){
+  const engine = sim.maxSpeed >= UNLOCK_ENGINE;
+  const tiers  = sim.maxSpeed >= UNLOCK_TIER;
+  $("g_engine").hidden = !engine;
+  $("tierrow").hidden  = !tiers;
+
+  const lbl = stepLabel(sim.tier);
+  $("u_nav").innerHTML  = "\u00b1" + lbl + " u/s";
+  $("u_eng").innerHTML  = "\u00b1" + lbl + " u/s\u00b2";
+  $("tierstep").textContent = lbl;
+  $("tiername").textContent = "TIER " + sim.tier;
+
+  let keys = "WASD / ARROWS \u2014 THRUSTERS";
+  if (engine) keys += "<br>E / Q \u2014 THRUST UP / DOWN";
+  if (tiers)  keys += "<br>] / [ \u2014 TIER UP / DOWN";
+  $("keylegend").innerHTML = keys;
+}
+
+addEventListener("keydown", e => {
+  if (e.repeat) return;                       // no hold-to-repeat, by design
+  if (sim.result){
+    if (e.key === "Enter" || e.key === " "){ e.preventDefault(); restart(true); }
+    else if (e.key.toLowerCase() === "c"){ e.preventDefault(); doCopy(); }
+    return;
+  }
+  const k = e.key.toLowerCase();
+  if (k === "w" || e.key === "ArrowUp")         { nudge(0, 1);  e.preventDefault(); }
+  else if (k === "s" || e.key === "ArrowDown")  { nudge(0,-1);  e.preventDefault(); }
+  else if (k === "a" || e.key === "ArrowLeft")  { nudge(-1,0);  e.preventDefault(); }
+  else if (k === "d" || e.key === "ArrowRight") { nudge(1, 0);  e.preventDefault(); }
+  else if (sim.maxSpeed >= UNLOCK_ENGINE && (k === "e" || k === "=")) adjustThrottle(1);
+  else if (sim.maxSpeed >= UNLOCK_ENGINE && (k === "q" || k === "-")) adjustThrottle(-1);
+  else if (sim.maxSpeed >= UNLOCK_TIER && k === "]") changeTier(1);
+  else if (sim.maxSpeed >= UNLOCK_TIER && k === "[") changeTier(-1);
+});
+
+let flashUntil = 0;
+function flash(msg, color){
+  const el = $("flash");
+  el.textContent = msg; el.style.color = color;
+  flashUntil = performance.now() + 1600;
+}
+
+/* ================== field ================== */
+const cv = $("sky"), ctx = cv.getContext("2d");
+let W = 0, H = 0, DPR = 1, stars = [];
+
+function resize(){
+  const box = $("field").getBoundingClientRect();
+  const side = Math.max(160, Math.floor(Math.min(box.width, box.height) - 16));
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  cv.style.width = side + "px"; cv.style.height = side + "px";
+  cv.width = Math.floor(side * DPR); cv.height = Math.floor(side * DPR);
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  W = side; H = side;
+  makeStars();
+}
+function makeStars(){
+  const rng = mulberry32(1337);
+  stars = [];
+  const n = Math.round((W * H) / 2600);
+  for (let i = 0; i < n; i++){
+    const band = i % 3;
+    stars.push({
+      x: rng()*W, y: rng()*H,
+      layer: 0.45 + band*0.32, base: 0.20 + band*0.20,
+      phase: rng()*6.283, rate: 0.8 + rng()*2.2
+    });
+  }
+}
+addEventListener("resize", resize);
+
+function poly(pts, fill, stroke, lw){
+  ctx.beginPath();
+  ctx.moveTo(pts[0][0], pts[0][1]);
+  for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+  ctx.closePath();
+  if (fill){ ctx.fillStyle = fill; ctx.fill(); }
+  if (stroke){ ctx.strokeStyle = stroke; ctx.lineWidth = lw || 1; ctx.stroke(); }
+}
+
+/* Geometric ship: dart hull, swept wings, cockpit, engine bell.
+   Flare grows with throttle; retro jets fire from the nose when braking. */
+function drawShip(x, y, r, ang){
+  ctx.save();
+  ctx.translate(x, y); ctx.rotate(ang);
+
+  const t = sim.throttle;
+  const f = Math.min(1, Math.log10(1 + Math.abs(t)) / 6);
+
+  if (t > 0 && f > 0.01){
+    const L = r * (0.7 + f * 2.6);
+    poly([[-r*0.86,r*0.17],[-r*0.86-L,0],[-r*0.86,-r*0.17]], "rgba(255,179,64,.85)");
+    poly([[-r*0.86,r*0.09],[-r*0.86-L*0.55,0],[-r*0.86,-r*0.09]], "rgba(232,244,255,.9)");
+  } else if (t < 0 && f > 0.01){
+    const L = r * (0.4 + f * 1.1);
+    for (const s of [1,-1]){
+      poly([[r*0.30,s*r*0.20],[r*0.30+L,s*r*0.30],[r*0.42,s*r*0.05]],
+           "rgba(255,77,90,.8)");
+    }
+  }
+
+  // wings
+  poly([[-r*0.15,r*0.13],[-r*0.98,r*0.86],[-r*0.72,r*0.10]], "rgba(93,255,155,.30)", "#5dff9b", 1);
+  poly([[-r*0.15,-r*0.13],[-r*0.98,-r*0.86],[-r*0.72,-r*0.10]], "rgba(93,255,155,.30)", "#5dff9b", 1);
+
+  // hull
+  poly([[r*1.05,0],[r*0.10,r*0.30],[-r*0.80,r*0.24],[-r*0.86,-r*0.24],[r*0.10,-r*0.30]],
+       "#0b1a12", "#5dff9b", 1.3);
+
+  // engine bell
+  poly([[-r*0.80,r*0.20],[-r*0.98,r*0.13],[-r*0.98,-r*0.13],[-r*0.80,-r*0.20]],
+       "rgba(93,255,155,.45)");
+
+  // cockpit
+  ctx.beginPath();
+  ctx.arc(r*0.34, 0, r*0.15, 0, 6.283);
+  ctx.fillStyle = "#e8f4ff"; ctx.fill();
+
+  ctx.restore();
+}
+
+function drawChevron(x, y, r, ang, color){
+  ctx.save();
+  ctx.translate(x, y); ctx.rotate(ang);
+  ctx.strokeStyle = color; ctx.lineWidth = 2;
+  ctx.lineCap = "round"; ctx.lineJoin = "round";
+  ctx.beginPath();
+  ctx.moveTo(-r*0.55, r*0.75); ctx.lineTo(r*0.8, 0); ctx.lineTo(-r*0.55, -r*0.75);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function draw(now){
+  ctx.fillStyle = "#05070d";
+  ctx.fillRect(0, 0, W, H);
+
+  const sp = speed();
+  const f = Math.min(1, Math.log10(1 + sp) / SPEED_LOG_RANGE);
+  const scroll = f * 460, streak = 1 + f * 36;
+
+  const hx = sim.heading.x, hy = -sim.heading.y;   // sim y is up, canvas y is down
+  const dt = Math.min(0.05, lastFrameDelta);
+
+  ctx.lineCap = "round";
+  for (const s of stars){
+    s.x -= hx * scroll * s.layer * dt;
+    s.y -= hy * scroll * s.layer * dt;
+    if (s.x < 0) s.x += W; else if (s.x > W) s.x -= W;
+    if (s.y < 0) s.y += H; else if (s.y > H) s.y -= H;
+
+    const a = Math.max(0, Math.min(1, s.base + 0.3*Math.sin(s.phase + now*0.001*s.rate)));
+    const len = streak * s.layer;
+    ctx.strokeStyle = "rgba(232,244,255," + a.toFixed(3) + ")";
+    ctx.lineWidth = 1.1;
+    ctx.beginPath();
+    ctx.moveTo(s.x, s.y); ctx.lineTo(s.x + hx*len, s.y + hy*len);
+    ctx.stroke();
+  }
+
+  const cx = W/2, cy = H/2, half = Math.min(W, H)/2 - 8;
+  ctx.strokeStyle = "rgba(93,255,155,.13)"; ctx.lineWidth = 1;
+  ctx.strokeRect(cx - half, cy - half, half*2, half*2);
+
+  const d = distance(), u = toHomeUnit();
+  const m = Math.max(Math.abs(u.x), Math.abs(u.y));
+  let e = m > 1e-4 ? (half - 14) / m : 0;
+  if (d < HOME_VISIBLE) e *= d / HOME_VISIBLE;
+  const mx = cx + u.x*e, my = cy - u.y*e;
+
+  if (d < HOME_VISIBLE){
+    const rr = Math.max(4, (DOCK_R / Math.max(d,1)) * e);
+    ctx.strokeStyle = "rgba(255,179,64,.35)"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(mx, my, Math.min(rr, half), 0, 6.283); ctx.stroke();
+  }
+
+  const pulse = d < HOME_VISIBLE ? 1 : 0.65 + 0.35*Math.sin(now*0.003);
+  drawChevron(mx, my, 10, Math.atan2(-u.y, u.x), "rgba(255,179,64," + pulse.toFixed(2) + ")");
+
+  // Heading is preserved by the sim when speed hits zero, so a stopped ship
+  // keeps pointing wherever it was last going.
+  const target = Math.atan2(-sim.heading.y, sim.heading.x);
+  let diff = target - renderAngle;
+  while (diff >  Math.PI) diff -= 6.283185307;
+  while (diff < -Math.PI) diff += 6.283185307;
+
+  let turn = diff * (1 - Math.exp(-TURN_EASE * dt));
+  const cap = TURN_MAX * dt;
+  if (turn >  cap) turn =  cap;
+  if (turn < -cap) turn = -cap;
+  renderAngle += turn;
+
+  drawShip(cx, cy, 15, renderAngle);
+}
+
+/* ================== hud ================== */
+function updateHud(now){
+  const d = distance(), bd = brakeDistance(), sp = speed();
+  const committed = bd > d;
+
+  const dEl = $("distance"), bEl = $("brake");
+  dEl.textContent = big(d);
+  dEl.classList.toggle("committed", committed);
+  bEl.textContent = big(bd);
+  bEl.classList.toggle("committed", committed);
+  $("brakeref").textContent = "@ " + big(brakeRef()) + " u/s\u00b2";
+
+  const ratio = d > 1 ? Math.min(bd/d, 1.2) : 1.2;
+  const fillEl = $("commitfill");
+  fillEl.style.width = (ratio/1.2*100).toFixed(2) + "%";
+  fillEl.classList.toggle("committed", committed);
+
+  const hint = $("commithint");
+  hint.classList.toggle("committed", committed);
+  hint.textContent = committed
+    ? "COMMITTED AT THIS THRUST \u2014 RAISE TIER OR OVERSHOOT"
+    : (ratio > 0.75 ? "APPROACHING COMMIT POINT" : "");
+
+  $("t_speed").textContent = big(sp);
+
+  const cr = closingRate(), crEl = $("t_closing");
+  crEl.textContent = big(cr);
+  crEl.className = "v" + (cr < 0 ? " bad" : "");
+
+  const dr = lateralDrift(), drEl = $("t_drift");
+  drEl.textContent = (dr >= 0 ? "+" : "\u2212") + big(Math.abs(dr));
+  drEl.className = "v" + (Math.abs(dr) > affordableDrift() ? " warn" : "");
+
+  $("t_bearing").textContent = String(Math.round(compass(-sim.pos.x, -sim.pos.y))).padStart(3,"0") + "\u00b0";
+  $("t_eta").textContent = clock(cr > 0.01 ? d/cr : -1);
+  $("t_elapsed").textContent = clock(sim.elapsed);
+
+  // Gauge is relative to one decade above the current step, so it stays
+  // meaningful no matter how high the tier climbs.
+  const scale = stepOf(sim.tier) * 10;
+  const g = Math.max(-1, Math.min(1, sim.throttle / scale));
+  const fill = $("fill");
+  fill.style.width = (Math.abs(g)*50) + "%";
+  fill.style.left = g >= 0 ? "50%" : (50 - Math.abs(g)*50) + "%";
+  fill.classList.toggle("rev", g < 0);
+
+  const tv = $("thrval");
+  tv.textContent = (sim.throttle > 0 ? "+" : "") + big(sim.throttle);
+  tv.style.color = g < 0 ? "var(--alert)" : "var(--phos)";
+
+  if (now > flashUntil && $("flash").textContent) $("flash").textContent = "";
+}
+
+/* ================== ending ================== */
+function rank(t){
+  if (t <= 120) return "ACE";
+  if (t <= 240) return "PILOT";
+  if (t <= 420) return "NAVIGATOR";
+  return "MADE IT HOME";
+}
+
+function showEnding(){
+  const clean = sim.result === "clean";
+  const title = $("title");
+  title.textContent = clean ? "\u00b7 CLEAN DOCK \u00b7" : "\u00b7 HARD DOCK \u00b7";
+  title.style.color = clean ? "var(--phos)" : "var(--amber)";
+
+  const rows = [
+    ["TIME", clock(sim.elapsed)],
+    ["RANK", rank(sim.elapsed)],
+    ["CLOSEST APPROACH", big(sim.closest)],
+    ["ARRIVAL SPEED", big(speed()) + " u/s"],
+    ["TOP SPEED", big(sim.maxSpeed) + " u/s"],
+    ["HIGHEST TIER", String(sim.maxTier)],
+    ["FLYBYS", String(sim.flybys)],
+    ["TOTAL CLICKS", String(sim.clicks)]
+  ];
+  $("stats").innerHTML = rows
+    .map(r => '<div class="row"><span class="k">' + r[0] + '</span><span class="v">' + r[1] + "</span></div>")
+    .join("");
+
+  $("seed").textContent = "SEED " + sim.seed;
+  drawTrace();
+  $("ending").classList.add("show");
+}
+
+function drawTrace(){
+  const c = $("trace"), g = c.getContext("2d"), S = c.width;
+  g.fillStyle = "#080c14"; g.fillRect(0, 0, S, S);
+  if (path.length < 2) return;
+
+  let minX = 0, maxX = 0, minY = 0, maxY = 0;
+  for (const p of path){
+    if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x;
+    if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y;
+  }
+  const span = Math.max(maxX-minX, maxY-minY, 1);
+  const cx = (minX+maxX)/2, cy = (minY+maxY)/2;
+  const pad = S*0.11, scale = (S - pad*2)/span;
+  const mx = p => S/2 + (p.x - cx)*scale;
+  const my = p => S/2 - (p.y - cy)*scale;
+
+  g.strokeStyle = "#5dff9b"; g.lineWidth = 1.6;
+  g.lineJoin = "round"; g.lineCap = "round";
+  g.beginPath();
+  g.moveTo(mx(path[0]), my(path[0]));
+  for (let i = 1; i < path.length; i++) g.lineTo(mx(path[i]), my(path[i]));
+  g.stroke();
+
+  const h = {x:0,y:0};
+  g.strokeStyle = "#ffb340"; g.lineWidth = 1.4;
+  g.beginPath(); g.arc(mx(h), my(h), 8, 0, 6.283); g.stroke();
+
+  g.fillStyle = "#e8f4ff";
+  g.beginPath(); g.arc(mx(path[0]), my(path[0]), 3, 0, 6.283); g.fill();
+}
+
+/* ================== shareable result ================== */
+
+/* Swap these for Ukrainian (Час / Ранг / Найближча відстань / ...) if you'd
+   rather the share text not match the game's English UI. */
+const SHARE_LABELS = [
+  "Time", "Rank", "Closest approach", "Arrival speed",
+  "Top speed", "Highest tier", "Flybys", "Clicks", "Seed"
+];
+
+/* big() groups digits with a thin space, which travels badly through some
+   chat clients. Plain spaces for anything headed to the clipboard. */
+const plain = v => big(v).replace(/\u2009/g, " ");
+
+function segChar(dx, dy){
+  const ax = Math.abs(dx), ay = Math.abs(dy);
+  if (ax > ay * 2) return "-";
+  if (ay > ax * 2) return "|";
+  return (dx > 0) === (dy > 0) ? "\\" : "/";   // grid y points down
+}
+
+function bres(x0, y0, x1, y1, plot){
+  let dx = Math.abs(x1-x0), sx = x0 < x1 ? 1 : -1;
+  let dy = -Math.abs(y1-y0), sy = y0 < y1 ? 1 : -1;
+  let err = dx + dy, guard = 0;
+  for(;;){
+    plot(x0, y0);
+    if ((x0 === x1 && y0 === y1) || guard++ > 4000) break;
+    const e2 = 2*err;
+    if (e2 >= dy){ err += dy; x0 += sx; }
+    if (e2 <= dx){ err += dx; y0 += sy; }
+  }
+}
+
+/* Character cells are roughly 0.55 as wide as they are tall, so cols is about
+   1.8x rows to make the plot come out visually square. */
+function asciiTrace(cols, rows){
+  if (path.length < 2) return "(no track)";
+
+  let minX = 0, maxX = 0, minY = 0, maxY = 0;
+  for (const p of path){
+    if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x;
+    if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y;
+  }
+  const span = Math.max(maxX-minX, maxY-minY, 1);
+  const ccx = (minX+maxX)/2, ccy = (minY+maxY)/2;
+
+  const gx = p => Math.round((p.x - ccx)/span * (cols-1) + (cols-1)/2);
+  const gy = p => Math.round(-(p.y - ccy)/span * (rows-1) + (rows-1)/2);
+
+  const grid = [];
+  for (let r = 0; r < rows; r++) grid.push(new Array(cols).fill(" "));
+  const put = (x, y, ch) => {
+    if (x >= 0 && y >= 0 && x < cols && y < rows) grid[y][x] = ch;
+  };
+
+  // Collapse runs of samples that land in the same cell, so the direction
+  // characters come from real movement instead of jitter.
+  const cells = [];
+  for (const p of path){
+    const x = gx(p), y = gy(p);
+    const last = cells[cells.length-1];
+    if (!last || last[0] !== x || last[1] !== y) cells.push([x, y]);
+  }
+
+  if (cells.length < 2) put(cells[0][0], cells[0][1], "*");
+  for (let i = 1; i < cells.length; i++){
+    const a = cells[i-1], b = cells[i];
+    // Direction is measured across a window, not just the one-cell step, or
+    // every smooth curve would come out as alternating "-" and "|".
+    const j0 = Math.max(0, i-3), j1 = Math.min(cells.length-1, i+2);
+    let dx = cells[j1][0] - cells[j0][0];
+    let dy = cells[j1][1] - cells[j0][1];
+    if (dx === 0 && dy === 0){ dx = b[0]-a[0]; dy = b[1]-a[1]; }
+    const ch = segChar(dx, dy);
+    bres(a[0], a[1], b[0], b[1], (x, y) => put(x, y, ch));
+  }
+
+  put(gx(path[0]), gy(path[0]), "+");
+  put(gx({x:0,y:0}), gy({x:0,y:0}), "O");
+
+  return grid.map(r => r.join("").replace(/\s+$/, "")).join("\n");
+}
+
+function resultText(){
+  const vals = [
+    clock(sim.elapsed),
+    rank(sim.elapsed),
+    plain(sim.closest),
+    plain(speed()) + " u/s",
+    plain(sim.maxSpeed) + " u/s",
+    String(sim.maxTier),
+    String(sim.flybys),
+    String(sim.clicks),
+    String(sim.seed)
+  ];
+  const w = Math.max(...SHARE_LABELS.map(s => s.length)) + 2;
+  const body = SHARE_LABELS.map((l, i) => (l + ":").padEnd(w) + vals[i]).join("\n");
+
+  return "ZERO, ZERO  \u00b7  " + (sim.result === "clean" ? "CLEAN DOCK" : "HARD DOCK")
+       + "\n\n" + body
+       + "\n\n```\n" + asciiTrace(31, 17) + "\n```\n"
+       + "\n+ start   O home";
+}
+
+async function copyText(text){
+  try{
+    if (navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  }catch(e){ /* fall through */ }
+
+  // file:// and other non-secure contexts have no clipboard API.
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.setAttribute("readonly", "");
+  ta.style.position = "fixed";
+  ta.style.top = "-1000px";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  ta.setSelectionRange(0, text.length);
+  let ok = false;
+  try{ ok = document.execCommand("copy"); }catch(e){ ok = false; }
+  document.body.removeChild(ta);
+  return ok;
+}
+
+let copyTimer = 0;
+async function doCopy(){
+  const btn = $("copy");
+  const ok = await copyText(resultText());
+  btn.textContent = ok ? "COPIED" : "COPY FAILED";
+  btn.style.color = ok ? "var(--star)" : "var(--alert)";
+  clearTimeout(copyTimer);
+  copyTimer = setTimeout(() => {
+    btn.textContent = "COPY RESULT";
+    btn.style.color = "";
+  }, 1600);
+}
+$("copy").addEventListener("click", doCopy);
+
+function restart(newSeed){
+  $("ending").classList.remove("show");
+  spawn(newSeed ? Math.floor(Math.random()*999999) + 1 : sim.seed);
+}
+$("again").addEventListener("click", () => restart(true));
+$("retry").addEventListener("click", () => restart(false));
+
+/* ================== loop ================== */
+let acc = 0, last = performance.now(), lastFrameDelta = 0.016;
+
+function frame(now){
+  const delta = Math.min(0.25, (now - last)/1000);
+  last = now; lastFrameDelta = delta; acc += delta;
+
+  while (acc >= DT){
+    step(DT); acc -= DT;
+    if (++stepCount >= RECORD_EVERY){ stepCount = 0; path.push({x:sim.pos.x, y:sim.pos.y}); }
+  }
+
+  draw(now); updateHud(now);
+  requestAnimationFrame(frame);
+}
+
+resize();
+spawn(Math.floor(Math.random()*999999) + 1);
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
